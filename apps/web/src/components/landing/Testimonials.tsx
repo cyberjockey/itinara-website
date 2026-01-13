@@ -19,7 +19,7 @@ const testimonials = [
         id: 2,
         name: "Marcus Thorne",
         origin: "Australia",
-        text: "The AI suggestions were spot on. It found surf spots in Sumba that weren't on any blog. The offline maps saved us multiple times!",
+        text: "The Top Local Guide & Google Local Guide suggestions were spot on. It found surf spots in Sumba that weren't on any blog. The offline maps saved us multiple times!",
         trip: "10-day Sumba Surf Trip",
         rating: 5,
         image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",

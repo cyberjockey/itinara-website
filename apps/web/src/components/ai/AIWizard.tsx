@@ -66,7 +66,7 @@ export function AIWizard({ onComplete }: AIWizardProps) {
                 </div>
                 <h3 className="text-2xl font-heading font-bold text-deep-teak mb-2 animate-pulse">Dreaming up your trip...</h3>
                 <p className="text-stone-gray text-center max-w-md">
-                    Our AI is crafting a {days}-day itinerary for {destination} tailored to your preferences.
+                    Our Top Local Guides & Google Local Guides are crafting a {days}-day itinerary for {destination} tailored to your preferences.
                 </p>
             </div>
         );

@@ -12,7 +12,7 @@ export function FeaturesGrid() {
                         Why Choose ITINARA?
                     </h2>
                     <p className="text-stone-gray/80 text-lg max-w-2xl mx-auto">
-                        We fuse advanced AI with local expertise to give you a travel experience like no other.
+                        We fuse insights from Top Local Guides & Google Local Guides to give you a travel experience like no other.
                     </p>
                 </div>
 
@@ -31,9 +31,9 @@ export function FeaturesGrid() {
                                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-6 backdrop-blur-md">
                                     <Sparkles className="w-6 h-6 text-white" />
                                 </div>
-                                <h3 className="text-3xl font-bold mb-4 font-heading">AI-Powered Curation</h3>
+                                <h3 className="text-3xl font-bold mb-4 font-heading">Curated by Local Guides</h3>
                                 <p className="text-white/80 text-lg leading-relaxed">
-                                    Input your travel style, budget, and interests. Our AI instantly generates a tailor-made itinerary that feels handcrafted by a local expert.
+                                    Input your travel style, budget, and interests. Our Top Local Guides & Google Local Guides help build a tailor-made itinerary that feels handcrafted.
                                 </p>
                             </div>
                             {/* Mock UI Element */}

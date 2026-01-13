@@ -38,7 +38,7 @@ export default function NewTripPage() {
                         onClick={() => setMode("ai")}
                         className={`flex items-center gap-2 px-6 py-2 rounded-full text-sm font-bold transition-all ${mode === "ai" ? "bg-white shadow-sm text-deep-teak" : "text-stone-gray hover:text-deep-teak"}`}
                     >
-                        <Sparkles className="w-3 h-3" /> AI Generator
+                        <Sparkles className="w-3 h-3" /> Local Expert Plan
                     </button>
                 </div>
             </div>
@@ -46,7 +46,7 @@ export default function NewTripPage() {
             {mode === "ai" ? (
                 <div className="animate-in fade-in duration-500">
                     <div className="text-center mb-8">
-                        <h1 className="text-3xl font-heading font-bold text-deep-teak mb-2">Let AI Plan Your Trip</h1>
+                        <h1 className="text-3xl font-heading font-bold text-deep-teak mb-2">Let Local Guides Plan Your Trip</h1>
                         <p className="text-stone-gray">Tell us your preferences and we'll craft the perfect itinerary.</p>
                     </div>
 

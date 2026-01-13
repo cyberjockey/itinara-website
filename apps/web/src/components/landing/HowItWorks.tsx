@@ -14,7 +14,7 @@ const steps = [
     {
         id: 2,
         title: "We Curate",
-        description: "Our AI, trained on local insights, builds a personalized itinerary that balances major sights with hidden gems.",
+        description: "Our Top Local Guides & Google Local Guides build a personalized itinerary that balances major sights with hidden gems.",
         icon: Wand2,
         color: "bg-terracotta",
     },
