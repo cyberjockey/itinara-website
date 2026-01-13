@@ -1,0 +1,125 @@
+{
+  "node": {
+    "60a96496461265f5abdd6e532920c17caf3c1dee75": {
+      "workers": {
+        "app/dashboard/trips/[id]/page": {
+          "moduleId": "[project]/itinara-website/apps/web/.next-internal/server/app/dashboard/trips/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "toggleTripVisibility",
+          "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/trips/[id]/page": "action-browser"
+      },
+      "exportedName": "toggleTripVisibility",
+      "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+    },
+    "408604574426c96d292f85fb042d5c9fb987e7a1ec": {
+      "workers": {
+        "app/dashboard/trips/[id]/page": {
+          "moduleId": "[project]/itinara-website/apps/web/.next-internal/server/app/dashboard/trips/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "toggleLike",
+          "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/trips/[id]/page": "action-browser"
+      },
+      "exportedName": "toggleLike",
+      "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+    },
+    "78634308f1a3b5c4825c6ebfce14fa62180b9634be": {
+      "workers": {
+        "app/dashboard/trips/[id]/page": {
+          "moduleId": "[project]/itinara-website/apps/web/.next-internal/server/app/dashboard/trips/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "fetchComments",
+          "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/trips/[id]/page": "action-browser"
+      },
+      "exportedName": "fetchComments",
+      "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+    },
+    "70d99a0ab01257958a57f5a24698a70e65b5b3523a": {
+      "workers": {
+        "app/dashboard/trips/[id]/page": {
+          "moduleId": "[project]/itinara-website/apps/web/.next-internal/server/app/dashboard/trips/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addComment",
+          "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/trips/[id]/page": "action-browser"
+      },
+      "exportedName": "addComment",
+      "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+    },
+    "60455fdc2147b9b0b3f13f69f6d92afd5f07881df6": {
+      "workers": {
+        "app/dashboard/trips/[id]/page": {
+          "moduleId": "[project]/itinara-website/apps/web/.next-internal/server/app/dashboard/trips/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createActivity",
+          "filename": "itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/trips/[id]/page": "action-browser"
+      },
+      "exportedName": "createActivity",
+      "filename": "itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts"
+    },
+    "601a4c167d31abad0e5f682883ec6c5488bb53e50c": {
+      "workers": {
+        "app/dashboard/trips/[id]/page": {
+          "moduleId": "[project]/itinara-website/apps/web/.next-internal/server/app/dashboard/trips/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteComment",
+          "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/trips/[id]/page": "action-browser"
+      },
+      "exportedName": "deleteComment",
+      "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+    },
+    "706f6dc43a0c471049bb24dd23ef4186370a9c2dbc": {
+      "workers": {
+        "app/dashboard/trips/[id]/page": {
+          "moduleId": "[project]/itinara-website/apps/web/.next-internal/server/app/dashboard/trips/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "editComment",
+          "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/trips/[id]/page": "action-browser"
+      },
+      "exportedName": "editComment",
+      "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+    },
+    "606e1dcf9bfb42c477d60a0e8e46336aa4a5acf4eb": {
+      "workers": {
+        "app/dashboard/trips/[id]/page": {
+          "moduleId": "[project]/itinara-website/apps/web/.next-internal/server/app/dashboard/trips/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "toggleCommentLike",
+          "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/trips/[id]/page": "action-browser"
+      },
+      "exportedName": "toggleCommentLike",
+      "filename": "itinara-website/apps/web/src/app/dashboard/trips/actions.ts"
+    }
+  },
+  "edge": {}
+}

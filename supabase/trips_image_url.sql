@@ -1,0 +1,2 @@
+-- Add image_url to trips table
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS image_url text;

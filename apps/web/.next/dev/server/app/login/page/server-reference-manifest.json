@@ -1,0 +1,20 @@
+{
+  "node": {
+    "60937118ef5a814ebae2844ff0a666c16c47af719d": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": "[project]/itinara-website/apps/web/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/itinara-website/apps/web/src/app/login/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "login",
+          "filename": "itinara-website/apps/web/src/app/login/actions.ts"
+        }
+      },
+      "layer": {
+        "app/login/page": "action-browser"
+      },
+      "exportedName": "login",
+      "filename": "itinara-website/apps/web/src/app/login/actions.ts"
+    }
+  },
+  "edge": {}
+}
