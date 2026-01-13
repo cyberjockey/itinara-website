@@ -1,1 +1,12 @@
-{"pages":{},"app":{"/Users/macbookpro152019/itinara-website/apps/web/src/app/layout":["static/media/3296bccdacdd55f7-s.p.woff2","static/media/e4af272ccee01ff0-s.p.woff2","static/media/636a5ac981f94f8b-s.p.woff2"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}
+{
+  "app": {
+    "[project]/itinara-website/apps/web/src/app/page": [
+      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
+      "static/media/fba5a26ea33df6a3-s.p.1bbdebe6.woff2",
+      "static/media/115e7a2565b70400-s.p.e440a306.woff2"
+    ]
+  },
+  "appUsingSizeAdjust": true,
+  "pages": {},
+  "pagesUsingSizeAdjust": false
+}

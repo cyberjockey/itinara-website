@@ -29,7 +29,7 @@ export function ScrollReveal({
             transition: {
                 duration: 0.8,
                 delay: delay,
-                ease: "easeInOut",
+
             },
         },
     };

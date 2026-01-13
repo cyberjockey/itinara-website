@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, Transition } from "@headlessui/react"; // We might not have headlessui installed, better stick to custom or just simple HTML/CSS modal for MVP to avoid deps issues.
+// Custom modal pattern used instead of headlessui to avoid deps issues.
 // Actually, let's use the same custom modal pattern as AddActivityModal for consistency and no extra deps.
 
 import { X, Calendar, MapPin } from "lucide-react";
@@ -111,8 +111,8 @@ export default function AddToTripModal({ destination, trips }: AddToTripModalPro
                                             <label
                                                 key={trip.id}
                                                 className={`flex items-center p-3 rounded-xl border cursor-pointer transition-all ${selectedTripId === trip.id
-                                                        ? "border-terracotta bg-terracotta/5 ring-1 ring-terracotta"
-                                                        : "border-stone-gray/20 hover:border-terracotta/50"
+                                                    ? "border-terracotta bg-terracotta/5 ring-1 ring-terracotta"
+                                                    : "border-stone-gray/20 hover:border-terracotta/50"
                                                     }`}
                                             >
                                                 <input

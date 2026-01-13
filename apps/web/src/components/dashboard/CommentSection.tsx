@@ -33,7 +33,8 @@ export function CommentSection({ tripId, currentUserId, initialComments }: Comme
 
     // Organize flat comments into trees
     const rootComments = initialComments.filter(c => !c.parent_id);
-    const getReplies = (parentId: string) => {
+
+    const getReplies = (parentId: string): any[] => {
         return initialComments
             .filter(c => c.parent_id === parentId)
             .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) // Oldest first for replies usually

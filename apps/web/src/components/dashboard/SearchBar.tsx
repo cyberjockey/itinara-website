@@ -2,7 +2,7 @@
 
 import { Search } from "lucide-react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import { useDebouncedCallback } from "use-debounce"; // Need to check if we have this or implement custom debounce
+
 
 // Simple custom debounce since we might not have use-debounce installed and don't want to install more deps if not needed
 function useDebounce(callback: (...args: any[]) => void, delay: number) {
