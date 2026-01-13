@@ -11,3 +11,5 @@
 [01:48:37.767] Browser WARN    Image with src "/images/hero-bg.png" is using quality "90" which is not configured in images.qualities [75]. Please update your config to [75, 90].
 Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
 [01:48:39.596] Browser WARN    Image with src "https://randomuser.me/api/portraits/women/44.jpg" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[01:49:50.539] Browser WARN    Image with src "https://randomuser.me/api/portraits/men/32.jpg" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[01:49:55.552] Browser WARN    Image with src "https://randomuser.me/api/portraits/women/68.jpg" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
