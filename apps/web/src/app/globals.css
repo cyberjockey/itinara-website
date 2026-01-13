@@ -42,3 +42,10 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Enforce black text for inputs globally */
+input,
+textarea,
+select {
+  color: black;
+}
