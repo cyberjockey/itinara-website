@@ -57,8 +57,8 @@ export function Hero() {
                     alt="Indonesia Mosaic: Culture, Food, Heritage"
                     fill
                     className="object-cover object-center"
+                    quality={80}
                     priority
-                    quality={90}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
             </motion.div>

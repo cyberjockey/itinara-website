@@ -57,7 +57,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Sidebar */}
             <aside className={`
-                w-64 bg-white border-r border-stone-gray/10 flex flex-col fixed inset-y-0 z-50 transition-transform duration-300 ease-in-out shadow-xl md:shadow-none
+                w-[85vw] md:w-64 bg-white border-r border-stone-gray/10 flex flex-col fixed inset-y-0 z-50 transition-transform duration-300 ease-out shadow-2xl md:shadow-none will-change-transform transform-gpu
                 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
             `}>
                 <div className="p-6 flex justify-between items-center">

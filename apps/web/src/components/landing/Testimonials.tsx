@@ -13,7 +13,7 @@ const testimonials = [
         text: "I wanted to see the real Bali, not just the tourist traps. ITINARA guided me to a local family for a cooking class I'll never forget.",
         trip: "2-week Bali & Lombok",
         rating: 5,
-        image: "https://randomuser.me/api/portraits/women/44.jpg",
+        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
     },
     {
         id: 2,
@@ -22,7 +22,7 @@ const testimonials = [
         text: "The AI suggestions were spot on. It found surf spots in Sumba that weren't on any blog. The offline maps saved us multiple times!",
         trip: "10-day Sumba Surf Trip",
         rating: 5,
-        image: "https://randomuser.me/api/portraits/men/32.jpg",
+        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
     },
     {
         id: 3,
@@ -31,7 +31,7 @@ const testimonials = [
         text: "Planning a honeymoon was stressful until we found ITINARA. The romantic dinner recommendations were absolutely perfect.",
         trip: "Luxury Java & Bali",
         rating: 5,
-        image: "https://randomuser.me/api/portraits/women/68.jpg",
+        image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop",
     },
     {
         id: 4,
@@ -40,7 +40,7 @@ const testimonials = [
         text: "Jakarta's hidden coffee scene is incredible. The itinerary took me to places I'd never find on Google Maps.",
         trip: "Jakarta Coffee Culture",
         rating: 5,
-        image: "https://randomuser.me/api/portraits/men/45.jpg",
+        image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop",
     },
     {
         id: 5,
@@ -49,7 +49,7 @@ const testimonials = [
         text: "We hiked Rinjani with a guide recommended by ITINARA. It was tough but the details on preparation were a lifesaver.",
         trip: "Lombok Adventure",
         rating: 5,
-        image: "https://randomuser.me/api/portraits/women/65.jpg",
+        image: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=400&fit=crop",
     },
     {
         id: 6,
@@ -58,7 +58,7 @@ const testimonials = [
         text: "I loved the focus on art and history in Yogyakarta. It felt very respectful of the local culture.",
         trip: "Yogyakarta Heritage",
         rating: 5,
-        image: "https://randomuser.me/api/portraits/women/22.jpg",
+        image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop",
     },
 ];
 

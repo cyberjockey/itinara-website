@@ -28,9 +28,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { BackgroundMusic } from "@/components/ui/BackgroundMusic";
+// Imports moved to (public)/layout.tsx
 
 export default function RootLayout({
   children,
@@ -40,10 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jakarta.variable} ${inter.variable} ${crimson.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased bg-warm-white text-deep-teak" suppressHydrationWarning>
-        <Navbar />
         {children}
-        <Footer />
-        <BackgroundMusic />
       </body>
     </html>
   );
