@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.90.1",
     "clsx": "^2.1.1",
@@ -32,6 +33,7 @@
     "@types/react-simple-maps": "^3.0.6",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "pdfkit": "^0.17.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

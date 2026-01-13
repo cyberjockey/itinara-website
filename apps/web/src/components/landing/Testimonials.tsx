@@ -33,6 +33,33 @@ const testimonials = [
         rating: 5,
         image: "https://randomuser.me/api/portraits/women/68.jpg",
     },
+    {
+        id: 4,
+        name: "James Chen",
+        origin: "Singapore",
+        text: "Jakarta's hidden coffee scene is incredible. The itinerary took me to places I'd never find on Google Maps.",
+        trip: "Jakarta Coffee Culture",
+        rating: 5,
+        image: "https://randomuser.me/api/portraits/men/45.jpg",
+    },
+    {
+        id: 5,
+        name: "Sophie & Thomas",
+        origin: "Germany",
+        text: "We hiked Rinjani with a guide recommended by ITINARA. It was tough but the details on preparation were a lifesaver.",
+        trip: "Lombok Adventure",
+        rating: 5,
+        image: "https://randomuser.me/api/portraits/women/65.jpg",
+    },
+    {
+        id: 6,
+        name: "Aiko Tanaka",
+        origin: "Japan",
+        text: "I loved the focus on art and history in Yogyakarta. It felt very respectful of the local culture.",
+        trip: "Yogyakarta Heritage",
+        rating: 5,
+        image: "https://randomuser.me/api/portraits/women/22.jpg",
+    },
 ];
 
 export function Testimonials() {

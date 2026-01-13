@@ -1,7 +1,9 @@
 {
-  "/dashboard/explore/[id]/page": "app/dashboard/explore/[id]/page.js",
-  "/dashboard/explore/page": "app/dashboard/explore/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/login/page": "app/login/page.js",
-  "/page": "app/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js",
+  "/destinations/[slug]/page": "app/destinations/[slug]/page.js",
+  "/dashboard/trips/[id]/print/page": "app/dashboard/trips/[id]/print/page.js",
+  "/dashboard/community/page": "app/dashboard/community/page.js",
+  "/dashboard/settings/page": "app/dashboard/settings/page.js",
+  "/dashboard/explore/page": "app/dashboard/explore/page.js"
 }

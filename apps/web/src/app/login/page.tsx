@@ -3,6 +3,7 @@
 import { login } from "./actions";
 import { useActionState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar"; // Assuming you want to reuse the Navbar or a simplified version
 
 const initialState = {
@@ -14,11 +15,27 @@ export default function LoginPage() {
     const [state, formAction, isPending] = useActionState(login, initialState);
 
     return (
-        <div className="min-h-screen bg-warm-white flex flex-col">
+        <div className="min-h-screen relative flex flex-col">
+            {/* Background Image */}
+            <div className="absolute inset-0 z-0">
+                <Image
+                    src="/images/login-mosaic.png"
+                    alt="Indonesia Mosaic"
+                    fill
+                    className="object-cover"
+                    priority
+                />
+                {/* Overlay to ensure text readability */}
+                <div className="absolute inset-0 bg-deep-teak/40" />
+            </div>
+
             <Navbar />
-            <div className="flex-1 flex items-center justify-center px-4">
-                <div className="bg-white p-8 rounded-3xl shadow-lg border border-stone-gray/10 w-full max-w-md">
+            <div className="flex-1 flex items-center justify-center px-4 relative z-10">
+                <div className="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-white/20 w-full max-w-md">
                     <div className="text-center mb-8">
+                        <div className="relative w-24 h-24 mx-auto mb-6 rounded-full overflow-hidden border-4 border-terracotta/10">
+                            <Image src="/logo.png" alt="ITINARA Logo" fill className="object-cover" />
+                        </div>
                         <h1 className="text-3xl font-heading font-bold text-deep-teak">Welcome Back</h1>
                         <p className="text-stone-gray/80">Sign in to continue your journey</p>
                     </div>

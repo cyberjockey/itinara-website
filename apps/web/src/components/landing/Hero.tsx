@@ -1,23 +1,60 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { ArrowDown, MapPin, Calendar, Compass } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useState, useEffect } from "react";
 
 export function Hero() {
     const { scrollY } = useScroll();
     const y = useTransform(scrollY, [0, 1000], [0, 400]);
+
+
+    const [text, setText] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [loopNum, setLoopNum] = useState(0);
+    const [typingSpeed, setTypingSpeed] = useState(150);
+
+    const words = ["Heritage", "Culture", "Culinary", "Indonesia"];
+
+    useEffect(() => {
+        const handleTyping = () => {
+            const i = loopNum % words.length;
+            const fullText = words[i];
+
+            setText(isDeleting
+                ? fullText.substring(0, text.length - 1)
+                : fullText.substring(0, text.length + 1)
+            );
+
+            setTypingSpeed(isDeleting ? 30 : 150);
+
+            if (!isDeleting && text === fullText) {
+                // Finished typing word, pause before deleting
+                // If it's the last word "Indonesia", pause longer or stop? 
+                // Let's pause longer then loop for now as it's standard.
+                setTimeout(() => setIsDeleting(true), 2000);
+            } else if (isDeleting && text === "") {
+                setIsDeleting(false);
+                setLoopNum(loopNum + 1);
+            }
+        };
+
+        const timer = setTimeout(handleTyping, typingSpeed);
+        return () => clearTimeout(timer);
+    }, [text, isDeleting, loopNum, typingSpeed, words]);
 
     return (
         <section className="relative h-screen w-full overflow-hidden flex items-center justify-center text-warm-white bg-deep-teak">
             {/* Parallax Background */}
             <motion.div
                 style={{ y }}
-                className="absolute inset-0 z-0 h-[120%] w-full" // Increased height to prevent gap at bottom
+                className="absolute inset-0 z-0 h-[120%] w-full"
             >
                 <Image
-                    src="/images/hero-bg.png"
-                    alt="Bali Rice Terraces"
+                    src="/images/hero-mosaic.png"
+                    alt="Indonesia Mosaic: Culture, Food, Heritage"
                     fill
                     className="object-cover object-center"
                     priority
@@ -43,10 +80,34 @@ export function Hero() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-5xl md:text-7xl lg:text-8xl font-heading font-bold leading-tight tracking-tight drop-shadow-lg"
+                    className="text-5xl md:text-7xl lg:text-8xl font-heading font-bold leading-tight tracking-tight drop-shadow-2xl relative z-10"
+                    style={{
+                        textShadow: "0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15)"
+                    }}
                 >
-                    Explore Indonesia <br />
-                    <span className="text-sunrise-gold italic font-accent">with intention.</span>
+                    Explore <span className="text-white">{text}</span>
+                    <span className="animate-pulse">|</span>
+                    <br />
+                    <motion.span
+                        className="text-sunrise-gold italic font-accent inline-block"
+                        animate={{
+                            rotateX: [0, 10, 0],
+                            y: [0, -5, 0],
+                            textShadow: [
+                                "0 0px 0px rgba(244, 164, 96, 0)",
+                                "0 10px 20px rgba(244, 164, 96, 0.5)",
+                                "0 0px 0px rgba(244, 164, 96, 0)"
+                            ]
+                        }}
+                        transition={{
+                            duration: 4,
+                            ease: "easeInOut",
+                            repeat: Infinity,
+                            repeatType: "mirror"
+                        }}
+                    >
+                        with intention.
+                    </motion.span>
                 </motion.h1>
 
                 <motion.p
@@ -65,14 +126,14 @@ export function Hero() {
                     transition={{ duration: 0.8, delay: 0.6 }}
                     className="flex flex-col sm:flex-row gap-4 mt-4"
                 >
-                    <button className="h-14 px-8 rounded-full bg-terracotta hover:bg-deep-teak text-white font-semibold text-lg transition-all shadow-lg hover:scale-105 flex items-center gap-2 group">
+                    <Link href="/dashboard" className="h-14 px-8 rounded-full bg-terracotta hover:bg-deep-teak text-white font-semibold text-lg transition-all shadow-lg hover:scale-105 flex items-center gap-2 group">
                         <Calendar className="w-5 h-5" />
                         Start Planning
-                    </button>
-                    <button className="h-14 px-8 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold text-lg transition-all hover:scale-105 flex items-center gap-2">
+                    </Link>
+                    <Link href="/#destinations" className="h-14 px-8 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold text-lg transition-all hover:scale-105 flex items-center gap-2">
                         <MapPin className="w-5 h-5" />
                         Explore Destinations
-                    </button>
+                    </Link>
                 </motion.div>
             </div>
 

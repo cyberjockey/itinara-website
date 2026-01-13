@@ -1,0 +1,9 @@
+{
+  "components/landing/DestinationsMapLazy.tsx -> ./DestinationsMap": {
+    "id": "components/landing/DestinationsMapLazy.tsx -> ./DestinationsMap",
+    "files": [
+      "static/css/_app-pages-browser_src_components_landing_DestinationsMap_tsx.css",
+      "static/chunks/_app-pages-browser_src_components_landing_DestinationsMap_tsx.js"
+    ]
+  }
+}

@@ -19,7 +19,7 @@
   --color-ocean-turquoise: #40B5AD;
   --color-rice-paddy-green: #90C695;
   --color-batik-indigo: #2C5F88;
-  
+
   /* Neutrals */
   --color-warm-white: #FFF9F5;
   --color-stone-gray: #4A4A4A;
@@ -31,6 +31,10 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {

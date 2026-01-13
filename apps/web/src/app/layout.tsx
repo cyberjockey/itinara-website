@@ -18,9 +18,19 @@ const crimson = Crimson_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "ITINARA - Curated Indonesian Itineraries",
-  description: "Experience authentic Indonesia with AI-curated itineraries.",
+  metadataBase: new URL('https://itinara.com'),
+  title: "ITINARA - Curated Indonesia Travel Itineraries",
+  description: "Discover Indonesia with intention. Curated itineraries for independent travelers.",
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
 };
+
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { BackgroundMusic } from "@/components/ui/BackgroundMusic";
 
 export default function RootLayout({
   children,
@@ -28,12 +38,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        suppressHydrationWarning={true}
-        className={`${inter.variable} ${jakarta.variable} ${crimson.variable} antialiased bg-warm-white text-stone-gray font-sans`}
-      >
+    <html lang="en" className={`${jakarta.variable} ${inter.variable} ${crimson.variable}`} suppressHydrationWarning>
+      <body className="font-sans antialiased bg-warm-white text-deep-teak" suppressHydrationWarning>
+        <Navbar />
         {children}
+        <Footer />
+        <BackgroundMusic />
       </body>
     </html>
   );

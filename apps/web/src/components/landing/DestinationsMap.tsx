@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, ArrowRight, Compass, Minus, Plus, RefreshCw } from "lucide-react";
+import Link from "next/link";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
@@ -11,36 +12,43 @@ import { Tooltip } from "react-tooltip";
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
 
 // Updated with real coordinates [longitude, latitude]
+// Updated with real coordinates [longitude, latitude]
 const regions = [
+    {
+        id: "west-java",
+        name: "West Java",
+        coordinates: [107.6191, -6.9175] as [number, number], // Bandung
+        description: " Highlands, tea plantations, and cool mountain air.",
+    },
+    {
+        id: "jakarta",
+        name: "Jakarta",
+        coordinates: [106.8456, -6.2088] as [number, number],
+        description: "The bustling capital where tradition meets modernity.",
+    },
+    {
+        id: "central-java",
+        name: "Central Java",
+        coordinates: [110.419, -7.150] as [number, number], // Approx Semarang/Magelang
+        description: "The spiritual heart, home to majestic Borobudur.",
+    },
+    {
+        id: "yogyakarta",
+        name: "Yogyakarta",
+        coordinates: [110.3695, -7.7956] as [number, number],
+        description: "The cultural soul, hub of arts and royal heritage.",
+    },
     {
         id: "bali",
         name: "Bali",
         coordinates: [115.1889, -8.4095] as [number, number],
-        description: "Island of the Gods. Beaches, temples, and vibrant culture.",
+        description: "Island of the Gods. Beaches, temples, and culture.",
     },
     {
-        id: "java",
-        name: "Java",
-        coordinates: [110.3695, -7.7956] as [number, number],
-        description: "The heart of Indonesia. Ancient temples, volcanoes, and bustling cities.",
-    },
-    {
-        id: "komodo",
-        name: "Komodo",
-        coordinates: [119.4828, -8.5909] as [number, number],
-        description: "Home of the dragons. Pink beaches and world-class diving.",
-    },
-    {
-        id: "raja-ampat",
-        name: "Raja Ampat",
-        coordinates: [130.5167, -0.2333] as [number, number],
-        description: "The Last Paradise. Unrivaled marine biodiversity.",
-    },
-    {
-        id: "sumatra",
-        name: "Sumatra",
-        coordinates: [101.3431, -0.5897] as [number, number],
-        description: "Wild jungles, orangutans, and Lake Toba.",
+        id: "lombok",
+        name: "Lombok",
+        coordinates: [116.3288, -8.6500] as [number, number],
+        description: "Unspoiled beauty, pristine beaches and Rinjani.",
     },
 ];
 
@@ -97,7 +105,7 @@ export function DestinationsMap() {
                         transition={{ delay: 0.2 }}
                         className="text-stone-gray/80 text-lg max-w-2xl mx-auto"
                     >
-                        From the jungles of Sumatra to the reefs of Raja Ampat, discover the diversity of over 17,000 islands.
+                        From the cultural heart of Java to the pristine beaches of Bali and Lombok, discover curated routes for the independent traveler.
                     </motion.p>
                 </div>
 
@@ -223,9 +231,9 @@ export function DestinationsMap() {
                                     {activeRegion.description}
                                 </p>
                                 <div className="flex gap-3">
-                                    <button className="flex-1 py-3 bg-deep-teak text-white rounded-xl font-bold text-sm tracking-wide hover:bg-terracotta transition-colors flex items-center justify-center gap-2 group">
+                                    <Link href={`/destinations/${activeRegion.id}`} className="flex-1 py-3 bg-deep-teak text-white rounded-xl font-bold text-sm tracking-wide hover:bg-terracotta transition-colors flex items-center justify-center gap-2 group">
                                         Explore <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </button>
+                                    </Link>
                                     <button
                                         onClick={handleReset}
                                         className="px-4 py-3 bg-stone-gray/10 text-stone-gray rounded-xl font-bold text-sm hover:bg-stone-gray/20 transition-colors"
@@ -239,6 +247,6 @@ export function DestinationsMap() {
                     </AnimatePresence>
                 </motion.div>
             </div>
-        </section>
+        </section >
     );
 }
