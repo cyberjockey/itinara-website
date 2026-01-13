@@ -53,7 +53,7 @@ export function Hero() {
                 className="absolute inset-0 z-0 h-[120%] w-full"
             >
                 <Image
-                    src="/images/hero-mosaic.png"
+                    src="/images/hero-mosaic.jpg"
                     alt="Indonesia Mosaic: Culture, Food, Heritage"
                     fill
                     className="object-cover object-center"
