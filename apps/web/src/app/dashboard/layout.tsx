@@ -8,6 +8,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
@@ -30,7 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ];
 
     return (
-        <div className="flex min-h-screen bg-warm-white">
+        <div className="min-h-screen bg-warm-white">
             {/* Mobile Header */}
             <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-stone-gray/10 px-4 py-3 flex items-center justify-between">
                 <button
@@ -119,10 +120,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 md:ml-64 relative pt-16 md:pt-0">
-                <div className="p-4 md:p-8">
-                    {children}
-                </div>
+            <main className="md:ml-64 relative min-h-screen pt-16 md:pt-0">
+                {children}
             </main>
         </div>
     );

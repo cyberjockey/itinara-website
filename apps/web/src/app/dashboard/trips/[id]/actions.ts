@@ -9,25 +9,54 @@ export async function createActivity(prevState: any, formData: FormData) {
     const tripId = formData.get("tripId") as string;
     const dayNumber = parseInt(formData.get("dayNumber") as string);
     const title = formData.get("title") as string;
-    const startTime = formData.get("startTime") as string; // Optional
-    const location = formData.get("location") as string; // Optional
-    const notes = formData.get("notes") as string; // Optional
-    const category = formData.get("category") as string; // Optional
+    const startTime = formData.get("startTime") as string; // "HH:MM"
+    const location = formData.get("location") as string;
+    const category = formData.get("category") as string;
+    const notes = formData.get("notes") as string;
+    const coordinatesRaw = formData.get("coordinates") as string;
 
-    // Basic validation
-    if (!tripId || !title || !dayNumber) {
-        return { message: "Missing required fields." };
+    let coordinates = null;
+    if (coordinatesRaw) {
+        try {
+            coordinates = JSON.parse(coordinatesRaw);
+        } catch (e) {
+            console.error("Failed to parse coordinates", e);
+        }
     }
 
-    const { error } = await supabase.from("activities").insert({
-        trip_id: tripId,
-        day_number: dayNumber,
-        title,
-        start_time: startTime || null,
-        location: location || null,
-        category: category || "other",
-        notes: notes || null,
-    });
+    // Basic validation
+    if (!title || !tripId || !dayNumber) {
+        return { message: "Missing required fields" };
+    }
+
+    // Check Trip Activity Limits
+    const { data: trip } = await supabase
+        .from('trips')
+        .select('trip_type, max_activities, activity_count')
+        .eq('id', tripId)
+        .single();
+
+    if (trip && trip.trip_type !== 'vip' && trip.max_activities !== null) {
+        if ((trip.activity_count || 0) >= trip.max_activities) {
+            return {
+                message: "Activity limit reached. Upgrade to VIP for unlimited activities.",
+                error: "LIMIT_REACHED"
+            };
+        }
+    }
+
+    const { error } = await supabase
+        .from("activities")
+        .insert({
+            trip_id: tripId,
+            day_number: dayNumber,
+            title,
+            start_time: startTime || null,
+            location: location || null,
+            category: category || "sightseeing",
+            notes: notes || null,
+            coordinates: coordinates // user_id not in table? usually RLS handles or it's implicitly linked via trip
+        });
 
     if (error) {
         console.error("Error creating activity:", error);

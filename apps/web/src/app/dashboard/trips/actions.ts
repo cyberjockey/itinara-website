@@ -209,3 +209,36 @@ export async function fetchComments(
     return { comments: trees, total: 100 };
 }
 
+
+export async function updateActivityPosition(
+    activityId: string,
+    tripId: string,
+    newDayNumber: number,
+    newIndex: number
+) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error("Unauthorized");
+
+    // 1. Verify ownership (optional but good practice)
+    // We trust RLS for now.
+
+    // 2. Update the specific activity
+    const { error } = await supabase
+        .from('activities')
+        .update({
+            day_number: newDayNumber,
+            order_index: newIndex
+        })
+        .eq('id', activityId)
+        .eq('trip_id', tripId); // Extra safety to ensure it belongs to this trip
+
+    if (error) {
+        console.error("Error updating activity position:", error);
+        throw new Error("Failed to update activity position");
+    }
+
+    // 3. Revalidate
+    revalidatePath(`/dashboard/trips/${tripId}`);
+}

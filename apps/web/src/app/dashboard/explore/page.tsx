@@ -37,19 +37,19 @@ export default async function ExplorePage(props: { searchParams: Promise<{ query
     }
 
     return (
-        <div className="max-w-7xl mx-auto">
-            <header className="mb-8">
-                <h1 className="text-3xl font-heading font-bold text-deep-teak mb-2">Explore Destinations</h1>
-                <p className="text-stone-gray">Discover the hidden gems of Indonesia.</p>
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+            <header className="mb-12 pt-8">
+                <h1 className="text-4xl md:text-5xl font-heading font-bold text-deep-teak mb-3">Explore Destinations</h1>
+                <p className="text-lg text-stone-gray/80">Discover the hidden gems of Indonesia.</p>
             </header>
 
             <SearchBar />
 
             {/* Destinations Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {destinations?.map((destination) => (
-                    <div key={destination.id} className="group bg-white rounded-2xl overflow-hidden border border-stone-gray/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                        <div className="relative h-64 overflow-hidden">
+                    <div key={destination.id} className="group bg-white rounded-3xl overflow-hidden border border-stone-gray/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <div className="relative h-72 overflow-hidden">
                             {/* In a real app, use the actual image_url. For now, if the seed used local paths, it works. If external, need Next.js config. */}
                             <Image
                                 src={destination.image_url || "/images/hero-bg.png"}
@@ -57,11 +57,11 @@ export default async function ExplorePage(props: { searchParams: Promise<{ query
                                 fill
                                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                             />
-                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 text-sm font-bold text-deep-teak shadow-sm">
-                                <Star className="w-3 h-3 text-orange-400 fill-orange-400" />
+                            <div className="absolute top-5 right-5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-sm font-bold text-deep-teak shadow-sm">
+                                <Star className="w-4 h-4 text-orange-400 fill-orange-400" />
                                 {destination.rating}
                             </div>
-                            <div className="absolute top-4 left-4">
+                            <div className="absolute top-5 left-5">
                                 <SaveButton
                                     destinationId={destination.id}
                                     initialIsSaved={savedIds.includes(destination.id)}
@@ -69,13 +69,13 @@ export default async function ExplorePage(props: { searchParams: Promise<{ query
                             </div>
                         </div>
 
-                        <div className="p-5">
-                            <h3 className="text-xl font-heading font-bold text-deep-teak mb-1">{destination.name}</h3>
-                            <div className="flex items-center gap-1 text-stone-gray text-sm mb-3">
-                                <MapPin className="w-3 h-3 text-terracotta" />
-                                {destination.location}
+                        <div className="p-6">
+                            <h3 className="text-xl font-heading font-bold text-deep-teak mb-2">{destination.name}</h3>
+                            <div className="flex items-center gap-2 text-stone-gray/80 text-sm mb-4">
+                                <MapPin className="w-4 h-4 text-terracotta" />
+                                <span className="font-medium">{destination.location}</span>
                             </div>
-                            <p className="text-stone-gray/80 text-sm line-clamp-2 mb-4">
+                            <p className="text-stone-gray/80 text-sm line-clamp-2 mb-4 leading-relaxed">
                                 {destination.description}
                             </p>
 

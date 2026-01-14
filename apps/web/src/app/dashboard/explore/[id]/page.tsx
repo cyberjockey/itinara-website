@@ -2,193 +2,135 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Star, Share2, Tag } from "lucide-react";
-import AddToTripModal from "@/components/dashboard/AddToTripModal";
-import { ReviewsList } from "@/components/destinations/ReviewsList";
-import { MapEmbed } from "@/components/destinations/MapEmbed";
-import { SaveButton } from "@/components/dashboard/SaveButton";
+import { ArrowLeft, MapPin, Star, Calendar, DollarSign } from "lucide-react";
+import { PlacesList } from "@/components/destinations/PlacesList";
+
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function DestinationDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const supabase = await createClient();
 
     // 1. Fetch Destination Details
-    const { data: destination, error } = await supabase
-        .from('destinations')
-        .select('*')
-        .eq('id', params.id)
+    const { data: destination, error: destError } = await supabase
+        .from("destinations")
+        .select("*")
+        .eq("id", params.id)
         .single();
 
-    if (error || !destination) {
+    if (destError || !destination) {
         return notFound();
     }
 
-    // 2. Fetch Manual Reviews
-    const { data: reviews } = await supabase
-        .from('reviews')
-        .select('*')
-        .eq('destination_id', destination.id)
-        .order('created_at', { ascending: false });
+    // 2. Fetch Places for this Destination
+    const { data: places } = await supabase
+        .from("places")
+        .select("*")
+        .eq("destination_id", params.id);
 
-    // 3. Fetch User's Trips (for the Add Modal)
+    // 3. Fetch User's Trips (for Add to Trip functionality)
     const { data: { user } } = await supabase.auth.getUser();
-    const { data: trips } = await supabase
-        .from('trips')
-        .select('id, title, start_date, end_date')
-        .eq('user_id', user?.id)
-        .eq('status', 'upcoming') // Only show upcoming trips usually
-        .order('start_date', { ascending: true });
+    let userTrips: any[] = [];
 
-    // 4. Check if Saved
-    let isSaved = false;
     if (user) {
-        const { data: saved } = await supabase
-            .from('saved_destinations')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('destination_id', destination.id)
-            .single();
-        isSaved = !!saved;
+        // Only fetch future trips for adding activities
+        const now = new Date().toISOString();
+        const { data: trips } = await supabase
+            .from("trips")
+            .select("id, title, start_date, end_date")
+            .eq("user_id", user.id)
+            .gte("end_date", now)
+            .order("start_date", { ascending: true });
+
+        if (trips) {
+            userTrips = trips;
+        }
     }
 
     return (
-        <div className="max-w-5xl mx-auto">
-            <Link href="/dashboard/explore" className="inline-flex items-center text-stone-gray hover:text-deep-teak mb-6 transition-colors font-medium">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Explore
-            </Link>
+        <div className="max-w-7xl mx-auto p-6">
+            {/* 1. Header & Back Link */}
+            <div className="mb-6">
+                <Link href="/dashboard/explore" className="inline-flex items-center text-stone-gray hover:text-deep-teak mb-4 transition-colors">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Explore
+                </Link>
 
-            <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10 mb-8">
-                {/* Hero Image */}
-                <div className="relative h-[400px] w-full">
+                <div className="relative h-48 rounded-3xl overflow-hidden mb-6">
                     <Image
                         src={destination.image_url || "/images/hero-bg.png"}
                         alt={destination.name}
                         fill
                         className="object-cover"
+                        priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
-                        <div className="p-8 w-full flex justify-between items-end">
-                            <div className="text-white">
-                                <h1 className="text-4xl md:text-5xl font-heading font-bold mb-2">{destination.name}</h1>
-                                <div className="flex items-center gap-4 text-white/90">
-                                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {destination.location}</span>
-                                    <span className="flex items-center gap-1"><Star className="w-4 h-4 text-orange-400 fill-orange-400" /> {destination.rating}</span>
-                                </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                    <div className="absolute bottom-6 left-6 text-white">
+                        <h1 className="text-4xl font-heading font-bold mb-2">{destination.name}</h1>
+                        <div className="flex items-center gap-4 text-sm font-medium opacity-90">
+                            <div className="flex items-center gap-1">
+                                <MapPin className="w-4 h-4 text-terracotta" />
+                                {destination.location}
                             </div>
-                            <div className="flex gap-3">
-                                <SaveButton
-                                    destinationId={destination.id}
-                                    initialIsSaved={isSaved}
-                                    className="!bg-white/20 !text-white hover:!bg-white hover:!text-red-500"
-                                />
-                                <button className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white hover:text-deep-teak transition-colors">
-                                    <Share2 className="w-5 h-5" />
-                                </button>
+                            <div className="flex items-center gap-1">
+                                <Star className="w-4 h-4 text-orange-400 fill-orange-400" />
+                                {destination.rating} Rating
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Content */}
-                <div className="grid md:grid-cols-3 gap-8 p-8">
-                    <div className="md:col-span-2 space-y-8">
-                        <div>
-                            <h2 className="text-2xl font-bold text-deep-teak mb-4">About this place</h2>
-                            <p className="text-stone-gray leading-relaxed text-lg">
-                                {destination.description}
-                                {/* Add some filler text if description is short to look good */}
-                                <br /><br />
-                                Experience the breathtaking beauty and rich culture of {destination.name}.
-                                Perfect for travelers seeking {destination.tags?.join(", ").toLowerCase()}.
-                            </p>
+            <div className="grid lg:grid-cols-3 gap-8">
+                {/* 2. Sidebar: Key Info */}
+                <div className="lg:col-span-1 space-y-6">
+                    <div className="bg-white rounded-2xl p-6 border border-stone-gray/10 shadow-sm">
+                        <h2 className="font-bold text-xl text-deep-teak mb-4">About</h2>
+                        <p className="text-stone-gray text-sm leading-relaxed mb-6">
+                            {destination.description}
+                        </p>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 text-sm text-stone-gray">
+                                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                    <Calendar className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="block font-bold text-deep-teak">Best Time</span>
+                                    Dry Season (Apr-Oct)
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm text-stone-gray">
+                                <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+                                    <DollarSign className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="block font-bold text-deep-teak">Budget</span>
+                                    Medium ($50-150/day)
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Video Teaser Section */}
-                        {destination.video_url && (
-                            <div className="mb-8">
-                                <h3 className="font-bold text-deep-teak mb-4 flex items-center gap-2">
-                                    <span className="w-8 h-8 rounded-full bg-terracotta/10 flex items-center justify-center text-terracotta text-xs font-bold">▶</span>
-                                    Cinematic Experience
-                                </h3>
-                                <div className="relative w-full rounded-2xl overflow-hidden border border-stone-gray/10 shadow-lg aspect-video bg-black">
-                                    <iframe
-                                        src={destination.video_url}
-                                        title="Teaser Video"
-                                        className="w-full h-full"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                    />
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Panoramic Gallery Section */}
-                        {destination.gallery_images && destination.gallery_images.length > 0 && (
-                            <div className="mb-8">
-                                <h3 className="font-bold text-deep-teak mb-4 flex items-center gap-2">
-                                    <MapPin className="w-4 h-4 text-terracotta" /> Scenic Views
-                                </h3>
-                                <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-                                    {destination.gallery_images.map((imgUrl: string, idx: number) => (
-                                        <div key={idx} className="relative h-64 w-[400px] flex-shrink-0 rounded-2xl overflow-hidden snap-center border border-stone-gray/10">
-                                            <Image
-                                                src={imgUrl}
-                                                alt={`Gallery ${idx}`}
-                                                fill
-                                                className="object-cover hover:scale-105 transition-transform duration-700"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <div>
-                            <h3 className="font-bold text-deep-teak mb-3 flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-terracotta" /> Tags
-                            </h3>
-                            <div className="flex flex-wrap gap-2">
-                                {destination.tags?.map((tag: string) => (
-                                    <span key={tag} className="px-3 py-1 bg-stone-gray/5 text-stone-gray rounded-lg text-sm font-medium">
+                        {destination.tags && (
+                            <div className="mt-6 flex flex-wrap gap-2">
+                                {destination.tags.map((tag: string) => (
+                                    <span key={tag} className="text-xs font-medium px-2 py-1 rounded-md bg-stone-gray/5 text-stone-gray border border-stone-gray/10">
                                         {tag}
                                     </span>
                                 ))}
                             </div>
-                        </div>
-
-                        {/* Google Reviews (Manual) */}
-                        {reviews && reviews.length > 0 && (
-                            <ReviewsList
-                                reviews={reviews}
-                                rating={destination.rating}
-                                totalRatings={reviews.length}
-                                googleReviewsUrl={destination.google_reviews_url}
-                            />
                         )}
                     </div>
+                </div>
 
-                    {/* Sidebar CTA */}
-                    <div className="md:col-span-1 space-y-6">
-                        <div className="bg-warm-white/50 rounded-2xl p-6 border border-stone-gray/10 sticky top-24">
-                            <h3 className="font-bold text-xl text-deep-teak mb-2">Interested?</h3>
-                            <p className="text-stone-gray text-sm mb-6">
-                                Add this destination to one of your upcoming trips to automatically schedule a visit.
-                            </p>
-
-                            <AddToTripModal destination={destination} trips={trips || []} />
-
-                            <p className="text-center text-xs text-stone-gray/50 mt-4">
-                                You can customize the time and details later.
-                            </p>
-                        </div>
-
-                        {/* Map Embed (Manual) */}
-                        <MapEmbed
-                            src={destination.map_embed_url}
-                            query={`${destination.name}, ${destination.location}`}
-                        />
-                    </div>
+                {/* 3. Main Content: Places */}
+                <div className="lg:col-span-2">
+                    <PlacesList
+                        places={places || []}
+                        userTrips={userTrips}
+                        destinationName={destination.name}
+                        destinationId={destination.id} // Keep ID for logic if needed (e.g. Add to Trip)
+                    />
                 </div>
             </div>
         </div>

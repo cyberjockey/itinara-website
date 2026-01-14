@@ -1,14 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
-import { TimelineView } from "@/components/dashboard/TimelineView";
 import { notFound } from "next/navigation";
-import { Calendar, MapPin, Share2 } from "lucide-react";
+import { Calendar, MapPin, Share2, Map as MapIcon, List as ListIcon, Sparkles } from "lucide-react"; // Added Icons
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { TripVisibilityToggle } from "@/components/dashboard/TripVisibilityToggle";
 import { CalendarExportButton } from "@/components/dashboard/CalendarExportButton";
-import { PrintPageButton } from "@/components/dashboard/PrintPageButton";
 import { LikeButton } from "@/components/dashboard/LikeButton";
 import { CommentPopover } from "@/components/dashboard/CommentPopover";
+import { ShareButton } from "@/components/dashboard/ShareButton"; // Add import
+import { TripViewToggle } from "@/components/dashboard/TripViewToggle"; // New Component for client-side toggle
 
 export default async function TripDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -49,18 +49,15 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
         .eq('user_id', user.id)
         .single() : { data: null };
 
-
-
-
     return (
-        <div className="h-[calc(100vh-64px)] flex flex-col">
-            <div className="mb-6">
-                <Link href="/dashboard" className="inline-flex items-center text-stone-gray hover:text-deep-teak mb-4 transition-colors">
+        <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+            <div className="mb-0 px-6 pt-6">
+                <Link href="/dashboard" className="inline-flex items-center text-stone-gray hover:text-deep-teak mb-2 transition-colors">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Dashboard
                 </Link>
 
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start mb-4">
                     <div>
                         <h1 className="text-3xl font-heading font-bold text-deep-teak">{trip.title}</h1>
                         <div className="flex items-center gap-4 text-stone-gray mt-2 text-sm">
@@ -73,6 +70,17 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                                 {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
                             </div>
                             <TripVisibilityToggle tripId={trip.id} initialIsPublic={trip.is_public || false} />
+
+                            {/* Trip Type Label */}
+                            {trip.trip_type === 'vip' ? (
+                                <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1">
+                                    <span>👑</span> VIP
+                                </div>
+                            ) : (
+                                <div className="bg-stone-gray/10 text-stone-gray px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                                    <Sparkles className="w-3 h-3" /> Premium
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="flex gap-2 items-center relative">
@@ -95,15 +103,16 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                             tripStartDate={trip.start_date}
                             activities={activities || []}
                         />
-                        <button className="flex items-center gap-2 px-4 py-2 border border-stone-gray/20 rounded-full text-stone-gray hover:bg-stone-gray/5 transition-colors font-medium text-sm">
-                            <Share2 className="w-4 h-4" />
-                            Share
-                        </button>
+                        <ShareButton tripId={trip.id} />
                     </div>
                 </div>
             </div>
 
-            <TimelineView trip={trip} activities={activities || []} />
+
+
+            {/* Client-side Toggle Wrapper */}
+            <TripViewToggle trip={trip} activities={activities || []} />
         </div>
     );
 }
+

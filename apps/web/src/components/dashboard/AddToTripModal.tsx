@@ -15,15 +15,23 @@ interface Trip {
     end_date: string;
 }
 
+interface Place {
+    name: string;
+    location: string;
+    type?: string;
+}
+
 interface AddToTripModalProps {
     destination: {
         name: string;
         location: string;
     };
     trips: Trip[];
+    place?: Place; // Optional: if adding a specific place
+    trigger?: React.ReactNode; // Optional: custom trigger button
 }
 
-export default function AddToTripModal({ destination, trips }: AddToTripModalProps) {
+export default function AddToTripModal({ destination, trips, place, trigger }: AddToTripModalProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTripId, setSelectedTripId] = useState<string>("");
     const [selectedDay, setSelectedDay] = useState<number>(1);
@@ -58,10 +66,17 @@ export default function AddToTripModal({ destination, trips }: AddToTripModalPro
         const formData = new FormData();
         formData.append("tripId", selectedTripId);
         formData.append("dayNumber", selectedDay.toString());
-        formData.append("title", `Visit ${destination.name}`);
-        formData.append("location", destination.location);
-        formData.append("category", "sightseeing");
-        formData.append("notes", "Added from Explore page");
+
+        // Use place details if available, otherwise destination details
+        const title = place ? `Visit ${place.name}` : `Visit ${destination.name}`;
+        const location = place ? place.location : destination.location;
+        const category = place?.type?.toLowerCase() || "sightseeing";
+        const notes = place ? `Added from ${destination.name} explore page` : "Added from Explore page";
+
+        formData.append("title", title);
+        formData.append("location", location);
+        formData.append("category", category);
+        formData.append("notes", notes);
         formData.append("startTime", "10:00"); // Default 10 AM
 
         const result = await createActivity(null, formData);
@@ -80,13 +95,17 @@ export default function AddToTripModal({ destination, trips }: AddToTripModalPro
 
     return (
         <>
-            <button
-                onClick={() => setIsOpen(true)}
-                className="w-full bg-terracotta text-white font-bold py-4 rounded-xl shadow-lg hover:bg-deep-teak transition-transform active:scale-95 flex items-center justify-center gap-2"
-            >
-                <PlusIcon className="w-5 h-5" />
-                Add to Trip
-            </button>
+            {trigger ? (
+                <div onClick={() => setIsOpen(true)}>{trigger}</div>
+            ) : (
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="w-full bg-terracotta text-white font-bold py-4 rounded-xl shadow-lg hover:bg-deep-teak transition-transform active:scale-95 flex items-center justify-center gap-2"
+                >
+                    <PlusIcon className="w-5 h-5" />
+                    Add to Trip
+                </button>
+            )}
 
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -96,7 +115,9 @@ export default function AddToTripModal({ destination, trips }: AddToTripModalPro
                     {/* Modal Content */}
                     <div className="relative bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="p-6 border-b border-stone-gray/10 flex justify-between items-center bg-warm-white">
-                            <h3 className="font-heading font-bold text-xl text-deep-teak">Add to Itinerary</h3>
+                            <h3 className="font-heading font-bold text-xl text-deep-teak">
+                                {place ? `Add ${place.name}` : "Add to Itinerary"}
+                            </h3>
                             <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-stone-gray/10 rounded-full text-stone-gray">
                                 <X className="w-5 h-5" />
                             </button>

@@ -1,3 +1,4 @@
+// Reverting to previous state without initialData for cleanliness
 "use client";
 
 import { useState } from "react";
@@ -11,13 +12,19 @@ interface AddActivityModalProps {
     onClose: () => void;
     tripId: string;
     dayNumber: number;
+    initialData?: {
+        title?: string;
+        location?: string;
+        category?: string;
+        coordinates?: { lat: number; lng: number } | null;
+    };
 }
 
 const initialState = {
     message: "",
 };
 
-export function AddActivityModal({ isOpen, onClose, tripId, dayNumber }: AddActivityModalProps) {
+export function AddActivityModal({ isOpen, onClose, tripId, dayNumber, initialData }: AddActivityModalProps) {
     // @ts-ignore
     const [state, formAction, isPending] = useActionState(async (prev: any, formData: FormData) => {
         const result = await createActivity(prev, formData);
@@ -48,7 +55,7 @@ export function AddActivityModal({ isOpen, onClose, tripId, dayNumber }: AddActi
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed inset-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-50 w-full md:w-[500px] bg-white md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                     >
-                        <div className="p-6 border-b border-stone-gray/10 flex justify-between items-center">
+                        <div className="p-6 border-b border-stone-gray/10 flex justify-between items-center bg-warm-white">
                             <h2 className="text-xl font-heading font-bold text-deep-teak">Add Activity - Day {dayNumber}</h2>
                             <button onClick={onClose} className="p-2 hover:bg-stone-gray/5 rounded-full text-stone-gray">
                                 <X className="w-5 h-5" />
@@ -58,6 +65,9 @@ export function AddActivityModal({ isOpen, onClose, tripId, dayNumber }: AddActi
                         <form action={formAction} className="p-6 overflow-y-auto flex-1 space-y-5">
                             <input type="hidden" name="tripId" value={tripId} />
                             <input type="hidden" name="dayNumber" value={dayNumber} />
+                            {initialData?.coordinates && (
+                                <input type="hidden" name="coordinates" value={JSON.stringify(initialData.coordinates)} />
+                            )}
 
                             <div>
                                 <label className="block text-sm font-medium text-stone-gray mb-1">
@@ -67,6 +77,7 @@ export function AddActivityModal({ isOpen, onClose, tripId, dayNumber }: AddActi
                                     name="title"
                                     type="text"
                                     required
+                                    defaultValue={initialData?.title}
                                     className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50"
                                     placeholder="e.g., Visit Borobudur Temple"
                                     autoFocus
@@ -95,6 +106,7 @@ export function AddActivityModal({ isOpen, onClose, tripId, dayNumber }: AddActi
                                         <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-gray/50" />
                                         <select
                                             name="category"
+                                            defaultValue={initialData?.category || "sightseeing"}
                                             className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50 appearance-none"
                                         >
                                             <option value="sightseeing">Sightseeing</option>
@@ -117,6 +129,7 @@ export function AddActivityModal({ isOpen, onClose, tripId, dayNumber }: AddActi
                                     <input
                                         name="location"
                                         type="text"
+                                        defaultValue={initialData?.location}
                                         className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50"
                                         placeholder="Specific address or place name"
                                     />
