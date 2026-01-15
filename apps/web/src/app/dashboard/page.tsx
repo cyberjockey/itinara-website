@@ -3,9 +3,25 @@ import { createClient } from "@/lib/supabase/server";
 import { Plus, Calendar, MapPin, MoreHorizontal, Sparkles } from "lucide-react";
 import { QuotaWidget } from "@/components/dashboard/QuotaWidget";
 
-export default async function DashboardPage() {
+import { verifyStripePurchase } from "../actions/stripe";
+
+// ...
+
+export default async function DashboardPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
+
+    // Handle Payment Success
+    const resolvedParams = await searchParams;
+    let paymentMessage = null;
+    if (resolvedParams?.payment === 'success' && typeof resolvedParams.session_id === 'string') {
+        const result = await verifyStripePurchase(resolvedParams.session_id);
+        paymentMessage = result.message;
+    }
 
     const { data: trips } = await supabase
         .from('trips')
@@ -24,6 +40,13 @@ export default async function DashboardPage() {
                     <QuotaWidget />
                 </div>
             </header>
+
+            {paymentMessage && (
+                <div className="mb-8 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 shadow-sm flex items-center justify-between">
+                    <span className="font-medium">{paymentMessage}</span>
+                    <Link href="/dashboard" className="text-sm underline opacity-70 hover:opacity-100">Dismiss</Link>
+                </div>
+            )}
 
             {trips && trips.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
