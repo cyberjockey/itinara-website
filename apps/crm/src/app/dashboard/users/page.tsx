@@ -1,7 +1,7 @@
 import { getUsers, verifyGuide, setUserRole } from "./actions";
 import { Check, Shield, Search, Filter, UserCog } from "lucide-react";
 import Image from "next/image";
-import { UserRoleBadge } from "@/components/users/UserRoleBadge"; // Will create simple badge inline or component
+import { UserRoleBadge } from "../../../components/users/UserRoleBadge"; // Using relative path to fix build alias issue
 
 export default async function UsersPage({ searchParams }: { searchParams: Promise<{ role?: string }> }) {
     const params = await searchParams;
