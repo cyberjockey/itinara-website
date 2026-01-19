@@ -19,7 +19,7 @@ export default function SignupPage() {
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <Image
-                    src="/images/login-mosaic.png"
+                    src="/images/login-mosaic-v2.png"
                     alt="Indonesia Mosaic"
                     fill
                     className="object-cover"
@@ -82,6 +82,37 @@ export default function SignupPage() {
                                 className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50"
                                 placeholder="you@example.com"
                             />
+                        </div>
+
+                        <div>
+                            <label htmlFor="phone" className="block text-sm font-medium text-stone-gray mb-1">
+                                Phone Number <span className="text-stone-gray/60 font-normal">(with country code)</span>
+                            </label>
+                            <input
+                                id="phone"
+                                name="phone"
+                                type="tel"
+                                required
+                                pattern="^\+?[0-9\s-]{7,15}$"
+                                title="Phone number must start with + and contain 7-15 digits"
+                                className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50"
+                                placeholder="+62 812 3456 7890"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="betaCode" className="block text-sm font-medium text-stone-gray mb-1">
+                                Beta Access Code <span className="text-terracotta ml-1">*</span>
+                            </label>
+                            <input
+                                id="betaCode"
+                                name="betaCode"
+                                type="text"
+                                required
+                                className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50"
+                                placeholder="Enter code"
+                            />
+                            <p className="text-xs text-stone-gray/60 mt-1">Required for beta access</p>
                         </div>
 
                         <div>

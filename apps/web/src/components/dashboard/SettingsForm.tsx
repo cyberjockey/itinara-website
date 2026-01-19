@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { updateProfile } from "@/app/dashboard/settings/actions";
 import { User, Save, Globe, Loader2 } from "lucide-react";
+import { RankBadge } from "@/components/ui/RankBadge";
+import { RankProgress } from "@/components/ui/RankProgress";
 
 export function SettingsForm() {
     const supabase = createClient();
@@ -12,10 +14,21 @@ export function SettingsForm() {
     const [message, setMessage] = useState("");
 
     // Form State
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [fullName, setFullName] = useState("");
     const [website, setWebsite] = useState("");
     const [avatarUrl, setAvatarUrl] = useState("");
     const [email, setEmail] = useState("");
+
+    // File Upload State
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    // Rank State
+    const [rankPoints, setRankPoints] = useState(0);
+    const [rankTier, setRankTier] = useState("Newcomer");
 
     useEffect(() => {
         async function fetchProfile() {
@@ -29,9 +42,14 @@ export function SettingsForm() {
                     .single();
 
                 if (profile) {
+                    setFirstName(profile.first_name || "");
+                    setLastName(profile.last_name || "");
+                    setPhoneNumber(profile.phone_number || "");
                     setFullName(profile.full_name || "");
                     setWebsite(profile.website || "");
                     setAvatarUrl(profile.avatar_url || "");
+                    setRankPoints(profile.rank_points || 0);
+                    setRankTier(profile.rank_tier || "Newcomer");
                 }
             }
             setLoading(false);
@@ -45,9 +63,14 @@ export function SettingsForm() {
         setMessage("");
 
         const formData = new FormData();
-        formData.append("fullName", fullName);
+        formData.append("firstName", firstName);
+        formData.append("lastName", lastName);
+        formData.append("phoneNumber", phoneNumber);
         formData.append("website", website);
-        formData.append("avatarUrl", avatarUrl);
+
+        if (avatarFile) {
+            formData.append("avatarFile", avatarFile);
+        }
 
         const result = await updateProfile(formData);
 
@@ -67,40 +90,95 @@ export function SettingsForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Avatar Section */}
             <div className="flex items-center gap-6 mb-8">
-                <div className="w-24 h-24 rounded-full bg-stone-gray/10 flex items-center justify-center overflow-hidden border-2 border-white shadow-md">
-                    {avatarUrl ? (
+                <div className="w-24 h-24 rounded-full bg-stone-gray/10 flex items-center justify-center overflow-hidden border-2 border-white shadow-md relative group">
+                    {(previewUrl || avatarUrl) ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                        <img
+                            src={previewUrl || avatarUrl}
+                            alt="Avatar"
+                            className="w-full h-full object-cover"
+                        />
                     ) : (
                         <User className="w-10 h-10 text-stone-gray/50" />
                     )}
+
+                    {/* Overlay for hover effect */}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <User className="w-6 h-6 text-white" />
+                    </div>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-stone-gray mb-1">Avatar URL</label>
-                    <input
-                        type="url"
-                        value={avatarUrl}
-                        onChange={(e) => setAvatarUrl(e.target.value)}
-                        placeholder="https://example.com/photo.jpg"
-                        className="w-full max-w-md px-4 py-2 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-1 focus:ring-terracotta outline-none text-sm"
-                    />
-                    <p className="text-xs text-stone-gray/50 mt-1">Paste a link to your profile photo.</p>
+                    <label className="block text-sm font-medium text-deep-teak mb-2">Profile Photo</label>
+                    <div className="relative">
+                        <input
+                            type="file"
+                            accept="image/png, image/jpeg, image/webp"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    if (file.size > 2 * 1024 * 1024) {
+                                        setMessage("Image size must be less than 2MB");
+                                        return;
+                                    }
+                                    setAvatarFile(file);
+                                    setPreviewUrl(URL.createObjectURL(file));
+                                    setMessage(""); // Clear error if any
+                                }
+                            }}
+                            className="block w-full text-sm text-stone-gray
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-terracotta/10 file:text-terracotta
+                                hover:file:bg-terracotta/20
+                                cursor-pointer
+                            "
+                        />
+                    </div>
+                    <p className="text-xs text-stone-gray/50 mt-2">
+                        JPG, PNG or WebP. Max 2MB.
+                    </p>
                 </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-bold text-deep-teak mb-2">Full Name</label>
+                    <label className="block text-sm font-bold text-deep-teak mb-2">First Name</label>
                     <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-gray/50" />
                         <input
                             type="text"
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
                             className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-1 focus:ring-terracotta outline-none transition-all"
-                            placeholder="Your Name"
+                            placeholder="John"
                         />
                     </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-bold text-deep-teak mb-2">Last Name</label>
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-gray/50" />
+                        <input
+                            type="text"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-1 focus:ring-terracotta outline-none transition-all"
+                            placeholder="Doe"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-bold text-deep-teak mb-2">Phone Number</label>
+                    <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="+62 812 3456 7890"
+                        className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-1 focus:ring-terracotta outline-none transition-all"
+                    />
                 </div>
 
                 <div>
@@ -126,6 +204,11 @@ export function SettingsForm() {
                         className="w-full px-4 py-3 rounded-xl border border-stone-gray/10 bg-stone-gray/5 text-stone-gray cursor-not-allowed"
                     />
                     <p className="text-xs text-stone-gray/50 mt-1">Email cannot be changed.</p>
+                </div>
+
+                <div className="md:col-span-2 p-6 bg-gradient-to-br from-terracotta/5 via-deep-teak/5 to-rice-paddy-green/5 rounded-xl border border-terracotta/20">
+                    <label className="block text-sm font-bold text-deep-teak mb-4">Your Rank Progress</label>
+                    <RankProgress currentTier={rankTier} currentPoints={rankPoints} />
                 </div>
             </div>
 

@@ -31,6 +31,7 @@ export function Navbar() {
     const navItems = [
         { label: "Destinations", href: "/#destinations" },
         { label: "About", href: "/#about" },
+        { label: "Blog", href: "/blog" },
     ];
 
     return (

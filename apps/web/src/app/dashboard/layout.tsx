@@ -7,6 +7,8 @@ import { Home, Map, Heart, Users, Settings, LogOut, Plus, Menu, X } from "lucide
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { TripTypeModal } from "@/components/dashboard/TripTypeModal";
+import { SidebarQuota } from "@/components/dashboard/SidebarQuota";
 
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -15,6 +17,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const supabase = createClient();
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isTripModalOpen, setIsTripModalOpen] = useState(false);
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -31,7 +34,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ];
 
     return (
-        <div className="min-h-screen bg-warm-white">
+        <div className="min-h-screen bg-warm-white flex">
+            <TripTypeModal isOpen={isTripModalOpen} onClose={() => setIsTripModalOpen(false)} />
+
             {/* Mobile Header */}
             <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-stone-gray/10 px-4 py-3 flex items-center justify-between">
                 <button
@@ -43,9 +48,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="flex items-center gap-2">
                     <span className="font-heading font-bold text-lg text-deep-teak">ITINARA</span>
                 </div>
-                <Link href="/dashboard/trips/new" className="p-2 bg-terracotta text-white rounded-full shadow-sm">
+                <button onClick={() => setIsTripModalOpen(true)} className="p-2 bg-terracotta text-white rounded-full shadow-sm">
                     <Plus className="w-5 h-5" />
-                </Link>
+                </button>
             </div>
 
             {/* Sidebar Overlay (Mobile) */}
@@ -58,10 +63,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Sidebar */}
             <aside className={`
-                w-[85vw] md:w-64 bg-white border-r border-stone-gray/10 flex flex-col fixed inset-y-0 z-50 transition-transform duration-300 ease-out shadow-2xl md:shadow-none will-change-transform transform-gpu
+                fixed inset-y-0 left-0 z-50 w-[85vw] md:w-64 bg-white border-r border-stone-gray/10 flex flex-col transition-transform duration-300 ease-out shadow-2xl md:shadow-none will-change-transform transform-gpu
                 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
             `}>
-                <div className="p-6 flex justify-between items-center">
+                <div className="p-6 flex justify-between items-center bg-white z-10">
                     <Link href="/" className="flex items-center gap-3 group">
                         <div className="relative w-8 h-8 overflow-hidden rounded-full border border-stone-gray/20">
                             <Image
@@ -81,14 +86,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </button>
                 </div>
 
-                <div className="px-4 py-2">
-                    <Link href="/dashboard/trips/new" className="w-full py-3 rounded-xl bg-terracotta text-white font-bold flex items-center justify-center gap-2 hover:bg-deep-teak transition-colors shadow-md hover:shadow-lg">
+                <div className="px-4 py-2 bg-white z-10">
+                    <button
+                        onClick={() => {
+                            setIsTripModalOpen(true);
+                            setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full py-3 rounded-xl bg-terracotta text-white font-bold flex items-center justify-center gap-2 hover:bg-deep-teak transition-colors shadow-md hover:shadow-lg"
+                    >
                         <Plus className="w-5 h-5" />
                         <span>New Trip</span>
-                    </Link>
+                    </button>
                 </div>
 
-                <nav className="flex-1 px-4 py-6 space-y-1">
+                <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -108,7 +119,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     })}
                 </nav>
 
-                <div className="p-4 border-t border-stone-gray/10">
+                <SidebarQuota />
+
+                <div className="p-4 border-t border-stone-gray/10 bg-white z-10 mt-auto">
                     <button
                         onClick={handleSignOut}
                         className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-stone-gray hover:bg-red-50 hover:text-red-600 transition-colors"
@@ -120,7 +133,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </aside>
 
             {/* Main Content */}
-            <main className="md:ml-64 relative min-h-screen pt-16 md:pt-0">
+            <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen bg-warm-white relative w-full">
                 {children}
             </main>
         </div>

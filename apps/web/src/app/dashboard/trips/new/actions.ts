@@ -103,6 +103,18 @@ export async function createTrip(prevState: any, formData: FormData) {
         // Trip was created but credit wasn't deducted - should log this
     }
 
+    // 6. Award rank points
+    const pointsToAward = tripType === 'premium' ? 10 : 30;
+    const { error: rankError } = await supabase.rpc('award_rank_points', {
+        p_user_id: user.id,
+        p_points: pointsToAward
+    });
+
+    if (rankError) {
+        console.error("Error awarding rank points:", rankError);
+        // Points weren't awarded but trip was created successfully
+    }
+
     revalidatePath("/dashboard");
     redirect("/dashboard");
 }

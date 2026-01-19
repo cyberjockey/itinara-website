@@ -173,7 +173,7 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
 
         const activeActivity = activities.find(a => a.id === activeId);
 
-        let newIndex = 0;
+        const newIndex = 0;
         let newDayNumber = activeActivity?.day_number || 1;
 
         if (activeId !== overId) {

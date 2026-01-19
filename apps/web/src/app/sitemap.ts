@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/client';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://itinara.com'; // Production URL
+    const baseUrl = 'https://itinaravacation.com'; // Production URL
 
     // Static Routes
     const routes = [
@@ -32,5 +32,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.9,
     }));
 
-    return [...routes, ...destinationRoutes];
+    // Dynamic Blog Routes
+    const { data: posts } = await supabase
+        .from('posts')
+        .select('slug, published_at')
+        .eq('status', 'published');
+
+    const blogRoutes = (posts || []).map((post) => ({
+        url: `${baseUrl}/blog/${post.slug}`,
+        lastModified: post.published_at || new Date().toISOString(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+    }));
+
+    return [...routes, ...destinationRoutes, ...blogRoutes];
 }

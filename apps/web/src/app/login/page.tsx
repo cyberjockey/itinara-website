@@ -19,7 +19,7 @@ export default function LoginPage() {
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <Image
-                    src="/images/login-mosaic.png"
+                    src="/images/login-mosaic-v2.png"
                     alt="Indonesia Mosaic"
                     fill
                     className="object-cover"

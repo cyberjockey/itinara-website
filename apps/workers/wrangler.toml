@@ -1,0 +1,22 @@
+name = "itinara-api-gateway"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+route = { pattern = "api.itinara.com/*", zone_name = "itinara.com" }
+
+# KV Namespace for caching
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "placeholder_id"
+
+# Durable Objects for rate limiting
+# [[durable_objects.bindings]]
+# name = "RATE_LIMITER"
+# class_name = "RateLimiter"
+
+# Secrets (set via `wrangler secret put`)
+# SUPABASE_CORE_URL
+# SUPABASE_CORE_ANON_KEY
+# INTERNAL_API_KEY

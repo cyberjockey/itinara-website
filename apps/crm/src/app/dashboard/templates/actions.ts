@@ -1,0 +1,291 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+export async function getTemplates() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    // If admin, show all? For now, let's just show own for guides, and all for admin in a different view if needed.
+    // The policy says guides can select rows where guide_id = auth.uid()
+    // Admins can select all.
+    // Let's filter by current user if they are a guide, or maybe just rely on RLS?
+    // RLS: USING (guide_id = auth.uid() OR (SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+    const { data, error } = await supabase
+        .from('trip_templates')
+        .select(`
+            *,
+            destinations (name)
+        `)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error fetching templates:", error);
+        return [];
+    }
+
+    return data;
+}
+
+export async function getTemplate(id: string) {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from('trip_templates')
+        .select(`
+            *,
+            destinations (name, id, country)
+        `)
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        console.error(`Error fetching template for id ${id}:`, JSON.stringify(error, null, 2));
+        return null;
+    }
+
+    return data;
+}
+
+export async function createTemplate(prevState: any, formData: FormData) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { message: "Unauthorized" };
+    }
+
+    const title = formData.get('title') as string;
+    const destination_id = formData.get('destination_id') as string;
+    const description = formData.get('description') as string;
+    const duration_days = parseInt(formData.get('duration_days') as string);
+    const difficulty_level = formData.get('difficulty_level') as string;
+    const trip_type = (formData.get('trip_type') as string) || 'standard';
+    const estimated_budget = formData.get('estimated_budget') as string;
+    const trip_preference = formData.get('trip_preference') as string;
+
+    // Quota Check & Deduction for VIP
+    if (trip_type === 'vip') {
+        const { data: isDeducted, error: quotaError } = await supabase
+            .rpc('deduct_trip_by_type', {
+                p_user_id: user.id,
+                p_trip_type: 'vip'
+            });
+
+        if (quotaError) {
+            console.error("Error deducting VIP quota:", quotaError);
+            return { message: "System error checking quotas." };
+        }
+
+        if (!isDeducted) {
+            return { message: "Insufficient VIP Quota. Please purchase more VIP credits." };
+        }
+    }
+
+    // Initial itinerary skeleton
+    const itinerary = {
+        days: Array.from({ length: duration_days }, (_, i) => ({
+            day: i + 1,
+            title: `Day ${i + 1}`,
+            activities: []
+        }))
+    };
+
+    const { data, error } = await supabase
+        .from('trip_templates')
+        .insert({
+            guide_id: user.id,
+            title,
+            destination_id,
+            description,
+            duration_days,
+            difficulty_level,
+            trip_type,
+            estimated_budget, // Insert budget
+            trip_preference,
+            itinerary, // Initial empty itinerary
+            status: 'draft'
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error creating template:", error);
+        // If insert failed but we deducted quota, we should ideally rollback (refund) the quota.
+        // For MVP, we'll just log it. In production, use a transaction or logic to refund.
+        if (trip_type === 'vip') {
+            await supabase.rpc('add_trip_credits_by_type', {
+                p_user_id: user.id,
+                p_trip_type: 'vip',
+                p_credits: 1
+            });
+        }
+        return { message: "Failed to create template" };
+    }
+
+    revalidatePath('/dashboard/templates');
+    redirect(`/dashboard/templates/${data.id}`);
+}
+
+export async function updateTemplate(id: string, formData: FormData) {
+    // This action handles basic info updates. 
+    // Complex JSON updates for the itinerary might need a separate API endpoint or specific handling.
+
+    const supabase = await createClient();
+
+    const updates: any = {};
+    if (formData.has('title')) updates.title = formData.get('title') as string;
+    if (formData.has('description')) updates.description = formData.get('description') as string;
+    if (formData.has('status')) updates.status = formData.get('status') as string;
+    if (formData.has('difficulty_level')) updates.difficulty_level = formData.get('difficulty_level') as string;
+    if (formData.has('featured_image')) updates.featured_image = formData.get('featured_image') as string;
+    if (formData.has('guide_material_url')) updates.guide_material_url = formData.get('guide_material_url') as string;
+    if (formData.has('estimated_budget')) updates.estimated_budget = formData.get('estimated_budget') as string;
+    if (formData.has('trip_preference')) updates.trip_preference = formData.get('trip_preference') as string;
+
+    // Add logic to save JSON itinerary if passed strictly (e.g. from the builder)
+    // We might parse a JSON string if sent via form
+    if (formData.has('itinerary_json')) {
+        try {
+            updates.itinerary = JSON.parse(formData.get('itinerary_json') as string);
+        } catch (e) {
+            console.error("Invalid JSON itinerary");
+        }
+    }
+
+    const { error } = await supabase
+        .from('trip_templates')
+        .update(updates)
+        .eq('id', id);
+
+    if (error) {
+        console.error("Error updating template:", error);
+        return { message: "Failed to update template" };
+    }
+
+    revalidatePath('/dashboard/templates');
+    revalidatePath(`/dashboard/templates/${id}`);
+    return { message: "Template updated successfully" };
+}
+
+export async function deleteTemplate(id: string) {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from('trip_templates')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        return { message: "Failed to delete template" };
+    }
+
+    revalidatePath('/dashboard/templates');
+    return { message: "Template deleted" };
+}
+
+export async function publishTemplate(id: string) {
+    const supabase = await createClient();
+
+    // Optional: Add validation here (e.g. check if itinerary has content)
+
+    const { error } = await supabase
+        .from('trip_templates')
+        .update({ status: 'published', published_at: new Date().toISOString() })
+        .eq('id', id);
+
+    if (error) {
+        console.error("Error publishing template:", error);
+        throw new Error("Failed to publish template");
+    }
+
+    revalidatePath(`/dashboard/templates/${id}`);
+    revalidatePath('/dashboard/templates');
+}
+
+export async function unpublishTemplate(id: string) {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from('trip_templates')
+        .update({ status: 'draft' })
+        .eq('id', id);
+
+    if (error) {
+        throw new Error("Failed to unpublish template");
+    }
+
+    revalidatePath(`/dashboard/templates/${id}`);
+    revalidatePath('/dashboard/templates');
+}
+
+export async function getPendingTemplates() {
+    const supabase = await createClient();
+
+    // Check if admin
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    // Ideally check role here or rely on RLS (Admins view all templates)
+
+    const { data, error } = await supabase
+        .from('trip_templates')
+        .select(`
+            *,
+            destinations (name),
+            profiles!guide_id (full_name, email)
+        `)
+        .eq('status', 'pending_review')
+        .order('updated_at', { ascending: false });
+
+    if (error) {
+        console.error("Error fetching pending templates:", error);
+        return [];
+    }
+
+    return data;
+}
+
+export async function approveTemplate(id: string) {
+    const supabase = await createClient();
+
+    // Check admin role logic should be strictly here or RLS
+
+    const { error } = await supabase
+        .from('trip_templates')
+        .update({
+            status: 'published',
+            published_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
+    if (error) {
+        console.error("Error approving template:", error);
+        throw new Error("Failed to approve template");
+    }
+
+    revalidatePath('/dashboard/moderation');
+    revalidatePath(`/dashboard/templates/${id}`);
+}
+
+export async function rejectTemplate(id: string) {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from('trip_templates')
+        .update({ status: 'draft' }) // Send back to draft
+        .eq('id', id);
+
+    if (error) {
+        console.error("Error rejecting template:", error);
+        throw new Error("Failed to reject template");
+    }
+
+    revalidatePath('/dashboard/moderation');
+    revalidatePath(`/dashboard/templates/${id}`);
+}
