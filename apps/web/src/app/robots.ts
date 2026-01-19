@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: ['/dashboard/', '/settings/', '/api/'], // Protect private/API routes
         },
-        sitemap: 'https://itinara.com/sitemap.xml',
+        sitemap: 'https://itinaravacation.com/sitemap.xml',
     };
 }

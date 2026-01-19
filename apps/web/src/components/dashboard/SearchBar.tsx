@@ -36,7 +36,7 @@ export function SearchBar() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-gray/50" />
             <input
                 type="text"
-                placeholder="Search for places, islands, or experiences..."
+                placeholder="Search for activities, islands, or experiences..."
                 className="w-full pl-12 pr-4 py-4 rounded-full bg-white border border-stone-gray/10 shadow-sm focus:ring-2 focus:ring-terracotta/20 focus:border-terracotta outline-none transition-all"
                 onChange={(e) => handleSearch(e.target.value)}
                 defaultValue={searchParams.get("query")?.toString()}

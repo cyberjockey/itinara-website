@@ -106,7 +106,7 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
             <div className="relative mb-2">
                 <input
                     type="text"
-                    placeholder="Search existing places..."
+                    placeholder="Search existing activities..."
                     className="w-full pl-3 pr-10 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -117,7 +117,7 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
             {/* List */}
             <div className="max-h-60 overflow-y-auto border border-gray-100 rounded-lg bg-white shadow-sm divide-y divide-gray-50">
                 {loading ? (
-                    <div className="p-4 text-center text-gray-400 text-xs">Loading places...</div>
+                    <div className="p-4 text-center text-gray-400 text-xs">Loading activities...</div>
                 ) : filteredPlaces.length > 0 ? (
                     filteredPlaces.map((place) => (
                         <button
@@ -140,7 +140,7 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
                     ))
                 ) : (
                     <div className="p-4 text-center">
-                        <p className="text-xs text-gray-500 mb-2">No places found matching "{searchTerm}"</p>
+                        <p className="text-xs text-gray-500 mb-2">No activities found matching "{searchTerm}"</p>
                     </div>
                 )}
             </div>
@@ -151,7 +151,7 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
                 className="w-full mt-2 py-2 flex items-center justify-center gap-2 text-sm text-blue-600 font-medium hover:bg-blue-50 rounded-lg border border-dashed border-blue-200 transition-colors"
             >
                 <Plus className="w-4 h-4" />
-                Create New Place
+                Create New Activity
             </button>
         </div>
     );

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
 import { format } from "date-fns";
+import { CommunityFeed } from "@/components/dashboard/CommunityFeed";
 
 export default async function CommunityPage() {
     const supabase = await createClient();
@@ -30,7 +31,7 @@ export default async function CommunityPage() {
     }
 
     // Fetch user likes to show "red heart" state
-    let likedTripIds = new Set<string>();
+    const likedTripIds = new Set<string>();
     if (user) {
         const { data: userLikes } = await supabase
             .from('trip_likes')
@@ -68,63 +69,11 @@ export default async function CommunityPage() {
             </header>
 
             {trips && trips.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {trips.map((trip) => (
-                        <Link
-                            key={trip.id}
-                            href={`/dashboard/trips/${trip.id}`}
-                            className="block bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10 hover:shadow-md transition-all hover:-translate-y-1 group"
-                        >
-                            {/* Card Image */}
-                            <div className="relative h-48 w-full overflow-hidden">
-                                <Image
-                                    src={trip.image_url || "/images/hero-bg.png"}
-                                    alt={trip.title}
-                                    fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end text-white">
-                                    <span className="px-2 py-1 bg-black/30 backdrop-blur-md rounded-lg text-xs font-bold flex items-center gap-1">
-                                        <MapPin className="w-3 h-3" /> {trip.destination}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Card Content */}
-                            <div className="p-6">
-                                <h3 className="text-xl font-bold text-deep-teak mb-2 line-clamp-1 group-hover:text-terracotta transition-colors">{trip.title}</h3>
-
-                                <div className="flex items-center text-sm text-stone-gray mb-4">
-                                    <Calendar className="w-4 h-4 mr-2 text-terracotta" />
-                                    {trip.start_date ? format(new Date(trip.start_date), "MMM d") : "TBD"}
-                                    {trip.end_date && ` - ${format(new Date(trip.end_date), "MMM d")}`}
-                                </div>
-
-                                {/* Author Info */}
-                                <div className="flex items-center justify-between pt-4 border-t border-stone-gray/10">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-stone-gray/10 overflow-hidden">
-                                            {trip.profiles?.avatar_url ? (
-                                                <Image src={trip.profiles.avatar_url} alt="Avatar" width={32} height={32} />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-stone-gray">
-                                                    {trip.profiles?.full_name?.[0] || "?"}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <span className="text-sm font-medium text-deep-teak">
-                                            {trip.profiles?.full_name || "Unknown Traveler"}
-                                        </span>
-                                    </div>
-                                    <span className="text-xs font-bold text-terracotta bg-terracotta/10 px-2 py-1 rounded-full">
-                                        View Trip
-                                    </span>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+                <CommunityFeed
+                    trips={trips}
+                    currentUserId={user?.id}
+                    likedTripIds={likedTripIds}
+                />
             ) : (
                 <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-stone-gray/20">
                     <p className="text-stone-gray">No public trips found yet. Be the first to publish one!</p>

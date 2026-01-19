@@ -2,16 +2,19 @@
 
 import { useState, useTransition } from "react";
 import { useTemplate } from "@/app/dashboard/explore/actions";
-import { Loader2, Calendar } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface UseTemplateButtonProps {
     templateId: string;
     durationDays: number;
+    vipQuota: number;
 }
 
-export default function UseTemplateButton({ templateId, durationDays }: UseTemplateButtonProps) {
+export default function UseTemplateButton({ templateId, durationDays, vipQuota }: UseTemplateButtonProps) {
     const [isPending, startTransition] = useTransition();
     const [showDate, setShowDate] = useState(false);
+    const router = useRouter();
 
     // Default start date to tomorrow
     const tomorrow = new Date();
@@ -29,6 +32,14 @@ export default function UseTemplateButton({ templateId, durationDays }: UseTempl
                 alert("Failed to book trip. Please try again.");
             }
         });
+    };
+
+    const handleClick = () => {
+        if (vipQuota < 1) {
+            router.push("/dashboard/purchase"); // Redirect to top-up
+            return;
+        }
+        setShowDate(true);
     };
 
     if (showDate) {
@@ -69,11 +80,20 @@ export default function UseTemplateButton({ templateId, durationDays }: UseTempl
     }
 
     return (
-        <button
-            onClick={() => setShowDate(true)}
-            className="w-full bg-terracotta hover:bg-[#B54B35] text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-terracotta/20 transition-all transform hover:-translate-y-0.5 mb-4"
-        >
-            Book This Trip
-        </button>
+        <div className="mb-4">
+            <button
+                onClick={handleClick}
+                className={`w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 
+                ${vipQuota < 1
+                        ? "bg-gray-100 text-stone-gray hover:bg-gray-200 shadow-gray-200/50"
+                        : "bg-terracotta hover:bg-[#B54B35] text-white shadow-terracotta/20"
+                    }`}
+            >
+                {vipQuota < 1 ? "Insufficient VIP Quota - Top Up" : "Buy with VIP Trip Quota"}
+            </button>
+            <p className="text-center text-xs text-stone-gray/60 mt-2">
+                Your Balance: <span className="font-bold text-deep-teak">{vipQuota} VIP Credits</span>
+            </p>
+        </div>
     );
 }

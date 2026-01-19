@@ -60,6 +60,26 @@ export async function createCheckoutSession(priceId: string, metadata: any) {
     }
 }
 
+export async function getPurchaseHistory() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    const { data, error } = await supabase
+        .from('payment_transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error fetching purchase history:", error);
+        return [];
+    }
+
+    return data;
+}
+
 export async function verifyStripePurchase(sessionId: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

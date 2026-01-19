@@ -66,6 +66,8 @@ export async function createTemplate(prevState: any, formData: FormData) {
     const duration_days = parseInt(formData.get('duration_days') as string);
     const difficulty_level = formData.get('difficulty_level') as string;
     const trip_type = (formData.get('trip_type') as string) || 'standard';
+    const estimated_budget = formData.get('estimated_budget') as string;
+    const trip_preference = formData.get('trip_preference') as string;
 
     // Quota Check & Deduction for VIP
     if (trip_type === 'vip') {
@@ -104,6 +106,8 @@ export async function createTemplate(prevState: any, formData: FormData) {
             duration_days,
             difficulty_level,
             trip_type,
+            estimated_budget, // Insert budget
+            trip_preference,
             itinerary, // Initial empty itinerary
             status: 'draft'
         })
@@ -141,6 +145,8 @@ export async function updateTemplate(id: string, formData: FormData) {
     if (formData.has('difficulty_level')) updates.difficulty_level = formData.get('difficulty_level') as string;
     if (formData.has('featured_image')) updates.featured_image = formData.get('featured_image') as string;
     if (formData.has('guide_material_url')) updates.guide_material_url = formData.get('guide_material_url') as string;
+    if (formData.has('estimated_budget')) updates.estimated_budget = formData.get('estimated_budget') as string;
+    if (formData.has('trip_preference')) updates.trip_preference = formData.get('trip_preference') as string;
 
     // Add logic to save JSON itinerary if passed strictly (e.g. from the builder)
     // We might parse a JSON string if sent via form

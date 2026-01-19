@@ -56,6 +56,9 @@ export default async function DashboardLayout({
                             <Link href="/dashboard/moderation" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
                                 Moderation Queue
                             </Link>
+                            <Link href="/dashboard/blog" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
+                                Blog Management
+                            </Link>
                         </>
                     )}
                     {(isGuide || isAdmin) && (
@@ -65,7 +68,7 @@ export default async function DashboardLayout({
                                 My Templates
                             </Link>
                             <Link href="/dashboard/places" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
-                                My Places
+                                My Activities
                             </Link>
                             <Link href="/dashboard/profile" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
                                 My Profile

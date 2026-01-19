@@ -118,7 +118,18 @@ interface PlaceFormProps {
 
 export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
     const router = useRouter();
-    const [images, setImages] = useState<string[]>(initialData?.cloudinary_images || []);
+    const [images, setImages] = useState<string[]>(() => {
+        if (initialData?.cloudinary_images && initialData.cloudinary_images.length > 0) {
+            return initialData.cloudinary_images;
+        }
+        if (initialData?.photos && Array.isArray(initialData.photos) && initialData.photos.length > 0) {
+            return initialData.photos;
+        }
+        if (initialData?.image_url) {
+            return [initialData.image_url];
+        }
+        return [];
+    });
 
     const action = mode === 'create'
         ? createPlace
@@ -142,13 +153,13 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
             <header className="mb-8">
                 <Link href="/dashboard/places" className="inline-flex items-center text-gray-500 hover:text-gray-900 mb-4 transition-colors">
                     <ArrowLeft className="w-4 h-4 mr-1" />
-                    Back to Places
+                    Back to Activities
                 </Link>
                 <h2 className="text-2xl font-bold text-gray-900">
-                    {mode === 'create' ? "Add New Place" : "Edit Place"}
+                    {mode === 'create' ? "Add New Activity" : "Edit Activity"}
                 </h2>
                 <p className="text-gray-500 text-sm mt-1">
-                    {mode === 'create' ? "Share a hidden gem with the world." : "Update information about this place."}
+                    {mode === 'create' ? "Share a unique activity with the world." : "Update information about this activity."}
                 </p>
             </header>
 
@@ -165,7 +176,7 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
                     <div className="space-y-4">
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                                Place Name
+                                Activity Name
                             </label>
                             <input
                                 id="name"
@@ -217,6 +228,7 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
                                     <option value="Club">Club</option>
                                 </select>
                             </div>
+
                             <div>
                                 <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
                                     Location / Address

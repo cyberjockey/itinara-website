@@ -155,6 +155,8 @@ export async function createPlace(prevState: any, formData: FormData) {
             status: 'Open',
             coordinates,
             cloudinary_images, // Save the array of URLs
+            photos: cloudinary_images, // Sync with photos array
+            image_url: cloudinary_images.length > 0 ? cloudinary_images[0] : null, // Sync with image_url
             // Attribution
             // guide_id: user.id // If we want to track who created it
         })
@@ -202,7 +204,13 @@ export async function updatePlace(placeId: string, prevState: any, formData: For
 
     if (formData.has('cloudinary_images_json')) {
         try {
-            updates.cloudinary_images = JSON.parse(formData.get('cloudinary_images_json') as string);
+            const images = JSON.parse(formData.get('cloudinary_images_json') as string);
+            updates.cloudinary_images = images;
+            // Also update legacy columns for compatibility
+            updates.photos = images;
+            if (images.length > 0) {
+                updates.image_url = images[0];
+            }
         } catch (e) {
             console.error("Invalid JSON images");
         }
@@ -220,4 +228,122 @@ export async function updatePlace(placeId: string, prevState: any, formData: For
 
     revalidatePath('/dashboard/places');
     return { message: "Place updated successfully", success: true };
+}
+
+// Helper for delay
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+export async function bulkGenerateCoordinates(placeIds: string[]) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { message: "Unauthorized", success: false };
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const id of placeIds) {
+        try {
+            // Get current place details
+            const place = await getPlace(id);
+            if (!place || !place.location || (place.coordinates?.lat && place.coordinates?.lng)) {
+                // Skip if no location or already has coords (optional optimization, but user might want to refresh)
+                // Let's assume user wants to force refresh if they selected it, 
+                // but checking if place exists is crucial.
+                if (!place) failCount++;
+                continue;
+            }
+
+            let coords = null;
+            let attempts = 0;
+            const maxAttempts = 3;
+
+            while (attempts < maxAttempts && !coords) {
+                try {
+                    coords = await generateCoordinates(place.name, place.location);
+                    if (coords) break;
+                } catch (e) {
+                    console.warn(`Attempt ${attempts + 1} failed for ${place.name}`);
+                }
+                attempts++;
+                if (!coords) await delay(1000 * attempts); // Exponential backoff
+            }
+
+            if (coords) {
+                await supabase
+                    .from('places')
+                    .update({ coordinates: coords })
+                    .eq('id', id);
+                successCount++;
+            } else {
+                failCount++;
+            }
+
+            // Rate Limit Delay between items
+            await delay(1000);
+
+        } catch (e) {
+            console.error(`Error processing ${id}:`, e);
+            failCount++;
+        }
+    }
+
+    revalidatePath('/dashboard/places');
+    return {
+        success: true,
+        message: `Processed ${placeIds.length} items. Success: ${successCount}, Failed: ${failCount}`
+    };
+}
+
+export async function bulkGenerateDescriptions(placeIds: string[]) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { message: "Unauthorized", success: false };
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const id of placeIds) {
+        try {
+            const place = await getPlace(id);
+            if (!place) {
+                failCount++;
+                continue;
+            }
+
+            let description = null;
+            let attempts = 0;
+            const maxAttempts = 3;
+
+            while (attempts < maxAttempts && !description) {
+                attempts++;
+                description = await generatePlaceDescription(place.name, place.location || "", place.type);
+                if (description) break;
+
+                if (!description) await delay(1000 * attempts);
+            }
+
+            if (description) {
+                await supabase
+                    .from('places')
+                    .update({ description })
+                    .eq('id', id);
+                successCount++;
+            } else {
+                failCount++;
+            }
+
+            // Rate Limit Delay between items
+            await delay(1500); // Slightly longer for AI generation
+
+        } catch (e) {
+            console.error(`Error processing ${id}:`, e);
+            failCount++;
+        }
+    }
+
+    revalidatePath('/dashboard/places');
+    return {
+        success: true,
+        message: `Processed ${placeIds.length} items. Success: ${successCount}, Failed: ${failCount}`
+    };
 }

@@ -80,9 +80,24 @@ export function SortableActivityCard({ activity, readOnly = false }: SortableAct
                     )}
 
                     {activity.location && (
-                        <div className="flex items-center gap-1 text-xs text-stone-gray mt-1 truncate">
-                            <MapPin className="w-3 h-3 text-terracotta flex-shrink-0" />
-                            <span className="truncate">{activity.location}</span>
+                        <div className="flex items-center gap-2 text-xs text-stone-gray mt-1">
+                            <div className="flex items-center gap-1 truncate flex-1">
+                                <MapPin className="w-3 h-3 text-terracotta flex-shrink-0" />
+                                <span className="truncate">{activity.location}</span>
+                            </div>
+                            <a
+                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors font-medium whitespace-nowrap"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                    <circle cx="12" cy="10" r="3" />
+                                </svg>
+                                Navigate
+                            </a>
                         </div>
                     )}
                 </div>

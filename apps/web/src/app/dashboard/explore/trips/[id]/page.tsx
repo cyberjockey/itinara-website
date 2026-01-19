@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MapPin, Calendar, Clock, User, ChevronLeft, Map, Star, FileText } from "lucide-react";
 import { getPublishedTemplate } from "../../actions";
 import UseTemplateButton from "@/components/explore/UseTemplateButton";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function TripDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -17,6 +18,22 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
 
     const { destinations, profiles: guide } = template;
     const itinerary = template.itinerary as any; // Cast JSONB
+
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    let vipCredits = 0;
+
+    if (user) {
+        const { data: quota } = await supabase
+            .from('user_quotas')
+            .select('vip_trips_remaining')
+            .eq('user_id', user.id)
+            .single();
+
+        if (quota) {
+            vipCredits = quota.vip_trips_remaining || 0;
+        }
+    }
 
     return (
         <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
@@ -133,13 +150,34 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                 {/* Sidebar */}
                 <div className="space-y-8">
                     {/* Booking Card */}
+
                     <div className="bg-white p-6 rounded-2xl shadow-lg border border-stone-gray/10 sticky top-8">
                         <div className="mb-6">
-                            <span className="text-sm text-stone-gray font-medium">Starting from</span>
+                            <span className="text-sm text-stone-gray font-medium">Estimated Budget</span>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-bold text-deep-teak">IDR 2.500k</span>
-                                <span className="text-sm text-stone-gray">/ person</span>
+                                <span className="text-3xl font-bold text-deep-teak">{template.estimated_budget || "Contact for Price"}</span>
                             </div>
+                        </div>
+
+                        <div className="mb-6 p-4 bg-rice-paddy-green/10 rounded-xl border border-rice-paddy-green/20">
+                            <h4 className="font-bold text-deep-teak text-sm mb-3">Includes Local Expert Guides:</h4>
+                            <ul className="space-y-2">
+                                {[
+                                    "Local Culture Guide",
+                                    "Heritage or Historical Guide",
+                                    "Legendary Cuisine Guide",
+                                    "Hidden Gem Guide",
+                                    "Emergency Contact Service"
+                                ].map((item, i) => (
+                                    <li key={i} className="flex items-start gap-2 text-xs text-stone-gray">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-terracotta mt-1.5 shrink-0" />
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                            <p className="text-[10px] text-stone-gray/60 mt-3 italic">
+                                * Quota deducted from your VIP trip allowance.
+                            </p>
                         </div>
                     </div>
 
@@ -155,7 +193,13 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                         </a>
                     )}
 
-                    <UseTemplateButton templateId={template.id} durationDays={template.duration_days} />
+
+
+                    <UseTemplateButton
+                        templateId={template.id}
+                        durationDays={template.duration_days}
+                        vipQuota={vipCredits}
+                    />
 
                     <p className="text-center text-xs text-stone-gray/60 mb-6">
                         Secure your dates with a local expert.

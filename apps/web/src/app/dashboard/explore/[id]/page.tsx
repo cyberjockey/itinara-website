@@ -196,12 +196,7 @@ export default async function DestinationDetailPage(props: { params: Promise<{ i
                         />
                     </section>
 
-                    <PlacesList
-                        places={places || []}
-                        userTrips={userTrips}
-                        destinationName={destination.name}
-                        destinationId={destination.id} // Keep ID for logic if needed (e.g. Add to Trip)
-                    />
+
                 </div>
             </div>
         </div>

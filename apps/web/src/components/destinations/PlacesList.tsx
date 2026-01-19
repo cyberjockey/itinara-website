@@ -36,7 +36,7 @@ export function PlacesList({ places, userTrips, destinationName, destinationId }
     if (!places || places.length === 0) {
         return (
             <div className="text-center py-12 bg-stone-gray/5 rounded-3xl">
-                <p className="text-stone-gray">No specific places listed yet for {destinationName}.</p>
+                <p className="text-stone-gray">No specific activities listed yet for {destinationName}.</p>
             </div>
         );
     }
@@ -44,7 +44,7 @@ export function PlacesList({ places, userTrips, destinationName, destinationId }
     return (
         <section className="">
             <div className="flex items-center gap-2 mb-6">
-                <h2 className="text-xl font-heading font-bold text-deep-teak">Places to Visit</h2>
+                <h2 className="text-xl font-heading font-bold text-deep-teak">Activities to Experience</h2>
                 <span className="px-2 py-0.5 rounded-full bg-stone-gray/10 text-xs font-medium text-stone-gray">{places.length}</span>
             </div>
 

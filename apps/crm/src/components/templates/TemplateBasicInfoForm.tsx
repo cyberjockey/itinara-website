@@ -89,6 +89,25 @@ export function TemplateBasicInfoForm({ destinations }: TemplateBasicInfoFormPro
                             <option value="challenging">Challenging (Intense)</option>
                         </select>
                     </div>
+                    <div>
+                        <label htmlFor="trip_preference" className="block text-sm font-medium text-gray-700 mb-1">
+                            Trip Preference
+                        </label>
+                        <select
+                            id="trip_preference"
+                            name="trip_preference"
+                            defaultValue="Adventure"
+                            className="w-full px-4 py-2 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        >
+                            <option value="">Select Preference...</option>
+                            <option value="Adventure">Adventure</option>
+                            <option value="Relax">Relax</option>
+                            <option value="Culture">Culture</option>
+                            <option value="Foodie">Foodie</option>
+                            <option value="Luxury">Luxury</option>
+                            <option value="Family">Family</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div>
@@ -101,6 +120,19 @@ export function TemplateBasicInfoForm({ destinations }: TemplateBasicInfoFormPro
                         rows={3}
                         className="w-full px-4 py-2 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                         placeholder="Briefly describe what makes this trip special..."
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor="estimated_budget" className="block text-sm font-medium text-gray-700 mb-1">
+                        Estimated Budget
+                    </label>
+                    <input
+                        id="estimated_budget"
+                        name="estimated_budget"
+                        type="text"
+                        className="w-full px-4 py-2 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        placeholder="e.g. IDR 2.500k, $500-800"
                     />
                 </div>
             </div>

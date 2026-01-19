@@ -49,13 +49,15 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
         .eq('user_id', user.id)
         .single() : { data: null };
 
+    const isOwner = user?.id === trip.user_id;
+
     return (
         <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden bg-white/50">
             <div className="mb-0 px-6 pt-6 bg-white border-b border-stone-gray/10 pb-4 shadow-sm z-10">
                 <div className="max-w-7xl mx-auto w-full">
-                    <Link href="/dashboard" className="inline-flex items-center text-sm font-medium text-stone-gray hover:text-deep-teak mb-4 transition-colors group">
+                    <Link href={isOwner ? "/dashboard" : "/dashboard/community"} className="inline-flex items-center text-sm font-medium text-stone-gray hover:text-deep-teak mb-4 transition-colors group">
                         <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-                        Back to Dashboard
+                        Back to {isOwner ? 'Dashboard' : 'Community'}
                     </Link>
 
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -68,10 +70,20 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                                 </div>
                                 <div className="flex items-center gap-1.5 bg-stone-gray/5 px-2.5 py-1 rounded-md">
                                     <Calendar className="w-3.5 h-3.5 text-terracotta" />
-                                    <span className="font-medium">{new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}</span>
+                                    <span className="font-medium">
+                                        {/* Privacy for visitors: Show only days count or general start date? 
+                                            User asked for privacy. Let's just show year or generic duration?
+                                            But 'TimelineView' needs dates. 
+                                            Let's keep dates for now as standard travel sites do, but remove editing.
+                                        */}
+                                        {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
+                                    </span>
                                 </div>
                                 <div className="w-px h-4 bg-stone-gray/20 mx-1 hidden md:block"></div>
-                                <TripVisibilityToggle tripId={trip.id} initialIsPublic={trip.is_public || false} />
+
+                                {isOwner && (
+                                    <TripVisibilityToggle tripId={trip.id} initialIsPublic={trip.is_public || false} />
+                                )}
 
                                 {/* Trip Type Label */}
                                 {trip.trip_type === 'vip' ? (
@@ -100,12 +112,18 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                                 <Share2 className="w-4 h-4" />
                                 <span className="hidden sm:inline">Print</span>
                             </Link>
-                            <CalendarExportButton
-                                tripTitle={trip.title}
-                                tripStartDate={trip.start_date}
-                                activities={activities || []}
-                            />
-                            <ShareButton tripId={trip.id} />
+
+                            {/* Actions only for owner or specific allowed actions for visitors */}
+                            {isOwner && (
+                                <>
+                                    <CalendarExportButton
+                                        tripTitle={trip.title}
+                                        tripStartDate={trip.start_date}
+                                        activities={activities || []}
+                                    />
+                                    <ShareButton tripId={trip.id} />
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -113,7 +131,11 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
 
             {/* Client-side Toggle Wrapper */}
             <div className="flex-1 overflow-hidden relative">
-                <TripViewToggle trip={trip} activities={activities || []} />
+                <TripViewToggle
+                    trip={trip}
+                    activities={activities || []}
+                    readOnly={!isOwner}
+                />
             </div>
         </div>
     );

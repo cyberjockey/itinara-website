@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Plus, Calendar, MapPin, MoreHorizontal, Sparkles } from "lucide-react";
 import { QuotaWidget } from "@/components/dashboard/QuotaWidget";
+import { RankBadge } from "@/components/ui/RankBadge";
 
 import { verifyStripePurchase } from "../actions/stripe";
 
@@ -14,6 +15,13 @@ export default async function DashboardPage({
 }) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
+
+    // Fetch user profile with rank data
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('rank_points, rank_tier')
+        .eq('id', user?.id)
+        .single();
 
     // Handle Payment Success
     const resolvedParams = await searchParams;
@@ -34,11 +42,21 @@ export default async function DashboardPage({
             <header className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12 pt-8">
                 <div className="flex-1">
                     <h1 className="text-4xl md:text-5xl font-heading font-bold text-deep-teak mb-2">My Trips</h1>
-                    <p className="text-lg text-stone-gray/80">Welcome back, {user?.user_metadata?.first_name || 'Traveler'}!</p>
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <p className="text-lg text-stone-gray/80">Welcome back, {user?.user_metadata?.first_name || 'Traveler'}!</p>
+                        {profile && (
+                            <RankBadge
+                                tier={profile.rank_tier || 'Pendatang'}
+                                points={profile.rank_points || 0}
+                                compact
+                            />
+                        )}
+                    </div>
                 </div>
                 <div className="md:min-w-[280px]">
                     <QuotaWidget />
                 </div>
+
             </header>
 
             {paymentMessage && (

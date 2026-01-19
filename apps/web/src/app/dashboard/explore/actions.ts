@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function getPublishedTemplates(query?: string, page = 1, limit = 6) {
+export async function getPublishedTemplates(query?: string, page = 1, limit = 6, preference?: string) {
     const supabase = await createClient();
 
     // 1. Fetch Templates with Pagination
@@ -16,6 +16,10 @@ export async function getPublishedTemplates(query?: string, page = 1, limit = 6)
         `, { count: 'exact' })
         .eq('status', 'published')
         .order('use_count', { ascending: false });
+
+    if (preference && preference !== 'All') {
+        dbQuery = dbQuery.eq('trip_preference', preference);
+    }
 
     if (query) {
         dbQuery = dbQuery.ilike('title', `%${query}%`);
@@ -206,4 +210,6 @@ export async function toggleSaveDestination(destinationId: string) {
 
     return { success: true };
 }
+
+
 
