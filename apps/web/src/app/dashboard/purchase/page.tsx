@@ -122,11 +122,7 @@ export default function PurchasePage() {
                     {CREDIT_BUNDLES.map((bundle) => (
                         <div key={bundle.id} className="bg-white rounded-2xl p-5 border border-stone-200 shadow-sm hover:shadow-md transition-all flex flex-col">
                             <div className="flex justify-between items-start mb-2">
-                                {bundle.rating && (
-                                    <div className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                        {bundle.rating}
-                                    </div>
-                                )}
+
                                 {bundle.badge && (
                                     <div className="bg-red-50 text-terracotta text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-100">
                                         {bundle.badge}
