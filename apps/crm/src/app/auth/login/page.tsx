@@ -1,6 +1,15 @@
+'use client'
+
+import { useActionState } from 'react'
 import { login } from './actions'
 
+const initialState = {
+    error: '',
+}
+
 export default function LoginPage() {
+    const [state, formAction, isPending] = useActionState(login, initialState)
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
@@ -13,7 +22,13 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                <form className="mt-8 space-y-6" action={login}>
+                <form className="mt-8 space-y-6" action={formAction}>
+                    {state?.error && (
+                        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+                            {state.error}
+                        </div>
+                    )}
+
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div>
                             <label htmlFor="beta-code" className="sr-only">Beta Access Code</label>
@@ -55,9 +70,10 @@ export default function LoginPage() {
                     <div>
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            disabled={isPending}
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Sign in
+                            {isPending ? 'Signing in...' : 'Sign in'}
                         </button>
                     </div>
                 </form>
