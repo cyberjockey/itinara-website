@@ -7,6 +7,7 @@ import CloudinaryImageUpload from "@/components/ui/CloudinaryImageUpload";
 import CloudinaryFileUpload from "@/components/ui/CloudinaryFileUpload";
 
 interface TemplateDetailsFormProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     template: any;
 }
 
@@ -15,7 +16,7 @@ const initialState = {
 };
 
 export function TemplateDetailsForm({ template }: TemplateDetailsFormProps) {
-    // @ts-ignore
+    // @ts-expect-error - Known type mismatch
     const [state, formAction, isPending] = useActionState((state, formData) => updateTemplate(template.id, formData), initialState);
 
     // State for the uploaded image URL

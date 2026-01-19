@@ -52,7 +52,7 @@ export async function getTemplate(id: string) {
     return data;
 }
 
-export async function createTemplate(prevState: any, formData: FormData) {
+export async function createTemplate(prevState: unknown, formData: FormData) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -138,6 +138,7 @@ export async function updateTemplate(id: string, formData: FormData) {
 
     const supabase = await createClient();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any = {};
     if (formData.has('title')) updates.title = formData.get('title') as string;
     if (formData.has('description')) updates.description = formData.get('description') as string;

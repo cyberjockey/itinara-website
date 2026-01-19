@@ -4,6 +4,8 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import rehypeRaw from 'rehype-raw';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
     Save, ArrowLeft, Image as ImageIcon, Globe, Loader2,
     Bold, Italic, Link as LinkIcon, List, Quote, Code, Heading1, Heading2,
@@ -140,7 +142,7 @@ export default function BlogEditor({ initialPost }: { initialPost?: Post }) {
                 <div className="flex items-center gap-3">
                     <select
                         value={post.status}
-                        onChange={(e) => setPost({ ...post, status: e.target.value as any })}
+                        onChange={(e) => setPost({ ...post, status: e.target.value as 'draft' | 'published' | 'archived' })}
                         className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                     >
                         <option value="draft">Draft</option>

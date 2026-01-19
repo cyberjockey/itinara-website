@@ -1,0 +1,345 @@
+
+> @itinara/web@0.1.0 lint
+> eslint
+
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/actions/stripe.ts
+   13:72  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  131:15  warning  'type' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/blog/[slug]/page.tsx
+  11:21  warning  'User' is defined but never used                                 @typescript-eslint/no-unused-vars
+  11:27  warning  'Calendar' is defined but never used                             @typescript-eslint/no-unused-vars
+  11:37  warning  'Clock' is defined but never used                                @typescript-eslint/no-unused-vars
+  12:10  warning  'notFound' is defined but never used                             @typescript-eslint/no-unused-vars
+  66:77  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  66:84  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  67:76  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  67:86  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/community/page.tsx
+  4:8   warning  'Image' is defined but never used     @typescript-eslint/no-unused-vars
+  5:8   warning  'Link' is defined but never used      @typescript-eslint/no-unused-vars
+  6:10  warning  'Calendar' is defined but never used  @typescript-eslint/no-unused-vars
+  6:20  warning  'MapPin' is defined but never used    @typescript-eslint/no-unused-vars
+  7:10  warning  'format' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/explore/[id]/page.tsx
+   41:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/explore/[id]/place/[placeId]/page.tsx
+   3:8   warning  'Image' is defined but never used             @typescript-eslint/no-unused-vars
+   5:35  warning  'Calendar' is defined but never used          @typescript-eslint/no-unused-vars
+   5:57  warning  'ExternalLink' is defined but never used      @typescript-eslint/no-unused-vars
+   9:10  warning  'AddActivityModal' is defined but never used  @typescript-eslint/no-unused-vars
+  31:20  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/explore/actions.ts
+  141:31  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  142:45  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  145:38  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  149:51  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  184:45  warning  'destinationId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/explore/page.tsx
+    2:24   warning  'Calendar' is defined but never used                             @typescript-eslint/no-unused-vars
+   94:55   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  157:123  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  157:136  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  169:53   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/explore/trips/[id]/page.tsx
+    4:18  warning  'Calendar' is defined but never used                             @typescript-eslint/no-unused-vars
+    4:28  warning  'Clock' is defined but never used                                @typescript-eslint/no-unused-vars
+    4:59  warning  'Star' is defined but never used                                 @typescript-eslint/no-unused-vars
+   20:45  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  101:57  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  114:80  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  192:49  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  225:33  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  225:45  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/page.tsx
+   3:10  warning  'Plus' is defined but never used          @typescript-eslint/no-unused-vars
+  71:39  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/purchase/page.tsx
+  1:10  warning  'getAllPackages' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/saved/page.tsx
+  23:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/settings/actions.ts
+  57:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/settings/page.tsx
+  3:10  warning  'useState' is defined but never used       @typescript-eslint/no-unused-vars
+  4:10  warning  'User' is defined but never used           @typescript-eslint/no-unused-vars
+  4:16  warning  'Save' is defined but never used           @typescript-eslint/no-unused-vars
+  4:22  warning  'Asterisk' is defined but never used       @typescript-eslint/no-unused-vars
+  5:10  warning  'updateProfile' is defined but never used  @typescript-eslint/no-unused-vars
+  6:10  warning  'createClient' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/trips/[id]/actions.ts
+  6:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/trips/[id]/page.tsx
+  3:43  warning  'MapIcon' is defined but never used   @typescript-eslint/no-unused-vars
+  3:60  warning  'ListIcon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/trips/[id]/print/page.tsx
+  22:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/trips/actions.ts
+   67:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  191:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  194:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/trips/new/DestinationCombobox.tsx
+  5:41  warning  'Search' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/trips/new/actions.ts
+    7:45  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  165:15  warning  'dateStr' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/dashboard/trips/new/page.tsx
+   4:26  warning  'useState' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+  14:5   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/destinations/[slug]/page.tsx
+  4:8   warning  'Image' is defined but never used         @typescript-eslint/no-unused-vars
+  5:8   warning  'Link' is defined but never used          @typescript-eslint/no-unused-vars
+  6:10  warning  'MapPin' is defined but never used        @typescript-eslint/no-unused-vars
+  6:18  warning  'Calendar' is defined but never used      @typescript-eslint/no-unused-vars
+  6:28  warning  'DollarSign' is defined but never used    @typescript-eslint/no-unused-vars
+  6:40  warning  'ArrowRight' is defined but never used    @typescript-eslint/no-unused-vars
+  6:52  warning  'Sparkles' is defined but never used      @typescript-eslint/no-unused-vars
+  6:62  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+  6:76  warning  'AlertCircle' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/login/actions.ts
+  7:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/login/page.tsx
+  14:5   error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  93:28  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                      react/no-unescaped-entities
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/pricing/page.tsx
+  1:10  warning  'getAllPackages' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/signup/actions.ts
+  7:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/signup/page.tsx
+  14:5  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+/Users/macbookpro152019/itinara-website/apps/web/src/app/trips/[id]/page.tsx
+  3:28  warning  'Share2' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/ai/AIWizard.tsx
+   4:45  warning  'Check' is defined but never used                                @typescript-eslint/no-unused-vars
+   4:64  warning  'Loader2' is defined but never used                              @typescript-eslint/no-unused-vars
+  89:59  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/ai/GeneratedTripPreview.tsx
+   4:25  warning  'Calendar' is defined but never used         @typescript-eslint/no-unused-vars
+  16:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/AddActivityModal.tsx
+   4:10  warning  'useState' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+  28:5   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  29:72  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/AddToTripModal.tsx
+    7:13  warning  'Calendar' is defined but never used                                                                                                                                       @typescript-eslint/no-unused-vars
+    7:23  warning  'MapPin' is defined but never used                                                                                                                                         @typescript-eslint/no-unused-vars
+  161:41  error    Do not use an `<a>` element to navigate to `/dashboard/trips/new/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/CalendarExportButton.tsx
+   6:11  warning  'Activity' is defined but never used      @typescript-eslint/no-unused-vars
+  19:17  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/CommentItem.tsx
+    5:53  warning  'X' is defined but never used             @typescript-eslint/no-unused-vars
+    5:56  warning  'Check' is defined but never used         @typescript-eslint/no-unused-vars
+   11:14  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  178:50  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/CommentPopover.tsx
+   3:31  warning  'useRef' is defined but never used                                                                                                       @typescript-eslint/no-unused-vars
+   4:25  warning  'Heart' is defined but never used                                                                                                        @typescript-eslint/no-unused-vars
+  16:46  error    Unexpected any. Specify a different type                                                                                                 @typescript-eslint/no-explicit-any
+  57:8   warning  React Hook useEffect has missing dependencies: 'comments.length' and 'loadComments'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  64:8   warning  React Hook useEffect has missing dependencies: 'isOpen' and 'loadComments'. Either include them or remove the dependency array           react-hooks/exhaustive-deps
+  76:18  warning  'e' is defined but never used                                                                                                            @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/CommentSection.tsx
+  11:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/CommunityFeed.tsx
+   8:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/CommunityTripCard.tsx
+   7:11  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  13:43  warning  'currentUserId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/DayColumn.tsx
+   53:58  warning  'onAddActivity' is defined but never used                                                                                                                                @typescript-eslint/no-unused-vars
+  128:25  error    Do not use an `<a>` element to navigate to `/dashboard/explore/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+  128:25  error    Do not use an `<a>` element to navigate to `/dashboard/explore/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/PurchaseHistory.tsx
+   5:28  warning  'AlertCircle' is defined but never used   @typescript-eslint/no-unused-vars
+  13:15  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/SaveButton.tsx
+  6:10  warning  'cn' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/SearchBar.tsx
+   8:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  11:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/SettingsForm.tsx
+   7:10  warning  'RankBadge' is defined but never used          @typescript-eslint/no-unused-vars
+  20:12  warning  'fullName' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/ShareButton.tsx
+  3:25  warning  'Copy' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/SidebarQuota.tsx
+   5:27  warning  'Loader2' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+   5:42  warning  'ChevronUp' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+  12:12  warning  'isOpen' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+  12:20  warning  'setIsOpen' is assigned a value but never used                                                               @typescript-eslint/no-unused-vars
+  13:11  warning  'router' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+  42:8   warning  React Hook useEffect has a missing dependency: 'supabase'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/TimelineView.tsx
+    3:20  warning  'useCallback' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+    4:10  warning  'format' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+  176:15  warning  'newIndex' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  190:19  warning  'currentItems' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  205:13  warning  'newDayNumber' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  217:22  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  226:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/TimelineView.tsx:226:9
+  224 |     const [isMounted, setIsMounted] = useState(false);
+  225 |     useEffect(() => {
+> 226 |         setIsMounted(true);
+      |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  227 |     }, []);
+  228 |
+  229 |     const dropAnimation = {  react-hooks/set-state-in-effect
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/TripMap.tsx
+  76:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/TripMap.tsx:76:9
+  74 |
+  75 |     useEffect(() => {
+> 76 |         setIsMounted(true);
+     |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  77 |     }, []);
+  78 |
+  79 |     if (!isMounted) {  react-hooks/set-state-in-effect
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/TripThreadSheet.tsx
+   4:54  warning  'Heart' is defined but never used                                                                                             @typescript-eslint/no-unused-vars
+   9:10  warning  'cn' is defined but never used                                                                                                @typescript-eslint/no-unused-vars
+  13:11  error    Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  20:73  warning  'initialIsLiked' is assigned a value but never used                                                                           @typescript-eslint/no-unused-vars
+  21:46  error    Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  37:8   warning  React Hook useEffect has missing dependencies: 'loadComments' and 'trip'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  77:18  warning  'e' is defined but never used                                                                                                 @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/TripTypeModal.tsx
+  4:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/dashboard/TripViewToggle.tsx
+   6:15  warning  'List' is defined but never used          @typescript-eslint/no-unused-vars
+   7:10  warning  'TripMap' is defined but never used       @typescript-eslint/no-unused-vars
+  19:11  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:17  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/destinations/DestinationContent.tsx
+    9:18   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   66:153  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  146:69   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/destinations/DestinationHero.tsx
+  14:41  warning  'description' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/destinations/PlacesList.tsx
+   3:24  warning  'Plus' is defined but never used          @typescript-eslint/no-unused-vars
+   5:10  warning  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  18:15  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  35:38  warning  'userTrips' is defined but never used     @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/explore/UseTemplateButton.tsx
+  29:23  error  React Hook "useTemplate" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/landing/FeaturesGrid.tsx
+  4:46  warning  'Move' is defined but never used  @typescript-eslint/no-unused-vars
+  4:52  warning  'Star' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/landing/Hero.tsx
+  19:11  warning  The 'words' array makes the dependencies of useEffect Hook (at line 46) change on every render. Move it inside the useEffect callback. Alternatively, wrap the initialization of 'words' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/landing/HowItWorks.tsx
+  65:59  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/landing/Testimonials.tsx
+  122:33  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  122:67  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/places/AddToTripWrapper.tsx
+   8:16  error    Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  15:84  warning  'placeCoordinates' is defined but never used            @typescript-eslint/no-unused-vars
+  16:12  warning  'isModalOpen' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  16:25  warning  'setIsModalOpen' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  29:12  warning  'selectedTripId' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  29:28  warning  'setSelectedTripId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/places/PlaceReviews.tsx
+  25:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  36:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/ui/BackgroundMusic.tsx
+  4:26  warning  'VolumeX' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/components/ui/PdfViewerModal.tsx
+  4:33  warning  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  4:46  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/lib/supabase/middleware.ts
+  18:58  warning  'options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/web/src/lib/supabase/server.ts
+  1:35  warning  'CookieOptions' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 175 problems (71 errors, 104 warnings)
+
+npm error Lifecycle script `lint` failed with error:
+npm error code 1
+npm error path /Users/macbookpro152019/itinara-website/apps/web
+npm error workspace @itinara/web@0.1.0
+npm error location /Users/macbookpro152019/itinara-website/apps/web
+npm error command failed
+npm error command sh -c eslint

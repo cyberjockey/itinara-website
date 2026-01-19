@@ -14,7 +14,7 @@ const initialState = {
 };
 
 export function TemplateBasicInfoForm({ destinations }: TemplateBasicInfoFormProps) {
-    // @ts-ignore
+
     const [state, formAction, isPending] = useActionState(createTemplate, initialState);
 
     return (

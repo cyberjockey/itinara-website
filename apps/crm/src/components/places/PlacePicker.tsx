@@ -22,7 +22,7 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
     // Initial load
     useEffect(() => {
         getPlaces(destinationId).then(data => {
-            setPlaces(data);
+            setPlaces(data.data);
             setLoading(false);
         });
     }, [destinationId]);
@@ -32,7 +32,7 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
     );
 
     // --- Create New Place Logic ---
-    const [createState, createAction, isCreatePending] = useActionState(async (prev: any, formData: FormData) => {
+    const [createState, createAction, isCreatePending] = useActionState(async (prev: unknown, formData: FormData) => {
         const result = await createPlace(prev, formData);
         if (result.place) {
             // Optimistically update list and select it
@@ -140,7 +140,7 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
                     ))
                 ) : (
                     <div className="p-4 text-center">
-                        <p className="text-xs text-gray-500 mb-2">No activities found matching "{searchTerm}"</p>
+                        <p className="text-xs text-gray-500 mb-2">No activities found matching &quot;{searchTerm}&quot;</p>
                     </div>
                 )}
             </div>

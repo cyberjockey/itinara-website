@@ -19,6 +19,7 @@ export default async function ModerationPage() {
 
             <div className="grid gap-4">
                 {pendingTemplates.length > 0 ? (
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     pendingTemplates.map((template: any) => (
                         <div key={template.id} className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="flex flex-col md:flex-row gap-6 justify-between items-start">

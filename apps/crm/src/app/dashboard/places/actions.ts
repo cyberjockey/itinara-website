@@ -113,7 +113,7 @@ export async function getPlace(id: string) {
     return data as Place;
 }
 
-export async function createPlace(prevState: any, formData: FormData) {
+export async function createPlace(prevState: unknown, formData: FormData) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -127,7 +127,7 @@ export async function createPlace(prevState: any, formData: FormData) {
     const location = formData.get('location') as string;
     const description = formData.get('description') as string;
 
-    let coordinates: any = null;
+    let coordinates: { lat: number, lng: number } | null = null;
     if (formData.get('lat') && formData.get('lng')) {
         coordinates = {
             lat: parseFloat(formData.get('lat') as string),
@@ -173,7 +173,7 @@ export async function createPlace(prevState: any, formData: FormData) {
     return { message: "Place created successfully", place: data };
 }
 
-export async function updatePlace(placeId: string, prevState: any, formData: FormData) {
+export async function updatePlace(placeId: string, prevState: unknown, formData: FormData) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -187,6 +187,7 @@ export async function updatePlace(placeId: string, prevState: any, formData: For
     const location = formData.get('location') as string;
     const description = formData.get('description') as string;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any = {
         name,
         destination_id,

@@ -112,6 +112,7 @@ function CoordinateGenerator() {
 
 interface PlaceFormProps {
     destinations: { id: string, name: string }[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialData?: any;
     mode: 'create' | 'edit';
 }
@@ -138,7 +139,7 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
     // Provide a valid initial state that matches the return type of the action
     const initialState = { message: "" };
 
-    const [state, formAction, isPending] = useActionState(async (prev: any, formData: FormData) => {
+    const [state, formAction, isPending] = useActionState(async (prev: unknown, formData: FormData) => {
         const result = await action(prev, formData);
 
         if ((mode === 'create' && 'place' in result && result.place) ||

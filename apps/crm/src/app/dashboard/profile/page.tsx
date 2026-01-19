@@ -7,8 +7,14 @@ import CloudinaryImageUpload from "@/components/ui/CloudinaryImageUpload";
 import Image from "next/image";
 
 export default function ProfilePage() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+
+
+
+    const [state, formAction, isPending] = useActionState(updateProfile, { message: "" });
+    const [avatarUrl, setAvatarUrl] = useState("");
 
     useEffect(() => {
         getProfile().then(data => {
@@ -17,9 +23,6 @@ export default function ProfilePage() {
             if (data?.avatar_url) setAvatarUrl(data.avatar_url);
         });
     }, []);
-
-    const [state, formAction, isPending] = useActionState(updateProfile, { message: "" });
-    const [avatarUrl, setAvatarUrl] = useState("");
 
     if (loading) return <div className="p-12 text-center text-gray-400">Loading profile...</div>;
 

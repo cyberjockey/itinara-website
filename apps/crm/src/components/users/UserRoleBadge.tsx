@@ -1,4 +1,4 @@
-import { Badge } from "lucide-react";
+// import { Badge } from "lucide-react"; // Unused
 
 interface UserRoleBadgeProps {
     role: string;

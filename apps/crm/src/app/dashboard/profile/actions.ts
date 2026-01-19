@@ -23,7 +23,7 @@ export async function getProfile() {
     return data;
 }
 
-export async function updateProfile(prevState: any, formData: FormData) {
+export async function updateProfile(prevState: unknown, formData: FormData) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -42,6 +42,7 @@ export async function updateProfile(prevState: any, formData: FormData) {
     const expertiseRaw = formData.get('guide_expertise') as string;
     const guide_expertise = expertiseRaw ? expertiseRaw.split(',').map(s => s.trim()).filter(s => s) : [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any = {
         full_name,
         guide_bio,
