@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { ArrowLeft, User, Calendar, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { ShareButtons } from "@/components/blog/ShareButtons";
@@ -147,7 +148,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                     {/* Content */}
                     <div className="prose prose-lg max-w-none text-black prose-headings:text-black prose-p:text-black prose-li:text-black prose-strong:text-black prose-a:text-terracotta prose-img:rounded-xl [&>*]:text-black">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[require('rehype-raw')]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                             {post.content.replace(/\\n/g, '\n')}
                         </ReactMarkdown>
                     </div>
