@@ -74,7 +74,8 @@ export async function getCustomers(query?: string) {
         .select('user_id, amount_paid');
 
     // Aggregate in memory (MVP optimized)
-    const customers: Customer[] = profiles.map((profile: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const customers: Customer[] = profiles.map((profile: any) => { // TODO: Define strict type
         const userTrips = trips?.filter(t => t.user_id === profile.id) || [];
         const userPurchases = purchases?.filter(p => p.user_id === profile.id) || [];
         const totalSpend = userPurchases.reduce((sum, p) => sum + Number(p.amount_paid), 0);

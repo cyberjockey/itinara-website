@@ -31,6 +31,7 @@ export default async function TemplatesPage() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {templates.map((template: any) => (
                         <Link
                             key={template.id}

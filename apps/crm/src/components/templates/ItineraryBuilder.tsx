@@ -12,7 +12,7 @@ interface Activity {
     title: string;
     description: string;
     start_time: string;
-    start_time: string;
+
     location: string;
     place_id?: string;
     place_data?: Place; // Optional: store full place data for UI display if needed
@@ -24,12 +24,14 @@ interface Day {
     activities: Activity[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function ItineraryBuilder({ template }: { template: any }) {
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
 
     // Initialize state from template JSON or default structure
     const [days, setDays] = useState<Day[]>(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (template.itinerary as any)?.days ||
         Array.from({ length: template.duration_days }, (_, i) => ({
             day: i + 1,

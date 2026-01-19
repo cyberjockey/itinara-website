@@ -1,0 +1,82 @@
+
+> crm@0.1.0 lint
+> eslint
+
+
+/Users/macbookpro152019/itinara-website/apps/crm/middleware.ts
+  1:35  warning  'CookieOptions' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/customers/[id]/page.tsx
+   3:35  warning  'Calendar' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  28:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/customers/page.tsx
+  54:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/destinations/page.tsx
+  2:24  warning  'MoreHorizontal' is defined but never used     @typescript-eslint/no-unused-vars
+  2:48  warning  'Trash' is defined but never used              @typescript-eslint/no-unused-vars
+  3:27  warning  'deleteDestination' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/layout.tsx
+  33:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/page.tsx
+  4:11  warning  'supabase' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/places/actions.ts
+  142:18  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  215:18  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  265:26  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/profile/page.tsx
+  5:25  warning  'Save' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/templates/actions.ts
+  157:18  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/templates/page.tsx
+  43:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/app/dashboard/users/page.tsx
+  1:33  warning  'setUserRole' is defined but never used    @typescript-eslint/no-unused-vars
+  2:17  warning  'Shield' is defined but never used         @typescript-eslint/no-unused-vars
+  2:25  warning  'Search' is defined but never used         @typescript-eslint/no-unused-vars
+  2:33  warning  'Filter' is defined but never used         @typescript-eslint/no-unused-vars
+  4:10  warning  'UserRoleBadge' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/components/blog/BlogEditor.tsx
+  262:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/components/destinations/DestinationForm.tsx
+  45:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/components/places/PlaceForm.tsx
+  3:20  warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/components/places/PlacePicker.tsx
+    4:17   warning  'ChevronsUpDown' is defined but never used                       @typescript-eslint/no-unused-vars
+   16:63   warning  'onCancel' is defined but never used                             @typescript-eslint/no-unused-vars
+  143:96   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  143:109  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/components/templates/ItineraryBuilder.tsx
+    4:24  warning  'Clock' is defined but never used  @typescript-eslint/no-unused-vars
+  126:45  warning  'index' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/components/templates/TemplateDetailsForm.tsx
+  5:10  warning  'Save' is defined but never used       @typescript-eslint/no-unused-vars
+  5:25  warning  'ImageIcon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/macbookpro152019/itinara-website/apps/crm/src/components/templates/TemplateEditor.tsx
+  6:18  warning  'Map' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 32 problems (2 errors, 30 warnings)
+
+npm error Lifecycle script `lint` failed with error:
+npm error code 1
+npm error path /Users/macbookpro152019/itinara-website/apps/crm
+npm error workspace crm@0.1.0
+npm error location /Users/macbookpro152019/itinara-website/apps/crm
+npm error command failed
+npm error command sh -c eslint

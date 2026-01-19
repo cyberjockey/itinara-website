@@ -3,10 +3,20 @@ import { Check, Shield, Search, Filter, UserCog } from "lucide-react";
 import Image from "next/image";
 import { UserRoleBadge } from "../../../components/users/UserRoleBadge"; // Using relative path to fix build alias issue
 
+interface User {
+    id: string;
+    full_name: string | null;
+    email: string | null;
+    username: string | null;
+    avatar_url: string | null;
+    role: string;
+    guide_verified: boolean;
+}
+
 export default async function UsersPage({ searchParams }: { searchParams: Promise<{ role?: string }> }) {
     const params = await searchParams;
     const roleFilter = params.role || undefined;
-    const users = await getUsers(roleFilter);
+    const users: User[] = await getUsers(roleFilter);
 
     return (
         <div className="max-w-6xl mx-auto">
@@ -43,7 +53,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {users.map((user: any) => (
+                        {users.map((user: User) => (
                             <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">

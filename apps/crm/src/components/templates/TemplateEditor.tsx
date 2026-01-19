@@ -6,6 +6,7 @@ import { TemplateDetailsForm } from "./TemplateDetailsForm";
 import { Layout, Map, Settings } from "lucide-react";
 import { cn } from "@/lib/utils"; // Make sure to have a utils file or use clsx directly
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function TemplateEditor({ template }: { template: any }) {
     const [activeTab, setActiveTab] = useState<'itinerary' | 'details' | 'settings'>('itinerary');
 

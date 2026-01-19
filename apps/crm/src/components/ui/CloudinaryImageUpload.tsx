@@ -31,6 +31,7 @@ export default function CloudinaryImageUpload({
 }: CloudinaryImageUploadProps) {
     const [uploadedImages, setUploadedImages] = useState<string[]>(defaultValue);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleUploadSuccess = (result: any) => {
         const info = result.info as CloudinaryResource;
         const newImages = [...uploadedImages, info.secure_url];

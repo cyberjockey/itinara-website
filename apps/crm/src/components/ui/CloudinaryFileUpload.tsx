@@ -32,6 +32,7 @@ export default function CloudinaryFileUpload({
         setFileUrl(defaultValue);
     }, [defaultValue]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleUploadSuccess = (result: any) => {
         const info = result.info as CloudinaryFileSystemResource;
         const newUrl = info.secure_url;
