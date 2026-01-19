@@ -7,7 +7,7 @@ import Stripe from "stripe";
 
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeKey ? new Stripe(stripeKey, {
-    apiVersion: "2024-12-18.acacia", // Use latest or pinned version
+    apiVersion: "2025-12-15.clover", // Use latest or pinned version
 }) : null;
 
 export async function createCheckoutSession(priceId: string, metadata: any) {
