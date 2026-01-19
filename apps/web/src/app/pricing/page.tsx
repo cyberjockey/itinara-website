@@ -121,11 +121,7 @@ export default function PricingPage() {
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {CREDIT_BUNDLES.map((bundle) => (
                             <div key={bundle.id} className="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm hover:shadow-md transition-all flex flex-col">
-                                {bundle.rating && ( // Assuming badge logic 
-                                    <div className="self-start bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full mb-3">
-                                        {bundle.rating} {/* Mapping rating/badge if available in types, checking pricing.ts showed 'badge' property */}
-                                    </div>
-                                )}
+
                                 {bundle.badge && (
                                     <div className="self-start bg-red-50 text-terracotta text-[10px] font-bold px-2 py-0.5 rounded-full mb-3 border border-red-100">
                                         {bundle.badge}
