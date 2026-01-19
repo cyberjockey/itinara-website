@@ -1,4 +1,4 @@
-'use server'
+'use server' // Force rebuild
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
