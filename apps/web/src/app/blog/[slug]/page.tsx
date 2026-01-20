@@ -149,9 +149,25 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     {/* Content */}
                     <div className="prose prose-lg max-w-none text-black prose-headings:text-black prose-p:text-black prose-li:text-black prose-strong:text-black prose-a:text-terracotta prose-img:rounded-xl [&>*]:text-black">
                         {(() => {
-                            const content = post.content || '';
-                            // Simple heuristic: if it starts with a tag, treat as HTML
-                            const isHtml = /^\s*</.test(content);
+                            let content = post.content || '';
+
+                            // Normalize newlines first (handle literal \n from DB)
+                            content = content.replace(/\\n/g, '\n');
+
+                            // Check for Markdown code block wrapping (common copy-paste issue)
+                            const codeBlockRegex = /^```(?:html)?\s*([\s\S]*?)\s*```$/i;
+                            const match = content.trim().match(codeBlockRegex);
+                            if (match) {
+                                content = match[1];
+                            }
+
+                            // Handle potential escaped HTML logic if needed (though usually not expected unless double encoded)
+                            // We do a check on the trimmed content
+                            const trimmed = content.trim();
+
+                            // Heuristic: Check if it starts with an HTML tag
+                            // We allow standard tags or even partials if it's the start of the string
+                            const isHtml = trimmed.startsWith('<');
 
                             if (isHtml) {
                                 return <div dangerouslySetInnerHTML={{ __html: content }} />;
@@ -159,7 +175,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                             return (
                                 <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                                    {content.replace(/\\n/g, '\n')}
+                                    {content}
                                 </ReactMarkdown>
                             );
                         })()}
