@@ -148,9 +148,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                     {/* Content */}
                     <div className="prose prose-lg max-w-none text-black prose-headings:text-black prose-p:text-black prose-li:text-black prose-strong:text-black prose-a:text-terracotta prose-img:rounded-xl [&>*]:text-black">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                            {post.content.replace(/\\n/g, '\n')}
-                        </ReactMarkdown>
+                        {(() => {
+                            const content = post.content || '';
+                            // Simple heuristic: if it starts with a tag, treat as HTML
+                            const isHtml = /^\s*</.test(content);
+
+                            if (isHtml) {
+                                return <div dangerouslySetInnerHTML={{ __html: content }} />;
+                            }
+
+                            return (
+                                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                                    {content.replace(/\\n/g, '\n')}
+                                </ReactMarkdown>
+                            );
+                        })()}
                     </div>
 
                     {/* Share / Footer */}
