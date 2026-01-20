@@ -27,7 +27,7 @@ export default async function DashboardLayout({
     return (
         <div className="min-h-screen bg-gray-50 flex">
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r fixed h-full overflow-y-auto">
+            <aside className="w-64 bg-white border-r fixed h-full overflow-y-auto hidden md:block z-20">
                 <div className="p-6 border-b">
                     <Link href="/dashboard" className="flex items-center gap-3">
                         <img src="/logo.svg" alt="Itinara Logo" className="w-8 h-8" />
@@ -90,7 +90,7 @@ export default async function DashboardLayout({
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 ml-64 p-8">
+            <main className="flex-1 ml-0 md:ml-64 p-4 md:p-8 transition-all duration-300">
                 {children}
             </main>
         </div>

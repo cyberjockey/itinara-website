@@ -124,15 +124,15 @@ export default function BlogEditor({ initialPost }: { initialPost?: Post }) {
     return (
         <div className="max-w-6xl mx-auto pb-20">
             {/* Header */}
-            <header className="fixed top-0 right-0 left-64 z-10 bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
+            <header className="fixed top-0 right-0 left-0 md:left-64 z-10 bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex items-center justify-between transition-all duration-300">
                 <div className="flex items-center gap-4">
                     <Link href="/dashboard/blog" className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
-                    <h1 className="text-xl font-bold text-gray-900">
+                    <h1 className="text-xl font-bold text-gray-900 line-clamp-1">
                         {initialPost ? 'Edit Article' : 'New Article'}
                     </h1>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize border
+                    <span className={`hidden sm:inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize border
                         ${post.status === 'published' ? 'bg-green-50 text-green-700 border-green-200' :
                             post.status === 'draft' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
                                 'bg-gray-50 text-gray-700 border-gray-200'}`}>
@@ -152,7 +152,7 @@ export default function BlogEditor({ initialPost }: { initialPost?: Post }) {
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 bg-blue-600 text-white px-4 md:px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm whitespace-nowrap"
                     >
                         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         Save Changes
@@ -160,9 +160,9 @@ export default function BlogEditor({ initialPost }: { initialPost?: Post }) {
                 </div>
             </header>
 
-            <div className="mt-20 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="mt-20 grid grid-cols-1 xl:grid-cols-3 gap-8">
                 {/* Left Column: Content */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="xl:col-span-2 space-y-6">
                     {/* Title & Slug */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
                         <div>
@@ -185,7 +185,7 @@ export default function BlogEditor({ initialPost }: { initialPost?: Post }) {
                                     type="text"
                                     value={post.slug || ''}
                                     onChange={(e) => setPost({ ...post, slug: e.target.value })}
-                                    className="flex-1 px-4 py-2 text-gray-900 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-mono placeholder:text-gray-900"
+                                    className="flex-1 px-4 py-2 text-gray-900 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-mono placeholder:text-gray-900 w-full min-w-0"
                                     placeholder="post-url-slug"
                                 />
                             </div>
@@ -193,7 +193,7 @@ export default function BlogEditor({ initialPost }: { initialPost?: Post }) {
                     </div>
 
                     {/* Editor */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px] flex flex-col">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[750px] flex flex-col">
                         <div className="border-b border-gray-200 px-4 py-2 flex items-center justify-between bg-gray-50">
                             <div className="flex items-center gap-2">
                                 <button
