@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Plus, Edit2, Eye, Calendar, FileText } from "lucide-react";
 import { format } from "date-fns";
+import { DeletePostButton } from "@/components/blog/DeletePostButton";
 
 export default async function BlogListPage() {
     const supabase = await createClient();
@@ -91,6 +92,7 @@ export default async function BlogListPage() {
                                                     <Eye className="w-4 h-4" />
                                                 </a>
                                             )}
+                                            <DeletePostButton postId={post.id} />
                                         </div>
                                     </td>
                                 </tr>
