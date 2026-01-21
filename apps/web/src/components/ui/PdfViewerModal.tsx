@@ -54,9 +54,14 @@ export function PdfViewerModal({ isOpen, onClose, title, pdfUrl }: PdfViewerModa
                                     <h3 className="font-heading font-bold text-lg tracking-wide">{title}</h3>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <button className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white" title="Download PDF">
+                                    <a
+                                        href={pdfUrl}
+                                        download
+                                        className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
+                                        title="Download PDF"
+                                    >
                                         <Download className="w-5 h-5" />
-                                    </button>
+                                    </a>
                                     <button
                                         onClick={onClose}
                                         className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white ml-2"

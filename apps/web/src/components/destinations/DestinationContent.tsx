@@ -9,11 +9,104 @@ interface DestinationContentProps {
     destination: any; // Using any for agility, ideally strictly typed
 }
 
+interface DestinationDetail {
+    bestTime: string;
+    idealTrip: string;
+    budget: string;
+    faqs: { question: string; answer: string }[];
+}
+
+const DESTINATION_DETAILS: Record<string, DestinationDetail> = {
+    'bali': {
+        bestTime: 'Dry Season (Apr-Oct)',
+        idealTrip: '7-10 Days',
+        budget: '$50-150/day',
+        faqs: [
+            { question: 'Is Bali safe for solo travelers?', answer: 'Yes, widely considered very safe. Common sense precautions apply, especially regarding swimming currents and securing valuables.' },
+            { question: 'How do I get around?', answer: 'Scooters are popular but require an international license. Ride-hailing apps like Gojek/Grab and private drivers are safer and very affordable options.' },
+            { question: 'Do I need a visa?', answer: 'Many nationalities are eligible for a Visa on Arrival (VOA) for 30 days. Check your specific country status before flying.' },
+            { question: 'Can I drink the tap water?', answer: 'No, it is not recommended. Always drink bottled or filtered water to avoid stomach issues.' }
+        ]
+    },
+    'jakarta': {
+        bestTime: 'Dry Season (Jun-Sep)',
+        idealTrip: '2-3 Days',
+        budget: '$60-120/day',
+        faqs: [
+            { question: 'How is the traffic situation?', answer: 'Traffic can be heavy. Utilizing the MRT, TransJakarta Busway, or traveling during off-peak hours is highly recommended.' },
+            { question: 'Is the city walkable?', answer: 'Walkability is limited to specific areas like Sudirman-Thamrin and Kota Tua. For other parts, taxis or ride-hailing apps are necessary.' },
+            { question: 'What is the best area to stay?', answer: 'Central Jakarta (Menteng/Thamrin) is great for luxury and business, while South Jakarta (Senopati/Kemang) offers a trendy vibe with excellent food scenes.' }
+        ]
+    },
+    'west-java': {
+        bestTime: 'Dry Season (Jun-Sep)',
+        idealTrip: '3-4 Days',
+        budget: '$40-100/day',
+        faqs: [
+            { question: 'How do I get to Bandung from Jakarta?', answer: 'The "Whoosh" Fast Train takes only 30 minutes. Alternatively, regular trains or shuttle buses take about 3 hours.' },
+            { question: 'What clothes should I pack?', answer: 'Bandung and its surroundings (Lembang/Ciwidey) can get chilly, especially at night. A light jacket is essential.' },
+            { question: 'Is it good for nature lovers?', answer: 'Absolutely. Attractions like Kawah Putih crater lake and the vast tea plantations offer stunning natural scenery.' }
+        ]
+    },
+    'yogyakarta': {
+        bestTime: 'Dry Season (Apr-Oct)',
+        idealTrip: '3-5 Days',
+        budget: '$30-80/day',
+        faqs: [
+            { question: 'Best way to see Borobudur?', answer: 'A sunrise tour provides a magical experience. Be sure to purchase climb-up tickets online well in advance.' },
+            { question: 'Is it different from Bali?', answer: 'Yes, Yogyakarta is the cultural soul of Java with a more traditional, conservative, and laid-back atmosphere compared to Bali.' },
+            { question: 'What about etiquette?', answer: 'Modest dress (covering shoulders and knees) is respectful and often required when visiting temples and the Sultan\'s Palace.' }
+        ]
+    }
+};
+
 export function DestinationContent({ destination }: DestinationContentProps) {
+    const details = DESTINATION_DETAILS[destination.slug.toLowerCase()] || {
+        bestTime: 'Dry Season (Apr-Oct)',
+        idealTrip: '5-7 Days',
+        budget: 'Medium ($50-150/day)',
+        faqs: [
+            { question: `Is ${destination.name} safe for solo travelers?`, answer: 'Yes, it is generally very safe. We recommend adhering to standard travel precautions and respecting local customs.' },
+            { question: 'Do I need a tour guide?', answer: 'No, our itinerary is capable of guiding you independently. However, for specific historical sites, a local guide can be hired on arrival.' }
+        ]
+    };
     const [pdfModalOpen, setPdfModalOpen] = useState(false);
     const [selectedPdf, setSelectedPdf] = useState<{ title: string; url: string }>({ title: "", url: "" });
 
-    const openPdf = (title: string, url: string) => {
+    const getPdfUrl = (slug: string, type: 'culture' | 'heritage' | 'culinary') => {
+        const mapping: Record<string, Record<string, string>> = {
+            'bali': {
+                'culture': 'Bali_Local_Culture_Guide.pdf',
+                'heritage': 'Bali_Living_Heritage.pdf',
+                'culinary': 'Bali_Legendary_Culinary_Guide.pdf'
+            },
+            'jakarta': {
+                'culture': 'Jakarta_Culture_Guide.pdf',
+                'heritage': 'Jakarta_Layers_of_Identity.pdf',
+                'culinary': 'Jakarta_Culinary_Layers.pdf'
+            },
+            'west-java': {
+                'culture': 'West_Java_Culture_Guide.pdf',
+                'heritage': 'West_Java_Local_Heritage_Guide.pdf',
+                'culinary': 'West_Java_Legendary_Culinary_Guide.pdf'
+            },
+            'yogyakarta': {
+                'heritage': 'Yogyakarta_Heritage_Guide.pdf',
+                'culinary': 'Yogyakarta_Legendary_Culinary_Guide.pdf'
+            }
+        };
+
+        const cityPdfs = mapping[slug.toLowerCase()];
+        if (!cityPdfs || !cityPdfs[type]) return null;
+        return `/pdfs/${cityPdfs[type]}`;
+    };
+
+    const openPdf = (title: string, slug: string, type: 'culture' | 'heritage' | 'culinary') => {
+        const url = getPdfUrl(slug, type);
+        if (!url) {
+            alert("This guide is coming soon! We're putting the finishing touches on it.");
+            return;
+        }
         setSelectedPdf({ title, url });
         setPdfModalOpen(true);
     };
@@ -28,7 +121,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">Best Time</h3>
-                        <p className="text-[#2C2121]/60 text-sm">Dry Season (Apr-Oct)</p>
+                        <p className="text-[#2C2121]/60 text-sm">{details.bestTime}</p>
                     </div>
                 </div>
                 <div className="w-px bg-[#2C2121]/10 hidden md:block"></div>
@@ -38,7 +131,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">Ideal Trip</h3>
-                        <p className="text-[#2C2121]/60 text-sm">5-7 Days</p>
+                        <p className="text-[#2C2121]/60 text-sm">{details.idealTrip}</p>
                     </div>
                 </div>
                 <div className="w-px bg-[#2C2121]/10 hidden md:block"></div>
@@ -48,7 +141,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">Budget</h3>
-                        <p className="text-[#2C2121]/60 text-sm">Medium ($50-150/day)</p>
+                        <p className="text-[#2C2121]/60 text-sm">{details.budget}</p>
                     </div>
                 </div>
             </section>
@@ -77,7 +170,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
                 <div className="grid md:grid-cols-3 gap-6">
                     {/* Card 1: Local Culture */}
                     <button
-                        onClick={() => openPdf(`Local Culture of ${destination.name}`, `/pdfs/${destination.slug}_culture.pdf`)}
+                        onClick={() => openPdf(`Local Culture of ${destination.name}`, destination.slug, 'culture')}
                         className="group relative h-64 rounded-2xl overflow-hidden shadow-lg transition-transform hover:-translate-y-1 hover:shadow-xl text-left"
                     >
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
@@ -97,7 +190,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
 
                     {/* Card 2: Local Heritage */}
                     <button
-                        onClick={() => openPdf(`Heritage Sites of ${destination.name}`, `/pdfs/${destination.slug}_heritage.pdf`)}
+                        onClick={() => openPdf(`Heritage Sites of ${destination.name}`, destination.slug, 'heritage')}
                         className="group relative h-64 rounded-2xl overflow-hidden shadow-lg transition-transform hover:-translate-y-1 hover:shadow-xl text-left"
                     >
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
@@ -115,7 +208,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
 
                     {/* Card 3: Legendary Culinary */}
                     <button
-                        onClick={() => openPdf(`Culinary Legends of ${destination.name}`, `/pdfs/${destination.slug}_culinary.pdf`)}
+                        onClick={() => openPdf(`Culinary Legends of ${destination.name}`, destination.slug, 'culinary')}
                         className="group relative h-64 rounded-2xl overflow-hidden shadow-lg transition-transform hover:-translate-y-1 hover:shadow-xl text-left"
                     >
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
@@ -168,14 +261,12 @@ export function DestinationContent({ destination }: DestinationContentProps) {
             <section className="mb-24">
                 <h2 className="text-3xl font-bold mb-8">Traveler FAQ</h2>
                 <div className="space-y-4">
-                    <div className="p-6 bg-white rounded-2xl border border-[#2C2121]/5">
-                        <h4 className="font-bold mb-2">Is {destination.name} safe for solo travelers?</h4>
-                        <p className="text-sm text-[#2C2121]/70">Yes, it is generally very safe. We recommend adhering to standard travel precautions and respecting local customs.</p>
-                    </div>
-                    <div className="p-6 bg-white rounded-2xl border border-[#2C2121]/5">
-                        <h4 className="font-bold mb-2">Do I need a tour guide?</h4>
-                        <p className="text-sm text-[#2C2121]/70">No, our itinerary is capable of guiding you independently. However, for specific historical sites, a local guide can be hired on arrival.</p>
-                    </div>
+                    {details.faqs.map((faq, index) => (
+                        <div key={index} className="p-6 bg-white rounded-2xl border border-[#2C2121]/5">
+                            <h4 className="font-bold mb-2">{faq.question}</h4>
+                            <p className="text-sm text-[#2C2121]/70">{faq.answer}</p>
+                        </div>
+                    ))}
                 </div>
             </section>
 

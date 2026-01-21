@@ -192,12 +192,39 @@ export function DestinationsMap() {
                                         data-tooltip-id="region-tooltip"
                                         data-tooltip-content={region.name}
                                     >
-                                        {/* Static Ring instead of Ping */}
-                                        <circle r={8 / position.zoom} fill="#F4A460" opacity={0.4} className="group-hover:opacity-80 transition-opacity duration-300" />
-                                        {/* Outer Ring */}
-                                        <circle r={6 / position.zoom} fill="rgba(244, 164, 96, 0.8)" stroke="#FFF" strokeWidth={1} className="group-hover:scale-110 transition-transform duration-300 ease-out" />
-                                        {/* Inner Dot */}
-                                        <circle r={3 / position.zoom} fill="#8B4513" />
+                                        {/* Animated Pulse Ring */}
+                                        <motion.circle
+                                            r={4 / position.zoom}
+                                            fill="#E35435"
+                                            initial={{ opacity: 0.6, scale: 1 }}
+                                            animate={{ opacity: 0, scale: 4 }}
+                                            transition={{
+                                                duration: 1.5,
+                                                repeat: Infinity,
+                                                ease: "easeOut"
+                                            }}
+                                        />
+                                        {/* Second Pulse Delayer (Optional for richer effect) */}
+                                        <motion.circle
+                                            r={4 / position.zoom}
+                                            fill="#E35435"
+                                            initial={{ opacity: 0.6, scale: 1 }}
+                                            animate={{ opacity: 0, scale: 3 }}
+                                            transition={{
+                                                duration: 1.5,
+                                                delay: 0.5,
+                                                repeat: Infinity,
+                                                ease: "easeOut"
+                                            }}
+                                        />
+                                        {/* Core Dot (Anchor) */}
+                                        <circle
+                                            r={4 / position.zoom}
+                                            fill="#E35435"
+                                            stroke="#FFF"
+                                            strokeWidth={1.5}
+                                            className="group-hover:scale-125 transition-transform duration-300"
+                                        />
                                     </g>
                                 </Marker>
                             ))}
@@ -205,7 +232,7 @@ export function DestinationsMap() {
                     </ComposableMap>
                     <Tooltip
                         id="region-tooltip"
-                        style={{ backgroundColor: "#8B4513", color: "#FFF", borderRadius: "8px", padding: "8px 12px", fontSize: "12px" }}
+                        style={{ backgroundColor: "#8B4513", color: "#FFF", borderRadius: "8px", padding: "8px 12px", fontSize: "12px", zIndex: 100 }}
                         border="1px solid rgba(255,255,255,0.2)"
                     />
 
