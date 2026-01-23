@@ -73,7 +73,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
 
             // Initial Hydration from defaultValue/value
             if (isFirstLoad.current && initialContent) {
-                editor.commands.setContent(ensureMarkdownBreaks(initialContent), false);
+                editor.commands.setContent(ensureMarkdownBreaks(initialContent), { emitUpdate: false });
                 isFirstLoad.current = false;
             }
         }, [editor, initialContent]);
@@ -88,7 +88,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
                 const currentMarkdown = (editor.storage as any).markdown.getMarkdown();
                 if (textarea.value !== currentMarkdown) {
                     const processed = ensureMarkdownBreaks(textarea.value);
-                    editor.commands.setContent(processed, false);
+                    editor.commands.setContent(processed, { emitUpdate: false });
                 }
             };
 
@@ -100,7 +100,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
         // Propagation of controlled value prop (if used)
         useEffect(() => {
             if (editor && value && value !== (editor.storage as any).markdown.getMarkdown()) {
-                editor.commands.setContent(ensureMarkdownBreaks(value.toString()), false);
+                editor.commands.setContent(ensureMarkdownBreaks(value.toString()), { emitUpdate: false });
             }
         }, [value, editor]);
 
