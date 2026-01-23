@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import remarkBreaks from 'remark-breaks';
 import { ArrowLeft, User, Calendar, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { ShareButtons } from "@/components/blog/ShareButtons";
@@ -174,7 +175,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             }
 
                             return (
-                                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw]}>
                                     {content}
                                 </ReactMarkdown>
                             );

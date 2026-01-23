@@ -52,6 +52,7 @@ export default async function PlacesPage(props: { searchParams: Promise<{ page?:
                         places={places}
                         pagination={
                             <Pagination
+                                key="places-pagination"
                                 totalItems={count}
                                 currentPage={page}
                                 pageSize={limit}

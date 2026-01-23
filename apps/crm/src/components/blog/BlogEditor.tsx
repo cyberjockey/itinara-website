@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import rehypeRaw from 'rehype-raw';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import {
     Save, ArrowLeft, Image as ImageIcon, Globe, Loader2,
     Bold, Italic, Link as LinkIcon, List, Quote, Code, Heading1, Heading2,
@@ -239,7 +240,7 @@ export default function BlogEditor({ initialPost }: { initialPost?: Post }) {
                                 />
                             ) : (
                                 <div className="prose prose-blue max-w-none p-8 overflow-y-auto h-full">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw]}>
                                         {post.content}
                                     </ReactMarkdown>
                                 </div>

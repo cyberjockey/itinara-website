@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Map, Heart, Users, Settings, LogOut, Plus, Menu, X } from "lucide-react";
+import { Home, Map, Heart, Users, Settings, LogOut, Plus, Menu, X, Compass } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     const navItems = [
         { name: "My Trips", href: "/dashboard", icon: Home },
+        { name: "Curated Trips", href: "/dashboard/curated-trips", icon: Compass },
         { name: "Explore", href: "/dashboard/explore", icon: Map },
         { name: "Saved", href: "/dashboard/saved", icon: Heart },
         { name: "Community", href: "/dashboard/community", icon: Users },

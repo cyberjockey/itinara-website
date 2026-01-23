@@ -70,7 +70,7 @@ export function PlacesTable({ places, pagination }: PlacesTableProps) {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             {/* Bulk Actions Toolbar */}
             {selectedIds.size > 0 && (
-                <div className="bg-blue-50 p-4 border-b border-blue-100 flex items-center justify-between animate-in slide-in-from-top-2">
+                <div key="toolbar" className="bg-blue-50 p-4 border-b border-blue-100 flex items-center justify-between animate-in slide-in-from-top-2">
                     <div className="flex items-center gap-2 text-blue-700 font-medium text-sm">
                         <CheckSquare className="w-4 h-4" />
                         <span>{selectedIds.size} selected</span>
@@ -96,7 +96,7 @@ export function PlacesTable({ places, pagination }: PlacesTableProps) {
                 </div>
             )}
 
-            <div className="overflow-x-auto">
+            <div key="table-content" className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
                         <tr>

@@ -6,9 +6,12 @@ import Link from "next/link";
 import { ArrowLeft, Loader2, Sparkles, Wand2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CloudinaryImageUpload from "@/components/ui/CloudinaryImageUpload";
+import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
+import { useRef } from "react";
 
 function DescriptionGenerator() {
     const [loading, setLoading] = useState(false);
+    const [completed, setCompleted] = useState(false);
 
     const handleGenerate = async () => {
         const nameInput = document.getElementById('name') as HTMLInputElement;
@@ -22,6 +25,7 @@ function DescriptionGenerator() {
         }
 
         setLoading(true);
+        setCompleted(false);
         try {
             const destText = destSelect.options[destSelect.selectedIndex]?.text || "";
             const queryLocation = locationInput?.value || destText || "Indonesia";
@@ -36,6 +40,8 @@ function DescriptionGenerator() {
                     // Trigger input event to ensure state updates if managed (though here it's uncontrolled mostly)
                     descInput.dispatchEvent(new Event('input', { bubbles: true }));
                 }
+                setCompleted(true);
+                setTimeout(() => setCompleted(false), 3000);
             } else {
                 alert("Failed to generate description. Please try again.");
             }
@@ -52,10 +58,13 @@ function DescriptionGenerator() {
             type="button"
             onClick={handleGenerate}
             disabled={loading}
-            className="text-xs flex items-center gap-1 text-[#D4654F] hover:text-[#b85642] font-medium transition-colors bg-[#D4654F]/10 hover:bg-[#D4654F]/20 px-2.5 py-1 rounded-md"
+            className={`text-xs flex items-center gap-1 font-medium transition-colors px-2.5 py-1 rounded-md ${completed
+                ? "text-green-600 bg-green-100 hover:bg-green-200"
+                : "text-[#D4654F] hover:text-[#b85642] bg-[#D4654F]/10 hover:bg-[#D4654F]/20"
+                }`}
         >
-            <Wand2 className="w-3 h-3" />
-            {loading ? "Writing..." : "Write with AI"}
+            {completed ? <Sparkles className="w-3 h-3" /> : <Wand2 className="w-3 h-3" />}
+            {loading ? "Writing..." : completed ? "Completed" : "Write with AI"}
         </button>
     );
 }
@@ -119,6 +128,7 @@ interface PlaceFormProps {
 
 export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
     const router = useRouter();
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [images, setImages] = useState<string[]>(() => {
         if (initialData?.cloudinary_images && initialData.cloudinary_images.length > 0) {
             return initialData.cloudinary_images;
@@ -290,13 +300,14 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
                                 </label>
                                 <DescriptionGenerator />
                             </div>
-                            <textarea
+                            <MarkdownEditor
                                 id="description"
+                                ref={textareaRef}
                                 name="description"
-                                rows={4}
+                                rows={15}
                                 defaultValue={initialData?.description}
                                 placeholder="What makes this place special? Tips for visitors?"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
+                                className="z-20 relative"
                             />
                         </div>
 

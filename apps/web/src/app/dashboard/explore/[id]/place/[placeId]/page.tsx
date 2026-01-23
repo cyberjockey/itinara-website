@@ -8,6 +8,9 @@ import { PlaceReviews } from "@/components/places/PlaceReviews";
 import { PlaceMap } from "@/components/places/PlaceMap";
 import { AddActivityModal } from "@/components/dashboard/AddActivityModal";
 import { AddToTripWrapper } from "@/components/places/AddToTripWrapper"; // New client wrapper
+import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+
 
 export const revalidate = 3600;
 
@@ -85,7 +88,13 @@ export default async function PlaceDetailPage(props: { params: Promise<{ id: str
 
                     <div className="prose prose-stone text-stone-gray mb-8">
                         <h3 className="font-bold text-lg text-deep-teak mb-2">About</h3>
-                        <p>{place.description || `Experience the unique charm of ${place.name}. A must-visit spot in ${place.location}.`}</p>
+                        {place.description ? (
+                            <ReactMarkdown remarkPlugins={[remarkBreaks]}>
+                                {place.description}
+                            </ReactMarkdown>
+                        ) : (
+                            <p>Experience the unique charm of {place.name}. A must-visit spot in {place.location}.</p>
+                        )}
                     </div>
 
                     <PlaceReviews reviews={reviews} />

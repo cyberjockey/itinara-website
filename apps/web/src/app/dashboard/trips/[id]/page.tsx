@@ -130,7 +130,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
             </div>
 
             {/* Client-side Toggle Wrapper */}
-            <div className="flex-1 overflow-hidden relative">
+            <div className="flex-1 overflow-hidden relative flex flex-col">
                 <TripViewToggle
                     trip={trip}
                     activities={activities || []}
