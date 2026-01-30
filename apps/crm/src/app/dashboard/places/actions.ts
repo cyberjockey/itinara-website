@@ -377,18 +377,53 @@ export async function bulkGenerateDescriptions(placeIds: string[]) {
 // ============ BULK CSV UPLOAD ============
 
 export type ParsedPlaceRow = {
-    destination_name: string;
-    name: string;
+    // Required
+    destination_name?: string;
+    'city / region'?: string; // Alternative header
+    name?: string;
+    'place name'?: string; // Alternative header
+
+    // Basic fields
     type?: string;
+    category?: string; // Alternative header
     rating?: string;
     status?: string;
     location?: string;
+    address?: string; // Alternative header
     description?: string;
+    about?: string; // Alternative header
     image_url?: string;
+
+    // Contact
     phone?: string;
+    'phone / whatsapp'?: string; // Alternative header
     website?: string;
+    social_media?: string;
+    'social media'?: string; // Alternative header
+
+    // Pricing & Tips
     price_level?: string;
+    'price range'?: string; // Alternative header
     what_to_expect?: string;
+    'what to expect'?: string; // Alternative header
+    highlight_and_tips?: string;
+    'highlight and tips'?: string; // Alternative header
+
+    // Coordinates
+    latitude?: string;
+    longitude?: string;
+
+    // Google fields
+    google_place_name?: string;
+    'place name on google'?: string; // Alternative header
+    full_address?: string;
+    'full address'?: string; // Alternative header
+    reviewer_count?: string;
+    'reviewer count'?: string; // Alternative header
+    google_maps_url?: string;
+    'google maps url'?: string; // Alternative header
+    google_place_id?: string;
+    'place id'?: string; // Alternative header
 };
 
 export type BulkUploadResult = {
@@ -431,31 +466,43 @@ export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUplo
     let failed = 0;
     const errors: Array<{ row: number; error: string }> = [];
 
+    // Helper to get value from row with alternative headers
+    const getValue = (row: ParsedPlaceRow, ...keys: string[]): string | undefined => {
+        for (const key of keys) {
+            const val = (row as Record<string, string | undefined>)[key];
+            if (val && val.trim()) return val.trim();
+        }
+        return undefined;
+    };
+
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         const rowNum = i + 2; // +2 because row 1 is header, and arrays are 0-indexed
 
-        // Validate required fields
-        if (!row.name || !row.name.trim()) {
-            errors.push({ row: rowNum, error: "Missing required field: name" });
+        // Get name with alternative headers
+        const name = getValue(row, 'name', 'place name');
+        if (!name) {
+            errors.push({ row: rowNum, error: "Missing required field: name (or 'Place Name')" });
             failed++;
             continue;
         }
 
-        if (!row.destination_name || !row.destination_name.trim()) {
-            errors.push({ row: rowNum, error: "Missing required field: destination_name" });
+        // Get destination with alternative headers
+        const destNameRaw = getValue(row, 'destination_name', 'city / region');
+        if (!destNameRaw) {
+            errors.push({ row: rowNum, error: "Missing required field: destination_name (or 'City / Region')" });
             failed++;
             continue;
         }
 
         // Look up destination ID
-        const destName = row.destination_name.toLowerCase().trim();
+        const destName = destNameRaw.toLowerCase().trim();
         let destinationId = destinationMap.get(destName);
 
         // Try partial match if exact match fails
         if (!destinationId) {
-            for (const [name, id] of destinationMap) {
-                if (name.includes(destName) || destName.includes(name)) {
+            for (const [dName, id] of destinationMap) {
+                if (dName.includes(destName) || destName.includes(dName)) {
                     destinationId = id;
                     break;
                 }
@@ -463,34 +510,82 @@ export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUplo
         }
 
         if (!destinationId) {
-            errors.push({ row: rowNum, error: `Destination not found: "${row.destination_name}"` });
+            errors.push({ row: rowNum, error: `Destination not found: "${destNameRaw}"` });
             failed++;
             continue;
         }
 
         // Parse rating if provided
         let rating: number | null = null;
-        if (row.rating) {
-            const parsed = parseFloat(row.rating);
+        const ratingStr = getValue(row, 'rating');
+        if (ratingStr) {
+            const parsed = parseFloat(ratingStr);
             if (!isNaN(parsed) && parsed >= 0 && parsed <= 5) {
                 rating = parsed;
             }
         }
 
-        // Insert the place
+        // Parse coordinates from latitude/longitude
+        let coordinates: { lat: number; lng: number } | null = null;
+        const latStr = getValue(row, 'latitude');
+        const lngStr = getValue(row, 'longitude');
+        if (latStr && lngStr) {
+            const lat = parseFloat(latStr);
+            const lng = parseFloat(lngStr);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                coordinates = { lat, lng };
+            }
+        }
+
+        // Parse reviewer count
+        let reviewerCount: number | null = null;
+        const reviewerCountStr = getValue(row, 'reviewer_count', 'reviewer count');
+        if (reviewerCountStr) {
+            // Handle formats like "1,234" or "1234"
+            const parsed = parseInt(reviewerCountStr.replace(/,/g, ''), 10);
+            if (!isNaN(parsed)) {
+                reviewerCount = parsed;
+            }
+        }
+
+        // Parse social_media as JSON if it looks like JSON, otherwise store as simple object
+        let socialMedia: Record<string, string> | null = null;
+        const socialMediaStr = getValue(row, 'social_media', 'social media');
+        if (socialMediaStr) {
+            try {
+                if (socialMediaStr.startsWith('{')) {
+                    socialMedia = JSON.parse(socialMediaStr);
+                } else {
+                    // Treat as a simple URL or handle
+                    socialMedia = { url: socialMediaStr };
+                }
+            } catch {
+                socialMedia = { url: socialMediaStr };
+            }
+        }
+
+        // Insert the place with all fields
         const { error } = await supabase.from('places').insert({
             destination_id: destinationId,
-            name: row.name.trim(),
-            type: row.type?.trim() || null,
+            name,
+            type: getValue(row, 'type', 'category') || null,
             rating,
-            status: row.status?.trim() || 'Open',
-            location: row.location?.trim() || null,
-            description: row.description?.trim() || null,
-            image_url: row.image_url?.trim() || null,
-            phone: row.phone?.trim() || null,
-            website: row.website?.trim() || null,
-            price_level: row.price_level?.trim() || null,
-            what_to_expect: row.what_to_expect?.trim() || null,
+            status: getValue(row, 'status') || 'Open',
+            location: getValue(row, 'location', 'address') || null,
+            description: getValue(row, 'description', 'about') || null,
+            image_url: getValue(row, 'image_url') || null,
+            coordinates,
+            phone: getValue(row, 'phone', 'phone / whatsapp') || null,
+            website: getValue(row, 'website') || null,
+            social_media: socialMedia,
+            price_level: getValue(row, 'price_level', 'price range') || null,
+            what_to_expect: getValue(row, 'what_to_expect', 'what to expect') || null,
+            highlight_and_tips: getValue(row, 'highlight_and_tips', 'highlight and tips') || null,
+            google_place_name: getValue(row, 'google_place_name', 'place name on google') || null,
+            full_address: getValue(row, 'full_address', 'full address') || null,
+            reviewer_count: reviewerCount,
+            google_maps_url: getValue(row, 'google_maps_url', 'google maps url') || null,
+            google_place_id: getValue(row, 'google_place_id', 'place id') || null,
         });
 
         if (error) {
@@ -512,3 +607,115 @@ export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUplo
     };
 }
 
+// ============ INLINE FIELD UPDATE ============
+
+const ALLOWED_FIELDS = [
+    'name', 'type', 'location', 'description', 'phone', 'website',
+    'price_level', 'rating', 'what_to_expect', 'highlight_and_tips',
+    'social_media', 'google_place_name', 'full_address', 'reviewer_count',
+    'google_maps_url', 'google_place_id', 'status'
+];
+
+export async function updatePlaceField(
+    placeId: string,
+    field: string,
+    value: string
+): Promise<{ success: boolean; error?: string }> {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    if (!ALLOWED_FIELDS.includes(field)) {
+        return { success: false, error: `Field "${field}" is not editable` };
+    }
+
+    // Parse special fields
+    let parsedValue: unknown = value;
+
+    if (field === 'rating') {
+        const num = parseFloat(value);
+        parsedValue = isNaN(num) ? null : Math.min(5, Math.max(0, num));
+    } else if (field === 'reviewer_count') {
+        const num = parseInt(value.replace(/,/g, ''), 10);
+        parsedValue = isNaN(num) ? null : num;
+    } else if (field === 'social_media') {
+        try {
+            if (value.startsWith('{')) {
+                parsedValue = JSON.parse(value);
+            } else if (value) {
+                parsedValue = { url: value };
+            } else {
+                parsedValue = null;
+            }
+        } catch {
+            parsedValue = { url: value };
+        }
+    } else if (value === '') {
+        parsedValue = null;
+    }
+
+    const { error } = await supabase
+        .from('places')
+        .update({ [field]: parsedValue })
+        .eq('id', placeId);
+
+    if (error) {
+        console.error('Update failed:', error);
+        return { success: false, error: error.message };
+    }
+
+    revalidatePath('/dashboard/places');
+    return { success: true };
+}
+
+// ============ EXPORT PLACES ============
+
+export async function getAllPlacesForExport(
+    columns: string[],
+    ids?: string[]
+): Promise<{ data: Record<string, unknown>[]; error?: string }> {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { data: [], error: "Unauthorized" };
+    }
+
+    let query = supabase.from('places').select('*').order('name');
+
+    if (ids && ids.length > 0) {
+        query = query.in('id', ids);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+        console.error('Export query failed:', error);
+        return { data: [], error: error.message };
+    }
+
+    // Filter to only requested columns and format data
+    const formattedData = (data || []).map(place => {
+        const row: Record<string, unknown> = {};
+
+        for (const col of columns) {
+            if (col === 'coordinates' && place.coordinates) {
+                row['latitude'] = place.coordinates.lat;
+                row['longitude'] = place.coordinates.lng;
+            } else if (col === 'social_media' && place.social_media) {
+                row[col] = typeof place.social_media === 'object'
+                    ? JSON.stringify(place.social_media)
+                    : place.social_media;
+            } else {
+                row[col] = place[col] ?? '';
+            }
+        }
+
+        return row;
+    });
+
+    return { data: formattedData };
+}

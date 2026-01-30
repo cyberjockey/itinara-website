@@ -1,16 +1,22 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Upload, X, FileSpreadsheet, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Upload, X, FileSpreadsheet, AlertCircle, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
 import { bulkUploadPlaces, type ParsedPlaceRow, type BulkUploadResult } from '@/app/dashboard/places/actions';
+import { ColumnMapper, type ColumnMapping } from './ColumnMapper';
 
-type PreviewRow = ParsedPlaceRow & { _rowNum: number };
+type PreviewRow = Record<string, string> & { _rowNum: number };
 
-function parseCSV(text: string): PreviewRow[] {
+interface BulkUploadProps {
+    onClose: () => void;
+    onImportComplete?: (result: BulkUploadResult) => void;
+}
+
+function parseCSV(text: string): { headers: string[]; rows: PreviewRow[] } {
     const lines = text.split('\n').filter(line => line.trim());
-    if (lines.length < 2) return [];
+    if (lines.length < 2) return { headers: [], rows: [] };
 
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+    const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/^["']|["']$/g, ''));
     const rows: PreviewRow[] = [];
 
     for (let i = 1; i < lines.length; i++) {
@@ -21,10 +27,10 @@ function parseCSV(text: string): PreviewRow[] {
             row[header] = values[index]?.trim().replace(/^["']|["']$/g, '') || '';
         });
 
-        rows.push(row as unknown as PreviewRow);
+        rows.push(row as PreviewRow);
     }
 
-    return rows;
+    return { headers, rows };
 }
 
 function parseCSVLine(line: string): string[] {
@@ -47,9 +53,26 @@ function parseCSVLine(line: string): string[] {
     return result;
 }
 
-export function BulkUpload({ onClose }: { onClose: () => void }) {
-    const [step, setStep] = useState<'upload' | 'preview' | 'result'>('upload');
-    const [rows, setRows] = useState<PreviewRow[]>([]);
+// Transform rows using column mapping
+function transformRows(rows: PreviewRow[], mapping: ColumnMapping): ParsedPlaceRow[] {
+    return rows.map(row => {
+        const transformed: Record<string, string> = {};
+
+        for (const [csvHeader, dbColumn] of Object.entries(mapping)) {
+            if (dbColumn && row[csvHeader] !== undefined) {
+                transformed[dbColumn] = row[csvHeader];
+            }
+        }
+
+        return transformed as ParsedPlaceRow;
+    });
+}
+
+export function BulkUpload({ onClose, onImportComplete }: BulkUploadProps) {
+    const [step, setStep] = useState<'upload' | 'mapping' | 'preview' | 'result'>('upload');
+    const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
+    const [rawRows, setRawRows] = useState<PreviewRow[]>([]);
+    const [mapping, setMapping] = useState<ColumnMapping>({});
     const [result, setResult] = useState<BulkUploadResult | null>(null);
     const [loading, setLoading] = useState(false);
     const [fileName, setFileName] = useState('');
@@ -63,27 +86,34 @@ export function BulkUpload({ onClose }: { onClose: () => void }) {
         const reader = new FileReader();
         reader.onload = (event) => {
             const text = event.target?.result as string;
-            const parsed = parseCSV(text);
-            setRows(parsed);
-            setStep('preview');
+            const { headers, rows } = parseCSV(text);
+            setCsvHeaders(headers);
+            setRawRows(rows);
+            setStep('mapping');
         };
         reader.readAsText(file);
+    };
+
+    const handleMappingComplete = (columnMapping: ColumnMapping) => {
+        setMapping(columnMapping);
+        setStep('preview');
     };
 
     const handleUpload = async () => {
         setLoading(true);
         try {
-            const uploadRows = rows.map(({ _rowNum, ...rest }) => rest);
-            const result = await bulkUploadPlaces(uploadRows);
-            setResult(result);
+            const transformedRows = transformRows(rawRows, mapping);
+            const uploadResult = await bulkUploadPlaces(transformedRows);
+            setResult(uploadResult);
             setStep('result');
+            onImportComplete?.(uploadResult);
         } catch (error) {
             console.error('Upload failed:', error);
             setResult({
                 success: false,
                 message: 'Upload failed unexpectedly',
                 inserted: 0,
-                failed: rows.length,
+                failed: rawRows.length,
                 errors: [{ row: 0, error: String(error) }]
             });
             setStep('result');
@@ -93,8 +123,8 @@ export function BulkUpload({ onClose }: { onClose: () => void }) {
     };
 
     const downloadTemplate = () => {
-        const headers = 'destination_name,name,type,rating,status,location,description,image_url,phone,website,price_level,what_to_expect';
-        const example = 'Bali,Uluwatu Temple,Culture,4.8,Open,"Uluwatu, Bali","Ancient sea temple on a cliff.",,,,$$$,';
+        const headers = 'Place Name,Category,City / Region,Phone / Whatsapp,Social Media,Website,About,Address,Price Range,What to Expect,Highlight and Tips,Latitude,Longitude,Place Name on Google,Full Address,Rating,Reviewer Count,Google Maps Url,Place Id';
+        const example = 'Uluwatu Temple,Culture,Bali,+62812345678,https://instagram.com/uluwatu,,Ancient sea temple on a cliff.,Uluwatu Pecatu Bali,$$$,Stunning sunset views and Kecak dance,Arrive before sunset for the best experience,-8.8291,115.0849,Uluwatu Temple,"Pecatu, South Kuta, Badung Regency, Bali, Indonesia",4.8,12500,https://maps.google.com/?cid=123456,ChIJ123456789';
         const csv = `${headers}\n${example}`;
 
         const blob = new Blob([csv], { type: 'text/csv' });
@@ -106,6 +136,19 @@ export function BulkUpload({ onClose }: { onClose: () => void }) {
         URL.revokeObjectURL(url);
     };
 
+    const getPreviewRows = () => {
+        // Apply mapping for preview
+        return rawRows.slice(0, 10).map(row => {
+            const mapped: Record<string, string> = { _rowNum: String(row._rowNum) };
+            for (const [csvHeader, dbColumn] of Object.entries(mapping)) {
+                if (dbColumn) {
+                    mapped[dbColumn] = row[csvHeader] || '';
+                }
+            }
+            return mapped;
+        });
+    };
+
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -113,7 +156,12 @@ export function BulkUpload({ onClose }: { onClose: () => void }) {
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                     <div className="flex items-center gap-3">
                         <FileSpreadsheet className="w-6 h-6 text-blue-600" />
-                        <h2 className="text-xl font-bold text-gray-900">Bulk Upload Places</h2>
+                        <h2 className="text-xl font-bold text-gray-900">Bulk Upload Activities</h2>
+                        {step !== 'upload' && step !== 'result' && (
+                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                                Step {step === 'mapping' ? '2' : '3'} of 3
+                            </span>
+                        )}
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                         <X className="w-5 h-5 text-gray-500" />
@@ -143,7 +191,7 @@ export function BulkUpload({ onClose }: { onClose: () => void }) {
                             <div className="bg-blue-50 rounded-xl p-4">
                                 <h3 className="font-medium text-blue-900 mb-2">CSV Format</h3>
                                 <p className="text-sm text-blue-700 mb-3">
-                                    Required columns: <code className="bg-blue-100 px-1 rounded">destination_name</code>, <code className="bg-blue-100 px-1 rounded">name</code>
+                                    Upload any CSV file and map columns to database fields in the next step.
                                 </p>
                                 <button
                                     onClick={downloadTemplate}
@@ -155,17 +203,33 @@ export function BulkUpload({ onClose }: { onClose: () => void }) {
                         </div>
                     )}
 
+                    {step === 'mapping' && (
+                        <div>
+                            <div className="mb-4">
+                                <p className="text-sm text-gray-600">
+                                    <span className="font-medium">{fileName}</span> — {rawRows.length} rows detected
+                                </p>
+                            </div>
+                            <ColumnMapper
+                                csvHeaders={csvHeaders}
+                                onMappingComplete={handleMappingComplete}
+                                onCancel={() => { setStep('upload'); setRawRows([]); setCsvHeaders([]); setFileName(''); }}
+                            />
+                        </div>
+                    )}
+
                     {step === 'preview' && (
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <p className="text-sm text-gray-600">
-                                    <span className="font-medium">{fileName}</span> — {rows.length} rows
+                                    <span className="font-medium">{fileName}</span> — {rawRows.length} rows ready to import
                                 </p>
                                 <button
-                                    onClick={() => { setStep('upload'); setRows([]); setFileName(''); }}
-                                    className="text-sm text-gray-500 hover:text-gray-700"
+                                    onClick={() => setStep('mapping')}
+                                    className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
                                 >
-                                    Choose different file
+                                    <ArrowLeft className="w-4 h-4" />
+                                    Adjust Mapping
                                 </button>
                             </div>
 
@@ -175,28 +239,30 @@ export function BulkUpload({ onClose }: { onClose: () => void }) {
                                         <thead className="bg-gray-50">
                                             <tr>
                                                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">#</th>
-                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Destination</th>
                                                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Name</th>
-                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Type</th>
-                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Location</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Category</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Destination</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Coords</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {rows.slice(0, 10).map((row, i) => (
+                                            {getPreviewRows().map((row, i) => (
                                                 <tr key={i} className="border-t border-gray-100">
                                                     <td className="px-3 py-2 text-gray-400">{row._rowNum}</td>
-                                                    <td className="px-3 py-2 text-gray-900">{row.destination_name}</td>
-                                                    <td className="px-3 py-2 text-gray-900 font-medium">{row.name}</td>
+                                                    <td className="px-3 py-2 text-gray-900 font-medium">{row.name || '—'}</td>
                                                     <td className="px-3 py-2 text-gray-600">{row.type || '—'}</td>
-                                                    <td className="px-3 py-2 text-gray-600">{row.location || '—'}</td>
+                                                    <td className="px-3 py-2 text-gray-600">{row.destination_name || '—'}</td>
+                                                    <td className="px-3 py-2 text-gray-500 text-xs">
+                                                        {row.latitude && row.longitude ? '✓' : '—'}
+                                                    </td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </table>
                                 </div>
-                                {rows.length > 10 && (
+                                {rawRows.length > 10 && (
                                     <div className="bg-gray-50 px-3 py-2 text-center text-sm text-gray-500 border-t border-gray-200">
-                                        + {rows.length - 10} more rows
+                                        + {rawRows.length - 10} more rows
                                     </div>
                                 )}
                             </div>
@@ -226,7 +292,7 @@ export function BulkUpload({ onClose }: { onClose: () => void }) {
                             {result.errors.length > 0 && (
                                 <div className="border border-red-200 rounded-xl overflow-hidden">
                                     <div className="bg-red-50 px-4 py-2 border-b border-red-200">
-                                        <span className="text-sm font-medium text-red-800">Errors</span>
+                                        <span className="text-sm font-medium text-red-800">Import Errors</span>
                                     </div>
                                     <div className="max-h-48 overflow-y-auto">
                                         {result.errors.map((err, i) => (
@@ -258,7 +324,7 @@ export function BulkUpload({ onClose }: { onClose: () => void }) {
                                 className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                             >
                                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                                Import {rows.length} Places
+                                Import {rawRows.length} Activities
                             </button>
                         </>
                     )}
