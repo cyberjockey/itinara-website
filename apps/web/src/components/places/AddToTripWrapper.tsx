@@ -2,17 +2,19 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import AddToTripModal from "@/components/dashboard/AddToTripModal";
 // Removed AddActivityModal import as it is replaced by dynamic import or usage below
 
 interface AddToTripWrapperProps {
     userTrips: any[];
+    placeId: string;
     placeName: string;
     placeLocation: string;
     placeType: string;
     placeCoordinates?: { lat: number; lng: number } | null;
 }
 
-export function AddToTripWrapper({ userTrips, placeName, placeLocation, placeType, placeCoordinates }: AddToTripWrapperProps) {
+export function AddToTripWrapper({ userTrips, placeId, placeName, placeLocation, placeType, placeCoordinates }: AddToTripWrapperProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     // For MVP with AddActivityModal, we usually pick a trip first.
     // Since AddActivityModal implies a specific trip and day, we might need the "AddToTripModal" logic here instead
@@ -46,6 +48,7 @@ export function AddToTripWrapper({ userTrips, placeName, placeLocation, placeTyp
             }}
             trips={userTrips} // Parent needs to ensure these have the right fields
             place={{
+                id: placeId,
                 name: placeName,
                 location: placeLocation,
                 type: placeType,
@@ -62,4 +65,4 @@ export function AddToTripWrapper({ userTrips, placeName, placeLocation, placeTyp
     );
 }
 
-import AddToTripModal from "@/components/dashboard/AddToTripModal";
+

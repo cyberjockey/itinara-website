@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // Custom modal pattern used instead of headlessui to avoid deps issues.
-// Actually, let's use the same custom modal pattern as AddActivityModal for consistency and no extra deps.
 
 import { X, Calendar, MapPin } from "lucide-react";
 import { format, parseISO, differenceInDays, addDays } from "date-fns";
 import { createActivity } from "@/app/dashboard/trips/[id]/actions";
+import { createPortal } from "react-dom";
 
 interface Trip {
     id: string;
@@ -16,6 +16,7 @@ interface Trip {
 }
 
 interface Place {
+    id?: string; // Add optional ID
     name: string;
     location: string;
     type?: string;
@@ -37,6 +38,11 @@ export default function AddToTripModal({ destination, trips, place, trigger }: A
     const [selectedDay, setSelectedDay] = useState<number>(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState("");
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const selectedTrip = trips.find(t => t.id === selectedTripId);
 
@@ -77,6 +83,9 @@ export default function AddToTripModal({ destination, trips, place, trigger }: A
         formData.append("location", location);
         formData.append("category", category);
         formData.append("notes", notes);
+        if (place?.id) {
+            formData.append("placeId", place.id);
+        }
         formData.append("startTime", "10:00"); // Default 10 AM
 
         const result = await createActivity(null, formData);
@@ -107,8 +116,8 @@ export default function AddToTripModal({ destination, trips, place, trigger }: A
                 </button>
             )}
 
-            {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {isOpen && isMounted && createPortal(
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     {/* Backdrop */}
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
 
@@ -191,7 +200,8 @@ export default function AddToTripModal({ destination, trips, place, trigger }: A
                             </button>
                         </form>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );

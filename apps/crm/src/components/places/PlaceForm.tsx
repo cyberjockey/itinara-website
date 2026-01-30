@@ -3,7 +3,7 @@
 import { useState, useEffect, useActionState } from "react";
 import { createPlace, updatePlace, generateCoordinates, generatePlaceDescription } from "@/app/dashboard/places/actions";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Sparkles, Wand2 } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles, Wand2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CloudinaryImageUpload from "@/components/ui/CloudinaryImageUpload";
 import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
@@ -141,6 +141,8 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
         }
         return [];
     });
+
+    const [socialLinks, setSocialLinks] = useState<Record<string, string>>(initialData?.social_media || {});
 
     const action = mode === 'create'
         ? createPlace
@@ -290,6 +292,157 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#2C5F88] outline-none text-black"
                                     />
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Extended Details Section */}
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 space-y-4">
+                            <h3 className="text-sm font-medium text-gray-900 border-b pb-2">Extended Information</h3>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Phone / Whatsapp
+                                    </label>
+                                    <input
+                                        id="phone"
+                                        name="phone"
+                                        type="tel"
+                                        defaultValue={initialData?.phone}
+                                        placeholder="+62 812 3456 7890"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Website
+                                    </label>
+                                    <input
+                                        id="website"
+                                        name="website"
+                                        type="url"
+                                        defaultValue={initialData?.website}
+                                        placeholder="https://example.com"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="price_level" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Price Range
+                                    </label>
+                                    <select
+                                        id="price_level"
+                                        name="price_level"
+                                        defaultValue={initialData?.price_level || ""}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all bg-white text-black"
+                                    >
+                                        <option value="">Select Price Range...</option>
+                                        <option value="$">Low ($)</option>
+                                        <option value="$$">Medium ($$)</option>
+                                        <option value="$$$">High ($$$)</option>
+                                        <option value="Free">Free</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Social Media
+                                    </label>
+                                    <div className="space-y-2">
+                                        {Object.entries(socialLinks).map(([platform, url], index) => (
+                                            <div key={index} className="flex gap-2">
+                                                <select
+                                                    value={platform}
+                                                    onChange={(e) => {
+                                                        const newLinks = { ...socialLinks };
+                                                        const newPlatform = e.target.value;
+                                                        const currentUrl = newLinks[platform];
+                                                        delete newLinks[platform];
+                                                        newLinks[newPlatform] = currentUrl;
+                                                        setSocialLinks(newLinks);
+                                                    }}
+                                                    className="w-1/3 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#2C5F88] outline-none bg-white text-black"
+                                                >
+                                                    <option value="Instagram">Instagram</option>
+                                                    <option value="Facebook">Facebook</option>
+                                                    <option value="TikTok">TikTok</option>
+                                                    <option value="YouTube">YouTube</option>
+                                                    <option value="Twitter">Twitter/X</option>
+                                                    <option value="Website">Website</option>
+                                                </select>
+                                                <input
+                                                    type="url"
+                                                    value={url as string}
+                                                    onChange={(e) => {
+                                                        const newLinks = { ...socialLinks, [platform]: e.target.value };
+                                                        setSocialLinks(newLinks);
+                                                    }}
+                                                    placeholder="https://..."
+                                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#2C5F88] outline-none text-black"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newLinks = { ...socialLinks };
+                                                        delete newLinks[platform];
+                                                        setSocialLinks(newLinks);
+                                                    }}
+                                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const platform = `New Platform ${Object.keys(socialLinks).length + 1}`;
+                                            setSocialLinks({ ...socialLinks, [platform]: "" });
+                                        }}
+                                        className="text-sm text-[#2C5F88] hover:text-[#234b6b] font-medium flex items-center gap-1"
+                                    >
+                                        <Plus className="w-3 h-3" /> Add Social Link
+                                    </button>
+                                    <input
+                                        type="hidden"
+                                        name="social_media"
+                                        value={JSON.stringify(socialLinks)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="what_to_expect" className="block text-sm font-medium text-gray-700 mb-1">
+                                    What to Expect
+                                </label>
+                                <textarea
+                                    id="what_to_expect"
+                                    name="what_to_expect"
+                                    rows={3}
+                                    defaultValue={initialData?.what_to_expect}
+                                    placeholder="Brief summary of what visitors should expect..."
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="amenities" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Highlight & Tips (JSON Array)
+                                </label>
+                                {/* Using Amenities field for Highlights/Tips as per migration plan */}
+                                <textarea
+                                    id="amenities"
+                                    name="amenities"
+                                    rows={10}
+                                    defaultValue={JSON.stringify(initialData?.amenities || [], null, 2)}
+                                    placeholder='["Wear comfortable shoes", "Best visited at sunset"]'
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-xs focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
+                                />
                             </div>
                         </div>
 

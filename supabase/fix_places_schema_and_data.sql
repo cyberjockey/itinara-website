@@ -44,3 +44,22 @@ UPDATE places SET coordinates = '{"lat": -8.3496, "lng": 116.0385}' WHERE name =
 UPDATE places SET coordinates = '{"lat": -8.9059, "lng": 116.2934}' WHERE name = 'Mandalika Beach';
 UPDATE places SET coordinates = '{"lat": -8.8415, "lng": 116.2926}' WHERE name = 'Sade Village';
 UPDATE places SET coordinates = '{"lat": -8.2575, "lng": 117.5673}' WHERE name = 'Moyo Island';
+
+-- 8. Add Extended Details Columns
+ALTER TABLE places ADD COLUMN IF NOT EXISTS phone text;
+ALTER TABLE places ADD COLUMN IF NOT EXISTS website text;
+ALTER TABLE places ADD COLUMN IF NOT EXISTS social_media jsonb DEFAULT '{}'::jsonb;
+ALTER TABLE places ADD COLUMN IF NOT EXISTS price_level text;
+ALTER TABLE places ADD COLUMN IF NOT EXISTS amenities jsonb DEFAULT '[]'::jsonb;
+ALTER TABLE places ADD COLUMN IF NOT EXISTS what_to_expect text;
+
+-- 9. Seed Extended Data for Ancol Dreamland (Demo)
+UPDATE places 
+SET 
+    phone = '+62 21 29222222',
+    website = 'https://www.ancol.com',
+    social_media = '{"Instagram": "https://instagram.com/ancoltamanimpian", "Facebook": "https://facebook.com/ancoltamanimpian", "TikTok": "https://tiktok.com/@ancoltamanimpian"}'::jsonb,
+    price_level = '$$',
+    what_to_expect = 'A massive recreation complex featuring Dunia Fantasi theme park, Sea World, and beaches. Great for families.',
+    amenities = '["Parking", "Restrooms", "Food Court", "Prayer Room", "Wheelchair Accessible"]'::jsonb
+WHERE name = 'Ancol Dreamland';

@@ -1,6 +1,6 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import L from "leaflet";
@@ -80,7 +80,29 @@ export function TripMap({ activities }: TripMapProps) {
         return <div className="w-full h-full bg-stone-gray/5 rounded-2xl animate-pulse" />;
     }
 
-    const startPos: [number, number] = getCoordinates("Bali"); // Default center
+    const startPos: [number, number] = getCoordinates("Bali"); // Default fallback
+
+    // Sub-component to handle map bounds
+    function MapBounds() {
+        const map = useMap();
+
+        useEffect(() => {
+            if (activities.length > 0) {
+                const bounds = L.latLngBounds(activities.map(a => {
+                    if (a.coordinates && typeof a.coordinates === 'object' && 'lat' in a.coordinates && 'lng' in a.coordinates) {
+                        return [a.coordinates.lat, a.coordinates.lng];
+                    }
+                    return getCoordinates(a.location || "Bali");
+                }));
+
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                }
+            }
+        }, [activities, map]);
+
+        return null;
+    }
 
     return (
         <div className="w-full h-full rounded-2xl overflow-hidden border border-stone-gray/10 shadow-sm relative z-0">
@@ -94,6 +116,7 @@ export function TripMap({ activities }: TripMapProps) {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                <MapBounds />
 
                 {activities.map((activity) => {
                     let position: [number, number];
@@ -106,17 +129,46 @@ export function TripMap({ activities }: TripMapProps) {
 
                     return (
                         <Marker key={activity.id} position={position} icon={customIcon}>
-                            <Popup>
-                                <div className="p-1 min-w-[150px]">
-                                    <div className="text-xs font-bold text-terracotta uppercase mb-1 flex items-center gap-1">
-                                        <Calendar className="w-3 h-3" /> Day {activity.day_number} • {activity.start_time?.slice(0, 5) || "Anytime"}
+                            <Popup className="custom-popup">
+                                <div className="p-1 min-w-[200px]">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="text-xs font-bold text-terracotta uppercase flex items-center gap-1">
+                                            <Calendar className="w-3 h-3" /> Day {activity.day_number}
+                                        </div>
+                                        {activity.start_time && (
+                                            <span className="text-xs font-mono bg-stone-gray/5 px-1.5 py-0.5 rounded text-stone-gray">
+                                                {activity.start_time.slice(0, 5)}
+                                            </span>
+                                        )}
                                     </div>
-                                    <h3 className="font-bold text-deep-teak text-sm mb-1">{activity.title}</h3>
+
+                                    <h3 className="font-bold text-deep-teak text-base mb-1 leading-tight">{activity.title}</h3>
+
+                                    {activity.category && (
+                                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-stone-gray/5 text-stone-gray capitalize border border-stone-gray/10 mb-2">
+                                            {activity.category}
+                                        </span>
+                                    )}
+
                                     {activity.location && (
-                                        <div className="flex items-center gap-1 text-xs text-stone-gray">
-                                            <MapPin className="w-3 h-3" /> {activity.location}
+                                        <div className="flex items-center gap-1 text-xs text-stone-gray mb-3">
+                                            <MapPin className="w-3 h-3 flex-shrink-0" />
+                                            <span className="truncate">{activity.location}</span>
                                         </div>
                                     )}
+
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location || activity.title)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center gap-2 w-full py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors font-bold text-xs"
+                                    >
+                                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                            <circle cx="12" cy="10" r="3" />
+                                        </svg>
+                                        Navigate
+                                    </a>
                                 </div>
                             </Popup>
                         </Marker>

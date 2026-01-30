@@ -13,6 +13,12 @@ export type Place = {
     location?: string;
     image_url?: string;
     coordinates?: { lat: number; lng: number };
+    phone?: string;
+    website?: string;
+    social_media?: any;
+    price_level?: string;
+    amenities?: any;
+    what_to_expect?: string;
 }
 
 export async function generateCoordinates(placeName: string, location: string) {
@@ -126,6 +132,12 @@ export async function createPlace(prevState: unknown, formData: FormData) {
     const type = formData.get('type') as string;
     const location = formData.get('location') as string;
     const description = formData.get('description') as string;
+    const phone = formData.get('phone') as string;
+    const website = formData.get('website') as string;
+    const price_level = formData.get('price_level') as string;
+    const what_to_expect = formData.get('what_to_expect') as string;
+    const social_media = formData.get('social_media') ? JSON.parse(formData.get('social_media') as string) : {};
+    const amenities = formData.get('amenities') ? JSON.parse(formData.get('amenities') as string) : [];
 
     let coordinates: { lat: number, lng: number } | null = null;
     if (formData.get('lat') && formData.get('lng')) {
@@ -157,6 +169,13 @@ export async function createPlace(prevState: unknown, formData: FormData) {
             cloudinary_images, // Save the array of URLs
             photos: cloudinary_images, // Sync with photos array
             image_url: cloudinary_images.length > 0 ? cloudinary_images[0] : null, // Sync with image_url
+            // Extended fields
+            phone,
+            website,
+            social_media,
+            price_level,
+            amenities,
+            what_to_expect
             // Attribution
             // guide_id: user.id // If we want to track who created it
         })
@@ -193,7 +212,13 @@ export async function updatePlace(placeId: string, prevState: unknown, formData:
         destination_id,
         type,
         location,
-        description
+        description,
+        phone: formData.get('phone') as string,
+        website: formData.get('website') as string,
+        price_level: formData.get('price_level') as string,
+        what_to_expect: formData.get('what_to_expect') as string,
+        social_media: formData.get('social_media') ? JSON.parse(formData.get('social_media') as string) : {},
+        amenities: formData.get('amenities') ? JSON.parse(formData.get('amenities') as string) : []
     };
 
     if (formData.get('lat') && formData.get('lng')) {
@@ -348,3 +373,142 @@ export async function bulkGenerateDescriptions(placeIds: string[]) {
         message: `Processed ${placeIds.length} items. Success: ${successCount}, Failed: ${failCount}`
     };
 }
+
+// ============ BULK CSV UPLOAD ============
+
+export type ParsedPlaceRow = {
+    destination_name: string;
+    name: string;
+    type?: string;
+    rating?: string;
+    status?: string;
+    location?: string;
+    description?: string;
+    image_url?: string;
+    phone?: string;
+    website?: string;
+    price_level?: string;
+    what_to_expect?: string;
+};
+
+export type BulkUploadResult = {
+    success: boolean;
+    message: string;
+    inserted: number;
+    failed: number;
+    errors: Array<{ row: number; error: string }>;
+};
+
+export async function getDestinations() {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from('destinations')
+        .select('id, name')
+        .order('name');
+
+    if (error) {
+        console.error("Error fetching destinations:", error);
+        return [];
+    }
+    return data as Array<{ id: string; name: string }>;
+}
+
+export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUploadResult> {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { success: false, message: "Unauthorized", inserted: 0, failed: 0, errors: [] };
+    }
+
+    // Get all destinations for name lookup
+    const destinations = await getDestinations();
+    const destinationMap = new Map(
+        destinations.map(d => [d.name.toLowerCase().trim(), d.id])
+    );
+
+    let inserted = 0;
+    let failed = 0;
+    const errors: Array<{ row: number; error: string }> = [];
+
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const rowNum = i + 2; // +2 because row 1 is header, and arrays are 0-indexed
+
+        // Validate required fields
+        if (!row.name || !row.name.trim()) {
+            errors.push({ row: rowNum, error: "Missing required field: name" });
+            failed++;
+            continue;
+        }
+
+        if (!row.destination_name || !row.destination_name.trim()) {
+            errors.push({ row: rowNum, error: "Missing required field: destination_name" });
+            failed++;
+            continue;
+        }
+
+        // Look up destination ID
+        const destName = row.destination_name.toLowerCase().trim();
+        let destinationId = destinationMap.get(destName);
+
+        // Try partial match if exact match fails
+        if (!destinationId) {
+            for (const [name, id] of destinationMap) {
+                if (name.includes(destName) || destName.includes(name)) {
+                    destinationId = id;
+                    break;
+                }
+            }
+        }
+
+        if (!destinationId) {
+            errors.push({ row: rowNum, error: `Destination not found: "${row.destination_name}"` });
+            failed++;
+            continue;
+        }
+
+        // Parse rating if provided
+        let rating: number | null = null;
+        if (row.rating) {
+            const parsed = parseFloat(row.rating);
+            if (!isNaN(parsed) && parsed >= 0 && parsed <= 5) {
+                rating = parsed;
+            }
+        }
+
+        // Insert the place
+        const { error } = await supabase.from('places').insert({
+            destination_id: destinationId,
+            name: row.name.trim(),
+            type: row.type?.trim() || null,
+            rating,
+            status: row.status?.trim() || 'Open',
+            location: row.location?.trim() || null,
+            description: row.description?.trim() || null,
+            image_url: row.image_url?.trim() || null,
+            phone: row.phone?.trim() || null,
+            website: row.website?.trim() || null,
+            price_level: row.price_level?.trim() || null,
+            what_to_expect: row.what_to_expect?.trim() || null,
+        });
+
+        if (error) {
+            errors.push({ row: rowNum, error: error.message });
+            failed++;
+        } else {
+            inserted++;
+        }
+    }
+
+    revalidatePath('/dashboard/places');
+
+    return {
+        success: failed === 0,
+        message: `Imported ${inserted} places. ${failed > 0 ? `${failed} failed.` : ''}`,
+        inserted,
+        failed,
+        errors
+    };
+}
+

@@ -13,6 +13,7 @@ export async function createActivity(prevState: any, formData: FormData) {
     const location = formData.get("location") as string;
     const category = formData.get("category") as string;
     const notes = formData.get("notes") as string;
+    const placeId = formData.get("placeId") as string; // Optional linking
     const coordinatesRaw = formData.get("coordinates") as string;
 
     let coordinates = null;
@@ -55,6 +56,7 @@ export async function createActivity(prevState: any, formData: FormData) {
             location: location || null,
             category: category || "sightseeing",
             notes: notes || null,
+            place_id: placeId || null, // Link to generic place
             coordinates: coordinates // user_id not in table? usually RLS handles or it's implicitly linked via trip
         });
 

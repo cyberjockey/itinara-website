@@ -12,6 +12,7 @@ interface Activity {
     location: string | null;
     category: string | null;
     notes: string | null;
+    place_id?: string; // Optional place_id for linking
 }
 
 interface SortableActivityCardProps {
@@ -63,9 +64,25 @@ export function SortableActivityCard({ activity, readOnly = false }: SortableAct
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-deep-teak truncate pr-2" title={activity.title}>
-                            {activity.title}
-                        </h4>
+                        <div className="flex items-center gap-2 truncate pr-2">
+                            <h4 className="font-bold text-deep-teak truncate" title={activity.title}>
+                                {activity.title}
+                            </h4>
+                            {activity.place_id && (
+                                <a
+                                    href={`/dashboard/explore/view/place/${activity.place_id}`}
+                                    target="_blank"
+                                    className="text-stone-gray hover:text-terracotta transition-colors"
+                                    title="View Details"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
+                                    </svg>
+                                </a>
+                            )}
+                        </div>
+
                         {!readOnly && (
                             <button className="text-stone-gray/40 hover:text-deep-teak opacity-0 group-hover:opacity-100 transition-opacity">
                                 <MoreVertical className="w-4 h-4" />
@@ -79,27 +96,26 @@ export function SortableActivityCard({ activity, readOnly = false }: SortableAct
                         </span>
                     )}
 
-                    {activity.location && (
-                        <div className="flex items-center gap-2 text-xs text-stone-gray mt-1">
-                            <div className="flex items-center gap-1 truncate flex-1">
-                                <MapPin className="w-3 h-3 text-terracotta flex-shrink-0" />
-                                <span className="truncate">{activity.location}</span>
-                            </div>
-                            <a
-                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors font-medium whitespace-nowrap"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                Navigate
-                            </a>
+                    {/* Always show Navigate / Location block if we have a title or location */}
+                    <div className="flex items-center gap-2 text-xs text-stone-gray mt-1">
+                        <div className="flex items-center gap-1 truncate flex-1">
+                            <MapPin className="w-3 h-3 text-terracotta flex-shrink-0" />
+                            <span className="truncate">{activity.location || activity.title}</span>
                         </div>
-                    )}
+                        <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location || activity.title)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 px-2 py-1 bg-stone-gray/5 text-stone-gray hover:text-terracotta rounded-md hover:bg-stone-gray/10 transition-colors font-medium whitespace-nowrap"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                            </svg>
+                            Navigate
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

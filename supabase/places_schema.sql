@@ -9,6 +9,12 @@ create table places (
   location text,
   description text,
   image_url text,
+  phone text,
+  website text,
+  social_media jsonb default '{}'::jsonb,
+  price_level text,
+  amenities jsonb default '[]'::jsonb,
+  what_to_expect text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

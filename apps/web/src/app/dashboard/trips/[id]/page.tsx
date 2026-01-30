@@ -31,7 +31,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
     // Fetch activities
     const { data: activities } = await supabase
         .from("activities")
-        .select("*")
+        .select("*, place:places(*)") // Join for extended details
         .eq("trip_id", params.id)
         .order("day_number", { ascending: true })
         .order("start_time", { ascending: true });

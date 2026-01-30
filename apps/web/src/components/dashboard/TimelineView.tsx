@@ -37,6 +37,7 @@ interface Activity {
     location: string | null;
     category: string | null;
     notes: string | null;
+    place_id?: string;
     order_index?: number;
 }
 
@@ -279,30 +280,10 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
                 </div>
             )}
 
-            <div className="flex-1 overflow-x-auto overflow-y-hidden p-6">
-                {readOnly ? (
-                    // Read Only View - Simplified
-                    <div className="flex h-full gap-6 w-max">
-                        {Array.from(columns.entries()).map(([dayNum, dayActivities]) => (
-                            <DayColumn
-                                key={dayNum}
-                                dayNumber={dayNum}
-                                date={addDays(startDate, dayNum - 1)}
-                                activities={dayActivities}
-                                onAddActivity={() => handleAddActivity(dayNum)}
-                                readOnly={true}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    // Drag and Drop View
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragStart={handleDragStart}
-                        onDragOver={handleDragOver}
-                        onDragEnd={handleDragEnd}
-                    >
+            <div className="flex-1 w-full flex justify-center overflow-hidden">
+                <div className="flex-1 max-w-7xl w-full overflow-x-auto overflow-y-hidden p-6">
+                    {readOnly ? (
+                        // Read Only View - Simplified
                         <div className="flex h-full gap-6 w-max">
                             {Array.from(columns.entries()).map(([dayNum, dayActivities]) => (
                                 <DayColumn
@@ -311,24 +292,46 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
                                     date={addDays(startDate, dayNum - 1)}
                                     activities={dayActivities}
                                     onAddActivity={() => handleAddActivity(dayNum)}
-                                    readOnly={false}
+                                    readOnly={true}
                                 />
                             ))}
                         </div>
-
-                        {createPortal(
-                            <DragOverlay dropAnimation={dropAnimation}>
-                                {activeId ? (
-                                    <SortableActivityCard
-                                        activity={activities.find(a => a.id === activeId)!}
+                    ) : (
+                        // Drag and Drop View
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragStart={handleDragStart}
+                            onDragOver={handleDragOver}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <div className="flex h-full gap-6 w-max">
+                                {Array.from(columns.entries()).map(([dayNum, dayActivities]) => (
+                                    <DayColumn
+                                        key={dayNum}
+                                        dayNumber={dayNum}
+                                        date={addDays(startDate, dayNum - 1)}
+                                        activities={dayActivities}
+                                        onAddActivity={() => handleAddActivity(dayNum)}
                                         readOnly={false}
                                     />
-                                ) : null}
-                            </DragOverlay>,
-                            document.body
-                        )}
-                    </DndContext>
-                )}
+                                ))}
+                            </div>
+
+                            {createPortal(
+                                <DragOverlay dropAnimation={dropAnimation}>
+                                    {activeId ? (
+                                        <SortableActivityCard
+                                            activity={activities.find(a => a.id === activeId)!}
+                                            readOnly={false}
+                                        />
+                                    ) : null}
+                                </DragOverlay>,
+                                document.body
+                            )}
+                        </DndContext>
+                    )}
+                </div>
             </div>
         </div>
     );

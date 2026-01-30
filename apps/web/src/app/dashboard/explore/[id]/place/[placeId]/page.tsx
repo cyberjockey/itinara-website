@@ -8,6 +8,7 @@ import { PlaceReviews } from "@/components/places/PlaceReviews";
 import { PlaceMap } from "@/components/places/PlaceMap";
 import { AddActivityModal } from "@/components/dashboard/AddActivityModal";
 import { AddToTripWrapper } from "@/components/places/AddToTripWrapper"; // New client wrapper
+import { PlaceExtendedDetails } from "@/components/places/PlaceExtendedDetails";
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 
@@ -41,6 +42,20 @@ export default async function PlaceDetailPage(props: { params: Promise<{ id: str
             .gte("end_date", now)
             .order("start_date", { ascending: true });
         if (trips) userTrips = trips;
+    }
+
+    // 3. Check if Place is Unlocked (Added to any trip)
+    // We check if this place_id acts as "place_id" in any activity of the user's trips
+    let isUnlocked = false;
+    if (user && userTrips.length > 0) {
+        const tripIds = userTrips.map(t => t.id);
+        const { count } = await supabase
+            .from("activities")
+            .select("*", { count: 'exact', head: true })
+            .in("trip_id", tripIds)
+            .eq("place_id", params.placeId);
+
+        isUnlocked = (count || 0) > 0;
     }
 
     // Default Images if photos array is empty
@@ -95,6 +110,8 @@ export default async function PlaceDetailPage(props: { params: Promise<{ id: str
                         ) : (
                             <p>Experience the unique charm of {place.name}. A must-visit spot in {place.location}.</p>
                         )}
+
+                        <PlaceExtendedDetails place={place} isUnlocked={isUnlocked} />
                     </div>
 
                     <PlaceReviews reviews={reviews} />
@@ -121,6 +138,7 @@ export default async function PlaceDetailPage(props: { params: Promise<{ id: str
                         <div className="mt-6 pt-6 border-t border-stone-gray/10">
                             <AddToTripWrapper
                                 userTrips={userTrips}
+                                placeId={place.id}
                                 placeName={place.name}
                                 placeLocation={place.location}
                                 placeType={place.type}

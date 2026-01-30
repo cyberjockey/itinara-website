@@ -59,6 +59,12 @@ export default async function DashboardLayout({
                             <Link href="/dashboard/blog" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
                                 Blog Management
                             </Link>
+                            <Link href="/dashboard/pages" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
+                                Static Pages
+                            </Link>
+                            <Link href="/dashboard/landing-pages" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
+                                Landing Pages
+                            </Link>
                         </>
                     )}
                     {(isGuide || isAdmin) && (

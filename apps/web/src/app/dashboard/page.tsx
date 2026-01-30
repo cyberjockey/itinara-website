@@ -78,33 +78,30 @@ export default async function DashboardPage({
                         return (
                             <Link href={`/dashboard/trips/${trip.id}`} key={trip.id} className="block group">
                                 <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full flex flex-col">
-                                    <div className="h-56 bg-gradient-to-br from-stone-gray/5 to-stone-gray/10 relative shrink-0">
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <MapPin className="w-16 h-16 text-stone-gray/15" />
-                                        </div>
-                                        <div className="absolute top-5 left-5">
-                                            {isVIP ? (
-                                                <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
-                                                    <span>👑</span> VIP
-                                                </div>
-                                            ) : (
-                                                <div className="bg-white/95 backdrop-blur-sm text-terracotta border border-terracotta/20 px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1">
-                                                    <Sparkles className="w-3 h-3" /> Premium
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
                                     <div className="p-6 flex flex-col flex-1">
                                         <div className="flex justify-between items-start mb-4">
-                                            <h3 className="font-bold text-xl text-deep-teak group-hover:text-terracotta transition-colors line-clamp-2 leading-tight">{trip.title}</h3>
-                                            <button className="text-stone-gray hover:text-terracotta shrink-0 ml-3 transition-colors">
+                                            <div className="flex-1 pr-3">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    {isVIP ? (
+                                                        <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-sm flex items-center gap-1 w-fit">
+                                                            <span>👑</span> VIP
+                                                        </div>
+                                                    ) : (
+                                                        <div className="bg-stone-gray/5 text-terracotta border border-stone-gray/10 px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 w-fit">
+                                                            <Sparkles className="w-3 h-3" /> Premium
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <h3 className="font-bold text-xl text-deep-teak group-hover:text-terracotta transition-colors line-clamp-2 leading-tight">{trip.title}</h3>
+                                            </div>
+                                            <button className="text-stone-gray hover:text-terracotta shrink-0 transition-colors">
                                                 <MoreHorizontal className="w-5 h-5" />
                                             </button>
                                         </div>
 
-                                        <div className="mb-3">
-                                            <div className="flex items-center justify-between text-xs mb-1">
-                                                <span className="text-stone-gray/80 font-medium">Activities</span>
+                                        <div className="mb-4">
+                                            <div className="flex items-center justify-between text-xs mb-1.5">
+                                                <span className="text-stone-gray/80 font-medium">Activity Limit</span>
                                                 <span className={`font-bold ${isAtLimit ? 'text-red-600' : isNearLimit ? 'text-orange-600' : 'text-stone-gray'}`}>
                                                     {activityCount}{isVIP ? '' : `/${maxActivities || 10}`}
                                                     {isVIP && <span className="text-amber-600 ml-1">∞</span>}
@@ -120,7 +117,7 @@ export default async function DashboardPage({
                                             )}
                                         </div>
 
-                                        <div className="space-y-3 text-sm text-stone-gray/80 mt-auto">
+                                        <div className="space-y-3 text-sm text-stone-gray/80 mt-auto pt-4 border-t border-stone-gray/5">
                                             <div className="flex items-center gap-2.5">
                                                 <MapPin className="w-4 h-4 text-terracotta shrink-0" />
                                                 <span className="truncate font-medium">{trip.destination}</span>
