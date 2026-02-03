@@ -16,11 +16,12 @@ export function MapEmbed({ src, query }: MapEmbedProps) {
     }
 
     return (
-        <div className="w-full h-[300px] rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10">
+        <div className="w-full relative w-full aspect-video md:aspect-[21/9] rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10">
             <iframe
                 title={`Map of ${query}`}
                 width="100%"
                 height="100%"
+                className="absolute inset-0 w-full h-full"
                 style={{ border: 0 }}
                 loading="lazy"
                 allowFullScreen

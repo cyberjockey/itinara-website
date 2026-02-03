@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Place } from '@/app/dashboard/places/actions';
-import { Loader2, MapPin, CheckSquare, Square, Check, X } from 'lucide-react';
+import { Loader2, MapPin, CheckSquare, Square, Check, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { ColumnConfig } from './ColumnSettings';
 
@@ -14,6 +14,9 @@ interface SpreadsheetTableProps {
     onSelectionChange: (ids: Set<string>) => void;
     onUpdateField: (placeId: string, field: string, value: string) => Promise<boolean>;
     pagination?: React.ReactNode;
+    onSort?: (column: string) => void;
+    currentSort?: string;
+    currentOrder?: 'asc' | 'desc';
 }
 
 interface EditingCell {
@@ -29,6 +32,9 @@ export function SpreadsheetTable({
     onSelectionChange,
     onUpdateField,
     pagination,
+    onSort,
+    currentSort,
+    currentOrder,
 }: SpreadsheetTableProps) {
     const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
     const [savingCell, setSavingCell] = useState<string | null>(null);
@@ -69,13 +75,21 @@ export function SpreadsheetTable({
             }
             return '';
         }
+        if (field === 'created_at' || field === 'updated_at') {
+            const dateStr = (place as any)[field];
+            if (dateStr) {
+                return new Date(dateStr).toLocaleDateString() + ' ' + new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            return '';
+        }
+
         const value = (place as Record<string, unknown>)[field];
         return value != null ? String(value) : '';
     };
 
     const startEditing = (placeId: string, field: string) => {
         // Don't allow editing certain fields
-        if (field === 'coordinates') return;
+        if (['coordinates', 'created_at', 'updated_at'].includes(field)) return;
 
         const place = places.find(p => p.id === placeId);
         if (!place) return;
@@ -224,15 +238,16 @@ export function SpreadsheetTable({
                 onClick={() => startEditing(place.id, column.key)}
                 className={`
                     min-h-[24px] px-1 py-0.5 rounded cursor-pointer transition-all
-                    hover:bg-blue-50 hover:ring-1 hover:ring-blue-200
+                    hover:bg-blue-50 hover:ring-1 hover:ring-blue-200 w-full
                     ${isSaving ? 'opacity-50' : ''}
                     ${isSaved ? 'bg-green-50 ring-1 ring-green-300' : ''}
                     ${!value ? 'text-gray-400 italic' : 'text-gray-900'}
                 `}
+                title={value} // Show full text on hover
             >
                 {isSaving && <Loader2 className="w-3 h-3 animate-spin inline mr-1" />}
                 {isSaved && <Check className="w-3 h-3 text-green-500 inline mr-1" />}
-                <span className="truncate">{value || '—'}</span>
+                <span className="block truncate">{value || '—'}</span>
             </div>
         );
     };
@@ -252,11 +267,25 @@ export function SpreadsheetTable({
                                     )}
                                 </button>
                             </th>
-                            {visibleColumns.map((col) => (
-                                <th key={col.key} className="px-4 py-3 whitespace-nowrap">
-                                    {col.label}
-                                </th>
-                            ))}
+                            {visibleColumns.map((col) => {
+                                const isSorted = currentSort === col.key;
+                                return (
+                                    <th
+                                        key={col.key}
+                                        className="px-4 py-3 whitespace-nowrap cursor-pointer hover:bg-gray-100 transition-colors"
+                                        onClick={() => onSort && onSort(col.key)}
+                                    >
+                                        <div className="flex items-center gap-1.5">
+                                            {col.label}
+                                            {isSorted ? (
+                                                currentOrder === 'asc' ? <ArrowUp className="w-3.5 h-3.5 text-blue-600" /> : <ArrowDown className="w-3.5 h-3.5 text-blue-600" />
+                                            ) : (
+                                                <ArrowUpDown className="w-3.5 h-3.5 text-gray-300 opacity-0 group-hover:opacity-100" />
+                                            )}
+                                        </div>
+                                    </th>
+                                );
+                            })}
                             <th className="px-4 py-3 text-right w-20">Actions</th>
                         </tr>
                     </thead>
@@ -277,7 +306,7 @@ export function SpreadsheetTable({
                                     </button>
                                 </td>
                                 {visibleColumns.map((col) => (
-                                    <td key={col.key} className="px-4 py-3 max-w-xs">
+                                    <td key={col.key} className="px-4 py-3 max-w-[200px] overflow-hidden">
                                         {renderCellContent(place, col)}
                                     </td>
                                 ))}

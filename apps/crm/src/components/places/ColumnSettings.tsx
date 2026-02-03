@@ -29,6 +29,8 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     { key: 'reviewer_count', label: 'Reviews', visible: false },
     { key: 'google_maps_url', label: 'Maps URL', visible: false },
     { key: 'google_place_id', label: 'Place ID', visible: false },
+    { key: 'created_at', label: 'Created At', visible: false },
+    { key: 'updated_at', label: 'Last Modified', visible: false },
 ];
 
 const STORAGE_KEY = 'crm_places_columns';
@@ -132,7 +134,11 @@ export function loadColumnsFromStorage(): ColumnConfig[] {
     try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-            return JSON.parse(stored);
+            const parsed = JSON.parse(stored) as ColumnConfig[];
+            // Merge with defaults to ensure new columns appear
+            const storedKeys = new Set(parsed.map(c => c.key));
+            const newColumns = DEFAULT_COLUMNS.filter(c => !storedKeys.has(c.key));
+            return [...parsed, ...newColumns];
         }
     } catch (e) {
         console.error('Failed to load column settings:', e);

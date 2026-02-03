@@ -114,7 +114,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
     return (
         <main className="max-w-4xl mx-auto px-6 py-20">
             {/* 2. City Snapshot */}
-            <section className="bg-white rounded-3xl p-8 shadow-sm border border-[#2C2121]/5 -mt-32 relative z-30 flex flex-wrap md:flex-nowrap justify-between gap-8 animate-fade-in-up">
+            <section className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-[#2C2121]/5 -mt-32 relative z-30 flex flex-col md:flex-row flex-wrap md:flex-nowrap justify-between gap-6 md:gap-8 animate-fade-in-up">
                 <div className="flex items-start gap-4 flex-1 min-w-[200px]">
                     <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
                         <Calendar className="w-6 h-6" />
@@ -124,7 +124,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
                         <p className="text-[#2C2121]/60 text-sm">{details.bestTime}</p>
                     </div>
                 </div>
-                <div className="w-px bg-[#2C2121]/10 hidden md:block"></div>
+                <div className="h-px w-full md:w-px md:h-auto bg-[#2C2121]/10 block"></div>
                 <div className="flex items-start gap-4 flex-1 min-w-[200px]">
                     <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600 shrink-0">
                         <Sparkles className="w-6 h-6" />
@@ -134,7 +134,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
                         <p className="text-[#2C2121]/60 text-sm">{details.idealTrip}</p>
                     </div>
                 </div>
-                <div className="w-px bg-[#2C2121]/10 hidden md:block"></div>
+                <div className="h-px w-full md:w-px md:h-auto bg-[#2C2121]/10 block"></div>
                 <div className="flex items-start gap-4 flex-1 min-w-[200px]">
                     <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 shrink-0">
                         <DollarSign className="w-6 h-6" />
@@ -167,7 +167,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
                     <span className="w-8 h-8 rounded-full bg-[#E35435] text-white flex items-center justify-center text-sm font-bold">2</span>
                     Explore Deeper
                 </h2>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Card 1: Local Culture */}
                     <button
                         onClick={() => openPdf(`Local Culture of ${destination.name}`, destination.slug, 'culture')}

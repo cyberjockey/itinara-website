@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Place, updatePlaceField } from '@/app/dashboard/places/actions';
 import { SpreadsheetTable } from './SpreadsheetTable';
 import { ColumnSettings, useColumnSettings } from './ColumnSettings';
+import { PlaceFilter } from './PlaceFilter';
 import { ExportButton } from './ExportButton';
 import { BulkUploadButton } from './BulkUploadButton';
 import { ErrorLogPanel, ErrorLogEntry, generateErrorId } from './ErrorLogPanel';
@@ -103,12 +105,29 @@ export function ActivitiesManager({ places, totalCount, pagination }: Activities
         }
     };
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const currentSort = searchParams.get('sortBy') || 'created_at';
+    const currentOrder = (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc';
+
+    const handleSort = (column: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (currentSort === column) {
+            params.set('sortOrder', currentOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            params.set('sortBy', column);
+            params.set('sortOrder', 'asc');
+        }
+        router.push(`?${params.toString()}`);
+    };
+
     return (
         <div className="space-y-4">
             {/* Toolbar */}
             <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2">
                     <ColumnSettings columns={columns} onChange={setColumns} />
+                    <PlaceFilter />
                     <ExportButton selectedIds={Array.from(selectedIds)} totalCount={totalCount} />
                 </div>
                 <div className="flex items-center gap-3">
@@ -158,6 +177,9 @@ export function ActivitiesManager({ places, totalCount, pagination }: Activities
                 onSelectionChange={setSelectedIds}
                 onUpdateField={handleUpdateField}
                 pagination={pagination}
+                onSort={handleSort}
+                currentSort={currentSort}
+                currentOrder={currentOrder}
             />
 
             {/* Error Log */}

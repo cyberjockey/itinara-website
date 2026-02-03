@@ -14,16 +14,19 @@ const DB_COLUMNS = [
     { key: 'website', label: 'Website', required: false },
     { key: 'social_media', label: 'Social Media', required: false },
     { key: 'price_level', label: 'Price Range', required: false },
-    { key: 'rating', label: 'Rating', required: false },
     { key: 'what_to_expect', label: 'What to Expect', required: false },
-    { key: 'highlight_and_tips', label: 'Highlight and Tips', required: false },
-    { key: 'latitude', label: 'Latitude', required: false },
-    { key: 'longitude', label: 'Longitude', required: false },
+    { key: 'image_url', label: 'Image URL', required: false },
+    { key: 'amenities', label: 'Highlight & Tips (Amenities)', required: false },
+    // Google Fields
     { key: 'google_place_name', label: 'Place Name on Google', required: false },
     { key: 'full_address', label: 'Full Address', required: false },
     { key: 'reviewer_count', label: 'Reviewer Count', required: false },
+    { key: 'rating', label: 'Rating', required: false },
     { key: 'google_maps_url', label: 'Google Maps URL', required: false },
     { key: 'google_place_id', label: 'Google Place ID', required: false },
+    // Coordinates
+    { key: 'latitude', label: 'Latitude', required: false },
+    { key: 'longitude', label: 'Longitude', required: false },
 ];
 
 // Auto-mapping suggestions based on common header variations
@@ -37,16 +40,17 @@ const AUTO_MAP_HINTS: Record<string, string[]> = {
     'website': ['website', 'url', 'link', 'web'],
     'social_media': ['social media', 'social_media', 'instagram', 'facebook', 'socials'],
     'price_level': ['price', 'price range', 'price_level', 'cost', 'pricing'],
-    'rating': ['rating', 'score', 'stars', 'rate'],
     'what_to_expect': ['what to expect', 'what_to_expect', 'expectations', 'expect'],
-    'highlight_and_tips': ['highlight', 'tips', 'highlight and tips', 'highlight_and_tips', 'highlights'],
-    'latitude': ['latitude', 'lat'],
-    'longitude': ['longitude', 'lng', 'lon', 'long'],
     'google_place_name': ['place name on google', 'google_place_name', 'google name'],
     'full_address': ['full address', 'full_address', 'complete address'],
     'reviewer_count': ['reviewer count', 'reviewer_count', 'reviews', 'review count'],
+    'rating': ['rating', 'score', 'stars', 'rate'],
     'google_maps_url': ['google maps url', 'google_maps_url', 'maps url', 'gmaps'],
     'google_place_id': ['place id', 'google_place_id', 'google place id', 'placeid'],
+    'latitude': ['latitude', 'lat'],
+    'longitude': ['longitude', 'lng', 'lon', 'long'],
+    'image_url': ['image', 'photo', 'picture', 'image url', 'image_url', 'image link url', 'image link url (place api)'],
+    'amenities': ['amenities', 'facilities', 'features', 'highlight and tips', 'highlights', 'tips', 'highlight_and_tips'],
 };
 
 export type ColumnMapping = Record<string, string>; // csvHeader -> dbColumn

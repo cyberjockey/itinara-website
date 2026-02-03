@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import Groq from "groq-sdk";
+import { deleteImages } from "@/lib/cloudinary";
 
 export type Place = {
     id: string;
@@ -19,6 +20,9 @@ export type Place = {
     price_level?: string;
     amenities?: any;
     what_to_expect?: string;
+    highlight_and_tips?: any; // JSONB
+    created_at?: string;
+    updated_at?: string;
 }
 
 export async function generateCoordinates(placeName: string, location: string) {
@@ -75,17 +79,38 @@ export async function generatePlaceDescription(placeName: string, location: stri
     }
 }
 
-export async function getPlaces(destinationId?: string, page = 1, limit = 3, query?: string) {
+export async function getPlaces(
+    destinationId?: string,
+    page = 1,
+    limit = 3,
+    query?: string,
+    sortBy: string = 'created_at',
+    sortOrder: 'asc' | 'desc' = 'desc',
+    filterType?: string,
+    filterStatus?: string
+) {
     const supabase = await createClient();
 
-    let dbQuery = supabase.from('places').select('*', { count: 'exact' }).order('name');
+    let dbQuery = supabase.from('places').select('*', { count: 'exact' });
 
+    // Sorting
+    dbQuery = dbQuery.order(sortBy, { ascending: sortOrder === 'asc' });
+
+    // Filtering
     if (destinationId) {
         dbQuery = dbQuery.eq('destination_id', destinationId);
     }
 
     if (query) {
         dbQuery = dbQuery.ilike('name', `%${query}%`);
+    }
+
+    if (filterType && filterType !== 'all') {
+        dbQuery = dbQuery.eq('type', filterType);
+    }
+
+    if (filterStatus && filterStatus !== 'all') {
+        dbQuery = dbQuery.eq('status', filterStatus);
     }
 
     const start = (page - 1) * limit;
@@ -138,6 +163,7 @@ export async function createPlace(prevState: unknown, formData: FormData) {
     const what_to_expect = formData.get('what_to_expect') as string;
     const social_media = formData.get('social_media') ? JSON.parse(formData.get('social_media') as string) : {};
     const amenities = formData.get('amenities') ? JSON.parse(formData.get('amenities') as string) : [];
+    const highlight_and_tips = formData.get('highlight_and_tips') ? JSON.parse(formData.get('highlight_and_tips') as string) : [];
 
     let coordinates: { lat: number, lng: number } | null = null;
     if (formData.get('lat') && formData.get('lng')) {
@@ -175,9 +201,14 @@ export async function createPlace(prevState: unknown, formData: FormData) {
             social_media,
             price_level,
             amenities,
-            what_to_expect
-            // Attribution
-            // guide_id: user.id // If we want to track who created it
+            what_to_expect,
+            highlight_and_tips,
+            google_place_name: formData.get('google_place_name') as string,
+            full_address: formData.get('full_address') as string,
+            rating: formData.get('rating') ? parseFloat(formData.get('rating') as string) : undefined,
+            reviewer_count: formData.get('reviewer_count') ? parseInt(formData.get('reviewer_count') as string) : undefined,
+            google_maps_url: formData.get('google_maps_url') as string,
+            google_place_id: formData.get('google_place_id') as string,
         })
         .select()
         .single();
@@ -188,8 +219,51 @@ export async function createPlace(prevState: unknown, formData: FormData) {
     }
 
     revalidatePath('/dashboard/templates'); // Revalidate wherever templates/places are used
-    revalidatePath('/dashboard/templates'); // Revalidate wherever templates/places are used
     return { message: "Place created successfully", place: data };
+}
+
+export async function deletePlace(id: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { message: "Unauthorized" };
+    }
+
+    // Get place to find images to delete
+    const { data: place, error: fetchError } = await supabase
+        .from('places')
+        .select('photos, image_url')
+        .eq('id', id)
+        .single();
+
+    if (fetchError || !place) {
+        return { message: "Place not found" };
+    }
+
+    // Delete images from Cloudinary
+    const imagesToDelete = new Set<string>();
+    if (place.image_url) imagesToDelete.add(place.image_url);
+    if (place.photos && Array.isArray(place.photos)) {
+        place.photos.forEach((url: string) => imagesToDelete.add(url));
+    }
+
+    if (imagesToDelete.size > 0) {
+        await deleteImages(Array.from(imagesToDelete));
+    }
+
+    // Delete from DB
+    const { error } = await supabase
+        .from('places')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        return { message: "Failed to delete place: " + error.message };
+    }
+
+    revalidatePath('/dashboard/places');
+    return { message: "Place deleted successfully", success: true };
 }
 
 export async function updatePlace(placeId: string, prevState: unknown, formData: FormData) {
@@ -206,6 +280,13 @@ export async function updatePlace(placeId: string, prevState: unknown, formData:
     const location = formData.get('location') as string;
     const description = formData.get('description') as string;
 
+    // Fetch existing place to compare images
+    const { data: existingPlace } = await supabase
+        .from('places')
+        .select('photos, image_url')
+        .eq('id', placeId)
+        .single();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any = {
         name,
@@ -218,7 +299,14 @@ export async function updatePlace(placeId: string, prevState: unknown, formData:
         price_level: formData.get('price_level') as string,
         what_to_expect: formData.get('what_to_expect') as string,
         social_media: formData.get('social_media') ? JSON.parse(formData.get('social_media') as string) : {},
-        amenities: formData.get('amenities') ? JSON.parse(formData.get('amenities') as string) : []
+        amenities: formData.get('amenities') ? JSON.parse(formData.get('amenities') as string) : [],
+        highlight_and_tips: formData.get('highlight_and_tips') ? JSON.parse(formData.get('highlight_and_tips') as string) : [],
+        google_place_name: formData.get('google_place_name') as string,
+        full_address: formData.get('full_address') as string,
+        rating: formData.get('rating') ? parseFloat(formData.get('rating') as string) : undefined,
+        reviewer_count: formData.get('reviewer_count') ? parseInt(formData.get('reviewer_count') as string) : undefined,
+        google_maps_url: formData.get('google_maps_url') as string,
+        google_place_id: formData.get('google_place_id') as string,
     };
 
     if (formData.get('lat') && formData.get('lng')) {
@@ -230,12 +318,31 @@ export async function updatePlace(placeId: string, prevState: unknown, formData:
 
     if (formData.has('cloudinary_images_json')) {
         try {
-            const images = JSON.parse(formData.get('cloudinary_images_json') as string);
-            updates.cloudinary_images = images;
-            // Also update legacy columns for compatibility
-            updates.photos = images;
-            if (images.length > 0) {
-                updates.image_url = images[0];
+            const newImages = JSON.parse(formData.get('cloudinary_images_json') as string) as string[];
+            updates.cloudinary_images = newImages;
+            updates.photos = newImages;
+            if (newImages.length > 0) {
+                updates.image_url = newImages[0];
+            } else {
+                updates.image_url = null;
+            }
+
+            // Detect and delete removed images
+            if (existingPlace && existingPlace.photos) {
+                const oldImages = new Set<string>(Array.isArray(existingPlace.photos) ? existingPlace.photos : []);
+                const currentImages = new Set<string>(newImages);
+                const removedImages: string[] = [];
+
+                oldImages.forEach(url => {
+                    if (!currentImages.has(url)) {
+                        removedImages.push(url);
+                    }
+                });
+
+                if (removedImages.length > 0) {
+                    // Fire and forget deletion to not block response
+                    deleteImages(removedImages).catch(e => console.error("Background image deletion failed:", e));
+                }
             }
         } catch (e) {
             console.error("Invalid JSON images");
@@ -408,6 +515,7 @@ export type ParsedPlaceRow = {
     'what to expect'?: string; // Alternative header
     highlight_and_tips?: string;
     'highlight and tips'?: string; // Alternative header
+    amenities?: string;
 
     // Coordinates
     latitude?: string;
@@ -515,11 +623,18 @@ export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUplo
             continue;
         }
 
+        // Check if place already exists (by name and destination)
+        const { data: existingPlace } = await supabase
+            .from('places')
+            .select('id, photos, image_url')
+            .eq('destination_id', destinationId)
+            .ilike('name', name)
+            .maybeSingle();
+
         // Parse rating if provided
         let rating: number | null = null;
-        const ratingStr = getValue(row, 'rating');
-        if (ratingStr) {
-            const parsed = parseFloat(ratingStr);
+        if (row.rating) {
+            const parsed = parseFloat(row.rating);
             if (!isNaN(parsed) && parsed >= 0 && parsed <= 5) {
                 rating = parsed;
             }
@@ -541,7 +656,6 @@ export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUplo
         let reviewerCount: number | null = null;
         const reviewerCountStr = getValue(row, 'reviewer_count', 'reviewer count');
         if (reviewerCountStr) {
-            // Handle formats like "1,234" or "1234"
             const parsed = parseInt(reviewerCountStr.replace(/,/g, ''), 10);
             if (!isNaN(parsed)) {
                 reviewerCount = parsed;
@@ -549,14 +663,15 @@ export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUplo
         }
 
         // Parse social_media as JSON if it looks like JSON, otherwise store as simple object
+        // Parse social_media
         let socialMedia: Record<string, string> | null = null;
         const socialMediaStr = getValue(row, 'social_media', 'social media');
         if (socialMediaStr) {
             try {
-                if (socialMediaStr.startsWith('{')) {
+                // If it looks like JSON, parse it. Otherwise treat as single URL
+                if (socialMediaStr.trim().startsWith('{') || socialMediaStr.trim().startsWith('[')) {
                     socialMedia = JSON.parse(socialMediaStr);
                 } else {
-                    // Treat as a simple URL or handle
                     socialMedia = { url: socialMediaStr };
                 }
             } catch {
@@ -564,35 +679,116 @@ export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUplo
             }
         }
 
-        // Insert the place with all fields
-        const { error } = await supabase.from('places').insert({
-            destination_id: destinationId,
-            name,
-            type: getValue(row, 'type', 'category') || null,
-            rating,
-            status: getValue(row, 'status') || 'Open',
-            location: getValue(row, 'location', 'address') || null,
-            description: getValue(row, 'description', 'about') || null,
-            image_url: getValue(row, 'image_url') || null,
-            coordinates,
-            phone: getValue(row, 'phone', 'phone / whatsapp') || null,
-            website: getValue(row, 'website') || null,
-            social_media: socialMedia,
-            price_level: getValue(row, 'price_level', 'price range') || null,
-            what_to_expect: getValue(row, 'what_to_expect', 'what to expect') || null,
-            highlight_and_tips: getValue(row, 'highlight_and_tips', 'highlight and tips') || null,
-            google_place_name: getValue(row, 'google_place_name', 'place name on google') || null,
-            full_address: getValue(row, 'full_address', 'full address') || null,
-            reviewer_count: reviewerCount,
-            google_maps_url: getValue(row, 'google_maps_url', 'google maps url') || null,
-            google_place_id: getValue(row, 'google_place_id', 'place id') || null,
-        });
+        // Parse highlight_and_tips (JSON Array)
+        let highlightAndTips: any = null;
+        const highlightStr = getValue(row, 'highlight_and_tips', 'highlight and tips');
+        if (highlightStr) {
+            try {
+                if (highlightStr.trim().startsWith('[')) {
+                    highlightAndTips = JSON.parse(highlightStr);
+                } else {
+                    // split by newline or comma if not JSON? Or just wrap in array
+                    highlightAndTips = [highlightStr];
+                }
+            } catch {
+                highlightAndTips = [highlightStr];
+            }
+        }
 
-        if (error) {
-            errors.push({ row: rowNum, error: error.message });
-            failed++;
+        // Parse amenities (JSON Array)
+        let amenities: any = null;
+        const amenitiesStr = getValue(row, 'amenities');
+        if (amenitiesStr) {
+            try {
+                if (amenitiesStr.trim().startsWith('[')) {
+                    amenities = JSON.parse(amenitiesStr);
+                } else {
+                    amenities = [amenitiesStr];
+                }
+            } catch {
+                amenities = [amenitiesStr];
+            }
+        }
+
+        // Handle Images
+        let newPhotos: string[] = [];
+        let mainImage: string | null = null;
+        if (row.image_url && row.image_url.trim()) {
+            newPhotos = row.image_url.split(',').map(url => url.trim()).filter(url => url.length > 0);
+        }
+
+        if (existingPlace) {
+            // UPSERT LOGIC
+            const currentPhotos = new Set(existingPlace.photos || []);
+            newPhotos.forEach(p => currentPhotos.add(p));
+            const updatedPhotos = Array.from(currentPhotos);
+
+            const updatedMainImage = existingPlace.image_url || ((updatedPhotos.length > 0) ? updatedPhotos[0] : null);
+
+            const { error } = await supabase.from('places').update({
+                rating: rating || undefined,
+                status: getValue(row, 'status') || undefined,
+                location: getValue(row, 'location', 'address') || undefined,
+                description: getValue(row, 'description', 'about') || undefined,
+                image_url: updatedMainImage,
+                photos: updatedPhotos,
+                phone: getValue(row, 'phone', 'phone / whatsapp') || undefined,
+                website: getValue(row, 'website') || undefined,
+                social_media: socialMedia || undefined,
+                price_level: getValue(row, 'price_level', 'price range') || undefined,
+                what_to_expect: getValue(row, 'what_to_expect', 'what to expect') || undefined,
+                highlight_and_tips: highlightAndTips || undefined,
+                amenities: amenities || undefined,
+                google_place_name: getValue(row, 'google_place_name', 'place name on google') || undefined,
+                full_address: getValue(row, 'full_address', 'full address') || undefined,
+                reviewer_count: reviewerCount || undefined,
+                google_maps_url: getValue(row, 'google_maps_url', 'google maps url') || undefined,
+                google_place_id: getValue(row, 'google_place_id', 'place id') || undefined,
+            }).eq('id', existingPlace.id);
+
+            if (error) {
+                errors.push({ row: rowNum, error: "Update failed: " + error.message });
+                failed++;
+            } else {
+                inserted++;
+            }
         } else {
-            inserted++;
+            // INSERT LOGIC
+            if (newPhotos.length > 0) {
+                mainImage = newPhotos[0];
+            }
+
+            const { error } = await supabase.from('places').insert({
+                destination_id: destinationId,
+                name,
+                type: getValue(row, 'type', 'category') || null,
+                rating,
+                status: getValue(row, 'status') || 'Open',
+                location: getValue(row, 'location', 'address') || null,
+                description: getValue(row, 'description', 'about') || null,
+                image_url: mainImage,
+                photos: newPhotos,
+                coordinates,
+                phone: getValue(row, 'phone', 'phone / whatsapp') || null,
+                website: getValue(row, 'website') || null,
+                social_media: socialMedia,
+                price_level: getValue(row, 'price_level', 'price range') || null,
+                what_to_expect: getValue(row, 'what_to_expect', 'what to expect') || null,
+                highlight_and_tips: highlightAndTips || null,
+                amenities: amenities || null,
+                google_place_name: getValue(row, 'google_place_name', 'place name on google') || null,
+                full_address: getValue(row, 'full_address', 'full address') || null,
+                reviewer_count: reviewerCount,
+                google_maps_url: getValue(row, 'google_maps_url', 'google maps url') || null,
+                google_place_id: getValue(row, 'google_place_id', 'place id') || null,
+            });
+
+            if (error) {
+                errors.push({ row: rowNum, error: error.message });
+                failed++;
+            } else {
+                inserted++;
+            }
         }
     }
 

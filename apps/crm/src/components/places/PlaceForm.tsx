@@ -446,6 +446,98 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
                             </div>
                         </div>
 
+                        {/* Google Place Details Section */}
+                        <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 space-y-4">
+                            <h3 className="text-sm font-medium text-blue-900 border-b border-blue-200 pb-2">Google Place Details</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="google_place_name" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Place Name on Google
+                                    </label>
+                                    <input
+                                        id="google_place_name"
+                                        name="google_place_name"
+                                        type="text"
+                                        defaultValue={initialData?.google_place_name}
+                                        placeholder="Name as it appears on Google Maps"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="full_address" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Full Address
+                                    </label>
+                                    <input
+                                        id="full_address"
+                                        name="full_address"
+                                        type="text"
+                                        defaultValue={initialData?.full_address}
+                                        placeholder="Complete formatted address"
+                                        className="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black bg-white"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Google Rating
+                                    </label>
+                                    <input
+                                        id="rating"
+                                        name="rating"
+                                        type="number"
+                                        step="0.1"
+                                        min="0"
+                                        max="5"
+                                        defaultValue={initialData?.rating}
+                                        placeholder="4.5"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="reviewer_count" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Review Count
+                                    </label>
+                                    <input
+                                        id="reviewer_count"
+                                        name="reviewer_count"
+                                        type="number"
+                                        defaultValue={initialData?.reviewer_count}
+                                        placeholder="1250"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="google_maps_url" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Google Maps URL
+                                    </label>
+                                    <input
+                                        id="google_maps_url"
+                                        name="google_maps_url"
+                                        type="url"
+                                        defaultValue={initialData?.google_maps_url}
+                                        placeholder="https://maps.google.com/..."
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="google_place_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Google Place ID
+                                    </label>
+                                    <input
+                                        id="google_place_id"
+                                        name="google_place_id"
+                                        type="text"
+                                        defaultValue={initialData?.google_place_id}
+                                        placeholder="ChIJ..."
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black font-mono text-sm"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <div>
                             <div className="flex justify-between items-center mb-1">
                                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">
@@ -494,7 +586,7 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }

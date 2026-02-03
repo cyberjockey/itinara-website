@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans, Crimson_Pro } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
+import { BackgroundMusicPlayer } from "@/components/ui/BackgroundMusicPlayer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -90,6 +91,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-warm-white text-deep-teak" suppressHydrationWarning>
 
         {children}
+        <BackgroundMusicPlayer />
         <Analytics />
       </body>
     </html>

@@ -12,46 +12,11 @@ interface BulkUploadProps {
     onImportComplete?: (result: BulkUploadResult) => void;
 }
 
-function parseCSV(text: string): { headers: string[]; rows: PreviewRow[] } {
-    const lines = text.split('\n').filter(line => line.trim());
-    if (lines.length < 2) return { headers: [], rows: [] };
+import Papa from 'papaparse';
 
-    const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/^["']|["']$/g, ''));
-    const rows: PreviewRow[] = [];
+// ... (other imports)
 
-    for (let i = 1; i < lines.length; i++) {
-        const values = parseCSVLine(lines[i]);
-        const row: Record<string, string> = { _rowNum: (i + 1).toString() };
-
-        headers.forEach((header, index) => {
-            row[header] = values[index]?.trim().replace(/^["']|["']$/g, '') || '';
-        });
-
-        rows.push(row as PreviewRow);
-    }
-
-    return { headers, rows };
-}
-
-function parseCSVLine(line: string): string[] {
-    const result: string[] = [];
-    let current = '';
-    let inQuotes = false;
-
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            result.push(current);
-            current = '';
-        } else {
-            current += char;
-        }
-    }
-    result.push(current);
-    return result;
-}
+// ... (BulkUpload component start) ...
 
 // Transform rows using column mapping
 function transformRows(rows: PreviewRow[], mapping: ColumnMapping): ParsedPlaceRow[] {
@@ -83,15 +48,25 @@ export function BulkUpload({ onClose, onImportComplete }: BulkUploadProps) {
         if (!file) return;
 
         setFileName(file.name);
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const text = event.target?.result as string;
-            const { headers, rows } = parseCSV(text);
-            setCsvHeaders(headers);
-            setRawRows(rows);
-            setStep('mapping');
-        };
-        reader.readAsText(file);
+
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: 'greedy', // Handles empty lines robustly
+            complete: (results) => {
+                setCsvHeaders(results.meta.fields || []);
+                // Add _rowNum manually
+                const rowsWithNum = results.data.map((row: any, index: number) => ({
+                    ...row,
+                    _rowNum: index + 2 // +2 because 1-indexed and header row
+                }));
+                setRawRows(rowsWithNum);
+                setStep('mapping');
+            },
+            error: (error) => {
+                console.error("CSV Parse Error:", error);
+                alert("Failed to parse CSV file: " + error.message);
+            }
+        });
     };
 
     const handleMappingComplete = (columnMapping: ColumnMapping) => {
@@ -123,8 +98,8 @@ export function BulkUpload({ onClose, onImportComplete }: BulkUploadProps) {
     };
 
     const downloadTemplate = () => {
-        const headers = 'Place Name,Category,City / Region,Phone / Whatsapp,Social Media,Website,About,Address,Price Range,What to Expect,Highlight and Tips,Latitude,Longitude,Place Name on Google,Full Address,Rating,Reviewer Count,Google Maps Url,Place Id';
-        const example = 'Uluwatu Temple,Culture,Bali,+62812345678,https://instagram.com/uluwatu,,Ancient sea temple on a cliff.,Uluwatu Pecatu Bali,$$$,Stunning sunset views and Kecak dance,Arrive before sunset for the best experience,-8.8291,115.0849,Uluwatu Temple,"Pecatu, South Kuta, Badung Regency, Bali, Indonesia",4.8,12500,https://maps.google.com/?cid=123456,ChIJ123456789';
+        const headers = 'Place Name,Category,City / Region,Phone / Whatsapp,Social Media,Website,About,Address,Price Range,What to Expect,Highlight and Tips,Image URL,Latitude,Longitude,Place Name on Google,Full Address,Rating,Reviewer Count,Google Maps Url,Place Id';
+        const example = 'Uluwatu Temple,Culture,Bali,+62812345678,https://instagram.com/uluwatu,,Ancient sea temple on a cliff.,Uluwatu Pecatu Bali,$$$,Stunning sunset views and Kecak dance,Arrive before sunset for the best experience,https://example.com/image.jpg,-8.8291,115.0849,Uluwatu Temple,"Pecatu, South Kuta, Badung Regency, Bali, Indonesia",4.8,12500,https://maps.google.com/?cid=123456,ChIJ123456789';
         const csv = `${headers}\n${example}`;
 
         const blob = new Blob([csv], { type: 'text/csv' });
@@ -243,6 +218,7 @@ export function BulkUpload({ onClose, onImportComplete }: BulkUploadProps) {
                                                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Category</th>
                                                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Destination</th>
                                                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Coords</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Image</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -254,6 +230,15 @@ export function BulkUpload({ onClose, onImportComplete }: BulkUploadProps) {
                                                     <td className="px-3 py-2 text-gray-600">{row.destination_name || '—'}</td>
                                                     <td className="px-3 py-2 text-gray-500 text-xs">
                                                         {row.latitude && row.longitude ? '✓' : '—'}
+                                                    </td>
+                                                    <td className="px-3 py-2 text-gray-600">
+                                                        {row.image_url ? (
+                                                            <div className="flex items-center gap-1 text-xs text-blue-600 truncate max-w-[150px]">
+                                                                <span title={row.image_url}>Link provided</span>
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-gray-400">—</span>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))}

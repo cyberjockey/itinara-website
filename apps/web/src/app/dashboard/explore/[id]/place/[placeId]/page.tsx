@@ -81,16 +81,28 @@ export default async function PlaceDetailPage(props: { params: Promise<{ id: str
                 {/* Main Content (Left 2/3) */}
                 <div className="lg:col-span-2">
                     <h1 className="text-3xl font-heading font-bold text-deep-teak mb-2">{place.name}</h1>
-                    <div className="flex items-center gap-4 text-sm text-stone-gray mb-6">
+                    <div className="flex items-center gap-4 text-sm text-stone-gray mb-6 flex-wrap">
                         <div className="flex items-center gap-1">
                             <MapPin className="w-4 h-4 text-terracotta" />
-                            {place.location}
+                            {place.full_address || place.location || place.name}
                         </div>
                         {place.rating && (
-                            <div className="flex items-center gap-1">
-                                <Star className="w-4 h-4 text-orange-400 fill-orange-400" />
-                                {place.rating} ({reviews.length} reviews)
+                            <div className="flex items-center gap-1" title="Google Rating">
+                                <Image src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width={16} height={16} alt="Google" className="inline-block" />
+                                <span className="font-medium text-gray-900">{place.rating}</span>
+                                {place.reviewer_count && <span className="text-gray-500">({place.reviewer_count} reviews)</span>}
                             </div>
+                        )}
+                        {place.google_maps_url && (
+                            <a
+                                href={place.google_maps_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-blue-600 hover:underline"
+                            >
+                                <ExternalLink className="w-3 h-3" />
+                                View on Google Maps
+                            </a>
                         )}
                         {place.status && (
                             <div className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${place.status === 'Open' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -114,7 +126,12 @@ export default async function PlaceDetailPage(props: { params: Promise<{ id: str
                         <PlaceExtendedDetails place={place} isUnlocked={isUnlocked} />
                     </div>
 
-                    <PlaceReviews reviews={reviews} />
+                    <PlaceReviews
+                        reviews={reviews}
+                        googleRating={place.rating}
+                        googleReviewCount={place.reviewer_count}
+                        googleMapsUrl={place.google_maps_url}
+                    />
                 </div>
 
                 {/* Sidebar (Right 1/3) */}

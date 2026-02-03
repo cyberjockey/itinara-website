@@ -5,14 +5,27 @@ import { Pagination } from "@/components/ui/Pagination";
 import { PlaceSearch } from "@/components/places/PlaceSearch";
 import { ActivitiesManager } from "@/components/places/ActivitiesManager";
 
-export default async function PlacesPage(props: { searchParams: Promise<{ page?: string; limit?: string; query?: string }> }) {
+export default async function PlacesPage(props: { searchParams: Promise<{ page?: string; limit?: string; query?: string; sortBy?: string; sortOrder?: string; filterType?: string; filterStatus?: string }> }) {
     const searchParams = await props.searchParams;
     const page = Number(searchParams?.page) || 1;
     const limit = Number(searchParams?.limit) || 25;
     const query = searchParams?.query || "";
+    const sortBy = searchParams?.sortBy || "created_at";
+    const sortOrder = (searchParams?.sortOrder as 'asc' | 'desc') || "desc";
+    const filterType = searchParams?.filterType;
+    const filterStatus = searchParams?.filterStatus;
 
-    // Fetch places with pagination and search
-    const { data: places, count } = await getPlaces(undefined, page, limit, query);
+    // Fetch places with pagination, search, sort, and filter
+    const { data: places, count } = await getPlaces(
+        undefined,
+        page,
+        limit,
+        query,
+        sortBy,
+        sortOrder,
+        filterType,
+        filterStatus
+    );
 
     return (
         <div>

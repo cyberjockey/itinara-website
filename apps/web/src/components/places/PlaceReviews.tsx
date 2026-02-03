@@ -1,6 +1,7 @@
 "use client";
 
 import { Star, User } from "lucide-react";
+import Image from "next/image";
 
 interface Review {
     author: string;
@@ -12,19 +13,43 @@ interface Review {
 
 interface PlaceReviewsProps {
     reviews: Review[];
+    googleRating?: number;
+    googleReviewCount?: number;
+    googleMapsUrl?: string;
 }
 
-export function PlaceReviews({ reviews }: PlaceReviewsProps) {
-    if (!reviews || reviews.length === 0) return null;
+export function PlaceReviews({ reviews, googleRating, googleReviewCount, googleMapsUrl }: PlaceReviewsProps) {
+    if ((!reviews || reviews.length === 0) && !googleRating) return null;
 
     return (
-        <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4">
-                <h3 className="font-bold text-lg text-deep-teak">Reviews</h3>
-                <div className="flex items-center gap-1 text-sm text-stone-gray/80">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" className="w-4 h-4" />
-                    <span>Rating</span>
+        <div className="bg-white rounded-2xl p-8 border border-stone-gray/10 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h3 className="text-xl font-bold text-deep-teak flex items-center gap-2">
+                        Reviews
+                        {googleRating && (
+                            <span className="text-sm font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <Image src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width={14} height={14} alt="Google" className="inline-block" />
+                                {googleRating} Rating
+                            </span>
+                        )}
+                    </h3>
+                    {googleReviewCount && (
+                        <p className="text-sm text-stone-gray mt-1">
+                            Based on {googleReviewCount.toLocaleString()} Google reviews
+                        </p>
+                    )}
                 </div>
+                {googleMapsUrl && (
+                    <a
+                        href={googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:underline font-medium"
+                    >
+                        Read all reviews on Google
+                    </a>
+                )}
             </div>
 
             <div className="space-y-4">
