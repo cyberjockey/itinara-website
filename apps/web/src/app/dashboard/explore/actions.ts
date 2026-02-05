@@ -127,7 +127,9 @@ export async function useTemplate(templateId: string, startDateStr: string) {
             destination: template.destinations?.name || "Unknown Destination",
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
-            status: 'planning'
+            status: 'planning',
+            guide_material_url: template.guide_material_url || null,
+            guide_materials: template.guide_materials || []
         })
         .select()
         .single();
@@ -142,19 +144,38 @@ export async function useTemplate(templateId: string, startDateStr: string) {
     const itinerary = template.itinerary as any; // Assuming JSON structure
 
     if (itinerary && itinerary.days) {
+        // Collect all activity titles to search for places
+        const allTitles = new Set<string>();
+        itinerary.days.forEach((day: any) => {
+            day.activities?.forEach((activity: any) => {
+                if (activity.title) allTitles.add(activity.title);
+            });
+        });
+
+        // Fetch matching places
+        const { data: matchedPlaces } = await supabase
+            .from('places')
+            .select('id, name')
+            .in('name', Array.from(allTitles));
+
+        const placesMap = new Map(matchedPlaces?.map(p => [p.name || "", p.id]) || []);
+
         itinerary.days.forEach((day: any, index: number) => {
             const dayNumber = index + 1; // 1-based day number
 
             if (day.activities) {
                 day.activities.forEach((activity: any) => {
+                    const placeId = activity.place_id || activity.place_data?.id || placesMap.get(activity.title);
+
                     activitiesToInsert.push({
                         trip_id: trip.id,
                         day_number: dayNumber,
                         title: activity.title || "Untitled Activity",
-                        start_time: activity.time || null, // Ensure format is correct for TIME column? usually HH:MM or HH:MM:SS
+                        start_time: activity.time || null,
                         location: activity.place_data?.location || activity.place_data?.name || null,
                         category: activity.place_data?.type || 'Sightseeing', // Default category
                         notes: activity.description || "",
+                        place_id: placeId || null,
                     });
                 });
             }

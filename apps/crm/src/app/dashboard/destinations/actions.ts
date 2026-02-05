@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { requirePermission, Permission } from '@/lib/rbac'
 
 export type Destination = {
     id: string
@@ -51,13 +52,12 @@ export async function getDestination(id: string) {
 }
 
 export async function createDestination(formData: FormData) {
-    const supabase = await createClient()
+    // RBAC: Only admins can manage destinations
+    await requirePermission(Permission.MANAGE_DESTINATIONS);
 
-    // Check auth and role
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
-
-    // Ideally check for admin role here too or rely on RLS
 
     const name = formData.get('name') as string
     const country = formData.get('country') as string
@@ -83,6 +83,9 @@ export async function createDestination(formData: FormData) {
 }
 
 export async function updateDestination(id: string, formData: FormData) {
+    // RBAC: Only admins can manage destinations
+    await requirePermission(Permission.MANAGE_DESTINATIONS);
+
     const supabase = await createClient()
 
     const name = formData.get('name') as string
@@ -109,6 +112,9 @@ export async function updateDestination(id: string, formData: FormData) {
 }
 
 export async function deleteDestination(id: string) {
+    // RBAC: Only admins can manage destinations
+    await requirePermission(Permission.MANAGE_DESTINATIONS);
+
     const supabase = await createClient()
 
     const { error } = await supabase

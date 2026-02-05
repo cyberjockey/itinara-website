@@ -1,6 +1,8 @@
 import { Star, User, SquareArrowOutUpRight } from "lucide-react";
 
 import { Review } from "@/lib/google-places";
+import { getImageUrl } from "@/lib/utils";
+import Image from "next/image";
 
 interface ReviewsListProps {
     reviews: Review[];
@@ -57,12 +59,14 @@ export function ReviewsList({ reviews, rating, totalRatings, googleReviewsUrl }:
                         <div className="flex items-start gap-4">
                             <div className="relative w-10 h-10 rounded-full overflow-hidden bg-stone-gray/10 shrink-0">
                                 {review.profile_photo_url ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img
-                                        src={review.profile_photo_url}
-                                        alt={review.author_name}
-                                        className="w-full h-full object-cover"
-                                    />
+                                    <div className="relative w-full h-full">
+                                        <Image
+                                            src={getImageUrl(review.profile_photo_url, "/images/placeholder-avatar.png")}
+                                            alt={review.author_name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-stone-gray">
                                         <User className="w-5 h-5" />

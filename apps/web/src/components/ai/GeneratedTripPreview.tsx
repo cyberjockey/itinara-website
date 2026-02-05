@@ -2,6 +2,7 @@
 
 import { GeneratedItinerary } from "@/lib/ai-service";
 import { Clock, MapPin, Calendar, Save, ArrowLeft, RefreshCw } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import { useState } from "react";
 import { createTripFromAI } from "@/app/dashboard/trips/new/actions"; // We'll need to create this action
@@ -66,7 +67,7 @@ export function GeneratedTripPreview({ itinerary, onReset }: GeneratedTripPrevie
             {/* Trip Cover */}
             <div className="relative h-64 w-full rounded-3xl overflow-hidden mb-8 shadow-md">
                 <Image
-                    src={itinerary.cover_image_url || "/images/hero-bg.png"}
+                    src={getImageUrl(itinerary.cover_image_url)}
                     alt={itinerary.title}
                     fill
                     className="object-cover"

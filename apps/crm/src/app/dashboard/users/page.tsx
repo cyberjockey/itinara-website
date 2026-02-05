@@ -1,7 +1,9 @@
 import { getUsers, verifyGuide, setUserRole } from "./actions";
+import { getInvitations } from "./invitation-actions";
 import { Check, Shield, Search, Filter, UserCog } from "lucide-react";
 import Image from "next/image";
-import { UserRoleBadge } from "../../../components/users/UserRoleBadge"; // Using relative path to fix build alias issue
+import { UserRoleBadge } from "../../../components/users/UserRoleBadge";
+import { UsersClient } from "./UsersClient";
 
 interface User {
     id: string;
@@ -18,6 +20,14 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
     const roleFilter = params.role || undefined;
     const users: User[] = await getUsers(roleFilter);
 
+    // Fetch pending invitations for admins
+    let invitations: Awaited<ReturnType<typeof getInvitations>> = [];
+    try {
+        invitations = await getInvitations();
+    } catch (e) {
+        // Non-admins won't have permission - that's fine
+    }
+
     return (
         <div className="max-w-6xl mx-auto">
             <header className="flex items-center justify-between mb-8">
@@ -25,6 +35,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
                     <h1 className="text-3xl font-heading font-bold text-gray-900">User Management</h1>
                     <p className="text-gray-500">Manage user roles and verify local guides.</p>
                 </div>
+                <UsersClient initialInvitations={invitations} />
             </header>
 
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -107,17 +118,6 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
                                                 </button>
                                             </form>
                                         )}
-
-                                        {/* Debug Role Switcher - Useful for dev */}
-                                        {/* 
-                                        <form action={async () => {
-                                            "use server";
-                                            const newRole = user.role === 'admin' ? 'traveler' : 'admin';
-                                            await setUserRole(user.id, newRole);
-                                        }}> 
-                                            <button className="text-xs text-gray-400 hover:text-gray-600">Toggle Admin</button>
-                                        </form>
-                                        */}
                                     </div>
                                 </td>
                             </tr>
@@ -134,3 +134,4 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         </div>
     );
 }
+

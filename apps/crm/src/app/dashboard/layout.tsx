@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from 'next/link';
 
+import { MobileNav } from "@/components/layout/MobileNav";
+
 export default async function DashboardLayout({
     children,
 }: {
@@ -25,8 +27,11 @@ export default async function DashboardLayout({
     const isGuide = profile?.role === 'local_guide';
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            {/* Sidebar */}
+        <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+            {/* Mobile Navigation */}
+            <MobileNav user={user} role={profile?.role || 'Guest'} />
+
+            {/* Sidebar (Desktop) */}
             <aside className="w-64 bg-white border-r fixed h-full overflow-y-auto hidden md:block z-20">
                 <div className="p-6 border-b">
                     <Link href="/dashboard" className="flex items-center gap-3">
@@ -52,6 +57,9 @@ export default async function DashboardLayout({
                             </Link>
                             <Link href="/dashboard/customers" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
                                 Customers
+                            </Link>
+                            <Link href="/dashboard/transactions" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
+                                Transactions
                             </Link>
                             <Link href="/dashboard/moderation" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
                                 Moderation Queue

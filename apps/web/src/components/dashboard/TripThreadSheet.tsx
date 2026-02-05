@@ -6,7 +6,7 @@ import Image from "next/image";
 import { format } from "date-fns";
 import { fetchComments, addComment } from "@/app/dashboard/trips/actions";
 import { CommentItem } from "@/components/dashboard/CommentItem";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import Link from "next/link";
 
 interface TripThreadSheetProps {
@@ -111,7 +111,7 @@ export function TripThreadSheet({ trip, currentUserId, isOpen, onClose, initialI
                     <div className="bg-white p-0 pb-6 border-b border-stone-gray/10 mb-2">
                         <div className="relative h-56 w-full">
                             <Image
-                                src={trip.image_url || "/images/hero-bg.png"}
+                                src={getImageUrl(trip.image_url)}
                                 alt={trip.title}
                                 fill
                                 className="object-cover"
@@ -133,7 +133,7 @@ export function TripThreadSheet({ trip, currentUserId, isOpen, onClose, initialI
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-stone-gray/10 overflow-hidden relative">
                                         {trip.profiles?.avatar_url ? (
-                                            <Image src={trip.profiles.avatar_url} alt="Ava" fill className="object-cover" />
+                                            <Image src={getImageUrl(trip.profiles.avatar_url, "/images/placeholder-avatar.png")} alt="Ava" fill className="object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center font-bold text-stone-gray">?</div>
                                         )}

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SearchBar } from "@/components/dashboard/SearchBar";
 import { SaveButton } from "@/components/dashboard/SaveButton";
+import { getImageUrl } from "@/lib/utils";
 
 export default async function ExplorePage(props: { searchParams: Promise<{ query?: string }> }) {
     const searchParams = await props.searchParams;
@@ -59,7 +60,7 @@ export default async function ExplorePage(props: { searchParams: Promise<{ query
                             <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
                                 <div className="relative h-64 shrink-0 overflow-hidden">
                                     <Image
-                                        src={destination.image_url || "/images/hero-bg.png"}
+                                        src={getImageUrl(destination.image_url)}
                                         alt={destination.name}
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-700"

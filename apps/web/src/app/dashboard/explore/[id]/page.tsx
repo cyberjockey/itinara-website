@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Star, Calendar, DollarSign } from "lucide-react";
 import { PlacesList } from "@/components/destinations/PlacesList";
+import { getImageUrl } from "@/lib/utils";
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -66,7 +67,7 @@ export default async function DestinationDetailPage(props: { params: Promise<{ i
 
                 <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden mb-8 shadow-xl">
                     <Image
-                        src={destination.image_url || "/images/hero-bg.png"}
+                        src={getImageUrl(destination.image_url)}
                         alt={destination.name}
                         fill
                         className="object-cover"
@@ -149,7 +150,7 @@ export default async function DestinationDetailPage(props: { params: Promise<{ i
                                         <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
                                             <div className="relative h-48 shrink-0 overflow-hidden">
                                                 <Image
-                                                    src={template.featured_image || destination.image_url || "/images/hero-bg.png"}
+                                                    src={getImageUrl(template.featured_image || destination.image_url)}
                                                     alt={template.title}
                                                     fill
                                                     className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -169,7 +170,7 @@ export default async function DestinationDetailPage(props: { params: Promise<{ i
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-6 h-6 rounded-full bg-gray-100 overflow-hidden relative">
                                                             {template.profiles?.avatar_url ? (
-                                                                <Image src={template.profiles.avatar_url} alt="Guide" fill className="object-cover" />
+                                                                <Image src={getImageUrl(template.profiles.avatar_url, "/images/placeholder-avatar.png")} alt="Guide" fill className="object-cover" />
                                                             ) : (
                                                                 <div className="w-full h-full bg-gray-200" />
                                                             )}

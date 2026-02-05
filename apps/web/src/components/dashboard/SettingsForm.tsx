@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getImageUrl } from "@/lib/utils";
+import NextImage from "next/image";
 import { updateProfile } from "@/app/dashboard/settings/actions";
 import { User, Save, Globe, Loader2 } from "lucide-react";
 import { RankBadge } from "@/components/ui/RankBadge";
@@ -92,11 +94,11 @@ export function SettingsForm() {
             <div className="flex items-center gap-6 mb-8">
                 <div className="w-24 h-24 rounded-full bg-stone-gray/10 flex items-center justify-center overflow-hidden border-2 border-white shadow-md relative group">
                     {(previewUrl || avatarUrl) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                            src={previewUrl || avatarUrl}
+                        <NextImage
+                            src={getImageUrl(previewUrl || avatarUrl, "/images/placeholder-avatar.png")}
                             alt="Avatar"
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
                         />
                     ) : (
                         <User className="w-10 h-10 text-stone-gray/50" />

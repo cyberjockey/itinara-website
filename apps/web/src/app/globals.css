@@ -27,12 +27,7 @@
   --color-light-sand: #F5EDE4;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+
 
 html {
   scroll-behavior: smooth;
@@ -49,4 +44,16 @@ input,
 textarea,
 select {
   color: black;
+}
+
+@keyframes music-wave {
+
+  0%,
+  100% {
+    height: 10%;
+  }
+
+  50% {
+    height: 100%;
+  }
 }

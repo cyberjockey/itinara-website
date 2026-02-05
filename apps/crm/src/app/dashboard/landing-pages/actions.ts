@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requirePermission, Permission } from "@/lib/rbac";
 
 // Block types for landing pages
 export type BlockType = 'hero' | 'features' | 'cta' | 'gallery' | 'richtext';
@@ -107,6 +108,9 @@ export async function createLandingPage(data: {
     meta_description?: string;
     status: 'draft' | 'published' | 'archived';
 }) {
+    // RBAC: Only admins can manage landing pages
+    await requirePermission(Permission.MANAGE_LANDING_PAGES);
+
     const supabase = await createClient();
 
     const { error } = await supabase.from("landing_pages").insert([
@@ -132,6 +136,9 @@ export async function updateLandingPage(id: string, data: {
     meta_description?: string;
     status: 'draft' | 'published' | 'archived';
 }) {
+    // RBAC: Only admins can manage landing pages
+    await requirePermission(Permission.MANAGE_LANDING_PAGES);
+
     const supabase = await createClient();
 
     // Get existing page to check published_at
@@ -161,6 +168,9 @@ export async function updateLandingPage(id: string, data: {
 }
 
 export async function deleteLandingPage(id: string) {
+    // RBAC: Only admins can manage landing pages
+    await requirePermission(Permission.MANAGE_LANDING_PAGES);
+
     const supabase = await createClient();
 
     const { error } = await supabase

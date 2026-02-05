@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission, Permission } from "@/lib/rbac";
 
 export type Customer = {
     id: string;
@@ -34,6 +35,9 @@ export type CustomerDetail = Customer & {
 };
 
 export async function getCustomers(query?: string) {
+    // RBAC: Only admins can view customers
+    await requirePermission(Permission.VIEW_CUSTOMERS);
+
     const supabase = await createClient();
 
     // Fetch profiles
@@ -95,6 +99,9 @@ export async function getCustomers(query?: string) {
 }
 
 export async function getCustomer(id: string): Promise<CustomerDetail | null> {
+    // RBAC: Only admins can view customer details
+    await requirePermission(Permission.VIEW_CUSTOMERS);
+
     const supabase = await createClient();
 
     // Fetch profile

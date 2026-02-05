@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 interface DestinationHeroProps {
@@ -23,7 +24,7 @@ export function DestinationHero({ name, description, imageUrl }: DestinationHero
                 className="absolute inset-0 z-0 h-[120%] w-full"
             >
                 <Image
-                    src={imageUrl || "/images/hero-bg.png"}
+                    src={getImageUrl(imageUrl)}
                     alt={name}
                     fill
                     className="object-cover"

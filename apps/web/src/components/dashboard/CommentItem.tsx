@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Send, Trash2, Heart, MessageCircle, Edit2, X, Check } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import { addComment, deleteComment, editComment, toggleCommentLike } from "@/app/dashboard/trips/actions";
 
 interface CommentItemProps {
@@ -81,7 +81,7 @@ export function CommentItem({
                 {/* Avatar */}
                 <div className="w-8 h-8 rounded-full bg-stone-gray/10 overflow-hidden flex-shrink-0 flex items-center justify-center text-xs font-bold text-stone-gray">
                     {comment.profiles?.avatar_url ? (
-                        <Image src={comment.profiles.avatar_url} alt="Avatar" width={32} height={32} className="object-cover" />
+                        <Image src={getImageUrl(comment.profiles.avatar_url, "/images/placeholder-avatar.png")} alt="Avatar" width={32} height={32} className="object-cover" />
                     ) : (
                         initial
                     )}

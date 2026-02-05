@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Calendar, Clock, User, ChevronLeft, Map, Star, FileText } from "lucide-react";
+import { MapPin, Calendar, Clock, User, ChevronLeft, Map, Star, FileText, Sparkles } from "lucide-react";
 import { getPublishedTemplate } from "../../actions";
 import UseTemplateButton from "@/components/explore/UseTemplateButton";
+import { TripGallery } from "@/components/dashboard/TripGallery";
 import { createClient } from "@/lib/supabase/server";
+import { getImageUrl } from "@/lib/utils";
 
 export default async function TripDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -48,7 +50,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
             {/* Hero Section */}
             <div className="relative rounded-3xl overflow-hidden aspect-[21/9] mb-12 shadow-xl">
                 <Image
-                    src={template.featured_image || destinations?.image_url || "/images/hero-bg.png"}
+                    src={getImageUrl(template.featured_image || destinations?.image_url)}
                     alt={template.title}
                     fill
                     className="object-cover"
@@ -63,6 +65,14 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                         <span className="bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border border-white/30">
                             {template.difficulty_level}
                         </span>
+                        <div className="flex items-center gap-1 bg-yellow-400/90 text-deep-teak px-2.5 py-1 rounded-full text-xs font-bold border border-yellow-300 shadow-sm">
+                            <Star className="w-3.5 h-3.5 fill-deep-teak" />
+                            <span>4.5+ Google Rated</span>
+                        </div>
+                        <div className="hidden md:flex items-center gap-1 bg-blue-500/80 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-xs font-bold border border-blue-400/50">
+                            <User className="w-3.5 h-3.5" />
+                            <span>Certified Local Guide</span>
+                        </div>
                     </div>
                     <h1 className="text-3xl md:text-5xl font-heading font-bold text-white mb-4 leading-tight">
                         {template.title}
@@ -82,10 +92,15 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                     {/* Overview */}
                     <section>
                         <h2 className="text-2xl font-bold text-deep-teak mb-4">About this Trip</h2>
-                        <p className="text-stone-gray leading-relaxed text-lg">
+                        <p className="text-stone-gray leading-relaxed text-lg mb-8">
                             {template.description}
                         </p>
                     </section>
+
+                    {/* Gallery Section */}
+                    {template.gallery_images && template.gallery_images.length > 0 && (
+                        <TripGallery images={template.gallery_images} />
+                    )}
 
                     {/* Itinerary */}
                     <section>
@@ -175,56 +190,57 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                                     </li>
                                 ))}
                             </ul>
-                            <p className="text-[10px] text-stone-gray/60 mt-3 italic">
-                                * Quota deducted from your VIP trip allowance.
+                            <p className="text-xs text-amber-600 mt-3 font-bold flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 animate-pulse"></span>
+                                Uses 1 VIP Trip Credit per booking
                             </p>
                         </div>
-                    </div>
 
-                    {template.guide_material_url && (
-                        <a
-                            href={template.guide_material_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 w-full mb-3 px-6 py-3 bg-white border-2 border-dashed border-terracotta/30 hover:border-terracotta text-terracotta font-bold rounded-xl transition-all hover:bg-terracotta/5 group"
-                        >
-                            <FileText className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                            <span>Download Guide's PDF</span>
-                        </a>
-                    )}
-
-
-
-                    <UseTemplateButton
-                        templateId={template.id}
-                        durationDays={template.duration_days}
-                        vipQuota={vipCredits}
-                    />
-
-                    <p className="text-center text-xs text-stone-gray/60 mb-6">
-                        Secure your dates with a local expert.
-                    </p>
-
-                    <div className="space-y-4 pt-6 border-t border-stone-gray/10">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden relative">
-                                {guide?.avatar_url ? (
-                                    <Image src={guide.avatar_url} alt={guide.full_name} fill className="object-cover" />
-                                ) : (
-                                    <User className="w-5 h-5 text-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                                )}
-                            </div>
-                            <div>
-                                <p className="text-xs text-stone-gray uppercase tracking-wider font-bold">Your Guide</p>
-                                <p className="font-bold text-deep-teak">{guide?.full_name || "Itinara Expert"}</p>
-                            </div>
-                        </div>
-
-                        {guide?.bio && (
-                            <p className="text-sm text-stone-gray/80 italic">
-                                "{guide.bio}"
-                            </p>
+                        {template.guide_material_url && (
+                            <a
+                                href={template.guide_material_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-2 w-full mb-3 px-6 py-3 bg-white border-2 border-dashed border-terracotta/30 hover:border-terracotta text-terracotta font-bold rounded-xl transition-all hover:bg-terracotta/5 group"
+                            >
+                                <FileText className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                <span>Download Guide's PDF</span>
+                            </a>
                         )}
+
+
+
+                        <UseTemplateButton
+                            templateId={template.id}
+                            durationDays={template.duration_days}
+                            vipQuota={vipCredits}
+                        />
+
+                        <p className="text-center text-xs text-stone-gray/60 mb-6">
+                            Secure your dates with a local expert.
+                        </p>
+
+                        <div className="space-y-4 pt-6 border-t border-stone-gray/10 mb-2">
+                            <div className="flex items-center gap-3 bg-stone-50 p-3 rounded-2xl border border-stone-gray/5">
+                                <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden relative shrink-0 border-2 border-white shadow-sm">
+                                    {guide?.avatar_url ? (
+                                        <Image src={getImageUrl(guide.avatar_url, "/images/placeholder-avatar.png")} alt={guide.full_name} fill className="object-cover" />
+                                    ) : (
+                                        <User className="w-6 h-6 text-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                    )}
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-[10px] text-stone-gray uppercase tracking-wider font-bold truncate">Your Local Guide</p>
+                                    <p className="font-bold text-deep-teak truncate">{guide?.full_name || "Itinara Expert"}</p>
+                                </div>
+                            </div>
+
+                            {guide?.bio && (
+                                <p className="text-sm text-stone-gray/80 italic">
+                                    "{guide.bio}"
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -39,8 +39,46 @@ export default function UseTemplateButton({ templateId, durationDays, vipQuota }
             router.push("/dashboard/purchase"); // Redirect to top-up
             return;
         }
-        setShowDate(true);
+        setShowPurchaseConfirm(true);
     };
+
+    const [showPurchaseConfirm, setShowPurchaseConfirm] = useState(false);
+
+    if (showPurchaseConfirm) {
+        return (
+            <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                    <h4 className="font-bold text-amber-800 mb-2 flex items-center gap-2">
+                        Wait! Just to Confirm...
+                    </h4>
+                    <p className="text-sm text-amber-700/80 leading-relaxed">
+                        Booking this curated trip will deduct <span className="font-bold">1 VIP Trip Credit</span> from your quota.
+                    </p>
+                    <p className="text-xs text-amber-700/60 mt-2 font-medium">
+                        Remaining after booking: {vipQuota - 1} Credits
+                    </p>
+                </div>
+
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setShowPurchaseConfirm(false)}
+                        className="flex-1 py-3 text-sm font-bold text-stone-gray hover:bg-stone-100 rounded-xl transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={() => {
+                            setShowPurchaseConfirm(false);
+                            setShowDate(true);
+                        }}
+                        className="flex-[2] bg-deep-teak hover:bg-[#2c1810] text-white font-bold py-3 rounded-xl shadow-lg transition-all"
+                    >
+                        Yes, Use 1 Credit
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     if (showDate) {
         return (

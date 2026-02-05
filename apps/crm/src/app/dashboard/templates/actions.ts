@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requirePermission, Permission } from "@/lib/rbac";
 
 export async function getTemplates() {
     const supabase = await createClient();
@@ -53,6 +54,9 @@ export async function getTemplate(id: string) {
 }
 
 export async function createTemplate(prevState: unknown, formData: FormData) {
+    // RBAC: Guides and admins can create templates
+    await requirePermission(Permission.MANAGE_TEMPLATES);
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -133,6 +137,9 @@ export async function createTemplate(prevState: unknown, formData: FormData) {
 }
 
 export async function updateTemplate(id: string, formData: FormData) {
+    // RBAC: Guides and admins can update templates
+    await requirePermission(Permission.MANAGE_TEMPLATES);
+
     // This action handles basic info updates. 
     // Complex JSON updates for the itinerary might need a separate API endpoint or specific handling.
 
@@ -145,9 +152,27 @@ export async function updateTemplate(id: string, formData: FormData) {
     if (formData.has('status')) updates.status = formData.get('status') as string;
     if (formData.has('difficulty_level')) updates.difficulty_level = formData.get('difficulty_level') as string;
     if (formData.has('featured_image')) updates.featured_image = formData.get('featured_image') as string;
-    if (formData.has('guide_material_url')) updates.guide_material_url = formData.get('guide_material_url') as string;
     if (formData.has('estimated_budget')) updates.estimated_budget = formData.get('estimated_budget') as string;
     if (formData.has('trip_preference')) updates.trip_preference = formData.get('trip_preference') as string;
+
+    // Handle Arrays (sent as JSON strings from frontend)
+    if (formData.has('gallery_images')) {
+        try {
+            updates.gallery_images = JSON.parse(formData.get('gallery_images') as string);
+        } catch (e) {
+            console.error("Invalid gallery_images JSON");
+            updates.gallery_images = [];
+        }
+    }
+
+    if (formData.has('guide_materials')) {
+        try {
+            updates.guide_materials = JSON.parse(formData.get('guide_materials') as string);
+        } catch (e) {
+            console.error("Invalid guide_materials JSON");
+            updates.guide_materials = [];
+        }
+    }
 
     // Add logic to save JSON itinerary if passed strictly (e.g. from the builder)
     // We might parse a JSON string if sent via form
@@ -175,6 +200,9 @@ export async function updateTemplate(id: string, formData: FormData) {
 }
 
 export async function deleteTemplate(id: string) {
+    // RBAC: Guides and admins can delete templates
+    await requirePermission(Permission.MANAGE_TEMPLATES);
+
     const supabase = await createClient();
 
     const { error } = await supabase
@@ -191,6 +219,9 @@ export async function deleteTemplate(id: string) {
 }
 
 export async function publishTemplate(id: string) {
+    // RBAC: Guides and admins can publish templates
+    await requirePermission(Permission.MANAGE_TEMPLATES);
+
     const supabase = await createClient();
 
     // Optional: Add validation here (e.g. check if itinerary has content)
@@ -210,6 +241,9 @@ export async function publishTemplate(id: string) {
 }
 
 export async function unpublishTemplate(id: string) {
+    // RBAC: Guides and admins can unpublish templates
+    await requirePermission(Permission.MANAGE_TEMPLATES);
+
     const supabase = await createClient();
 
     const { error } = await supabase
@@ -226,13 +260,13 @@ export async function unpublishTemplate(id: string) {
 }
 
 export async function getPendingTemplates() {
+    // RBAC: Only admins can view pending templates
+    await requirePermission(Permission.APPROVE_TEMPLATES);
+
     const supabase = await createClient();
 
-    // Check if admin
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
-
-    // Ideally check role here or rely on RLS (Admins view all templates)
 
     const { data, error } = await supabase
         .from('trip_templates')
@@ -253,9 +287,10 @@ export async function getPendingTemplates() {
 }
 
 export async function approveTemplate(id: string) {
-    const supabase = await createClient();
+    // RBAC: Only admins can approve templates
+    await requirePermission(Permission.APPROVE_TEMPLATES);
 
-    // Check admin role logic should be strictly here or RLS
+    const supabase = await createClient();
 
     const { error } = await supabase
         .from('trip_templates')
@@ -275,6 +310,9 @@ export async function approveTemplate(id: string) {
 }
 
 export async function rejectTemplate(id: string) {
+    // RBAC: Only admins can reject templates
+    await requirePermission(Permission.APPROVE_TEMPLATES);
+
     const supabase = await createClient();
 
     const { error } = await supabase

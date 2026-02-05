@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requirePermission, Permission } from "@/lib/rbac";
 
 export type StaticPage = {
     id: string;
@@ -46,6 +47,9 @@ export async function getStaticPage(id: string) {
 }
 
 export async function createStaticPage(formData: FormData) {
+    // RBAC: Only admins can manage static pages
+    await requirePermission(Permission.MANAGE_PAGES);
+
     const supabase = await createClient();
 
     const slug = formData.get("slug") as string;
@@ -75,6 +79,9 @@ export async function createStaticPage(formData: FormData) {
 }
 
 export async function updateStaticPage(id: string, formData: FormData) {
+    // RBAC: Only admins can manage static pages
+    await requirePermission(Permission.MANAGE_PAGES);
+
     const supabase = await createClient();
 
     const slug = formData.get("slug") as string;
@@ -106,6 +113,9 @@ export async function updateStaticPage(id: string, formData: FormData) {
 }
 
 export async function deleteStaticPage(id: string) {
+    // RBAC: Only admins can manage static pages
+    await requirePermission(Permission.MANAGE_PAGES);
+
     const supabase = await createClient();
 
     const { error } = await supabase

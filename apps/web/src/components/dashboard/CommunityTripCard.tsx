@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
 import { formatDistanceToNow, differenceInDays, parseISO } from "date-fns";
+import { getImageUrl } from "@/lib/utils";
 
 interface CommunityTripCardProps {
     trip: any;
@@ -28,7 +29,7 @@ export function CommunityTripCard({ trip, currentUserId, isLiked = false, onComm
                 <div className="flex items-center gap-3">
                     <div className="relative w-10 h-10 rounded-full bg-stone-gray/10 overflow-hidden ring-2 ring-white shadow-sm">
                         {avatarUrl ? (
-                            <Image src={avatarUrl} alt={authorName} fill className="object-cover" />
+                            <Image src={getImageUrl(avatarUrl, "/images/placeholder-avatar.png")} alt={authorName} fill className="object-cover" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center font-bold text-stone-gray text-sm">
                                 {authorInitials}
@@ -48,7 +49,7 @@ export function CommunityTripCard({ trip, currentUserId, isLiked = false, onComm
             {/* Main Content: Image & Link */}
             <Link href={`/dashboard/trips/${trip.id}`} className="block relative aspect-[4/3] w-full group-hover:brightness-[0.98] transition-all">
                 <Image
-                    src={trip.image_url || "/images/hero-bg.png"}
+                    src={getImageUrl(trip.image_url)}
                     alt={trip.title}
                     fill
                     className="object-cover"

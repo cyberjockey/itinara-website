@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import Groq from "groq-sdk";
 import { deleteImages } from "@/lib/cloudinary";
+import { requirePermission, requireResourceAccess, Permission, isAdmin } from "@/lib/rbac";
 
 export type Place = {
     id: string;
@@ -145,6 +146,9 @@ export async function getPlace(id: string) {
 }
 
 export async function createPlace(prevState: unknown, formData: FormData) {
+    // RBAC: Guides and admins can create places
+    await requirePermission(Permission.MANAGE_PLACES);
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -223,6 +227,9 @@ export async function createPlace(prevState: unknown, formData: FormData) {
 }
 
 export async function deletePlace(id: string) {
+    // RBAC: Guides and admins can delete places
+    await requirePermission(Permission.MANAGE_PLACES);
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -267,6 +274,9 @@ export async function deletePlace(id: string) {
 }
 
 export async function updatePlace(placeId: string, prevState: unknown, formData: FormData) {
+    // RBAC: Guides and admins can update places
+    await requirePermission(Permission.MANAGE_PLACES);
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -367,6 +377,9 @@ export async function updatePlace(placeId: string, prevState: unknown, formData:
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function bulkGenerateCoordinates(placeIds: string[]) {
+    // RBAC: Only admins can do bulk operations
+    await requirePermission(Permission.MANAGE_ALL_PLACES);
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { message: "Unauthorized", success: false };
@@ -428,6 +441,9 @@ export async function bulkGenerateCoordinates(placeIds: string[]) {
 }
 
 export async function bulkGenerateDescriptions(placeIds: string[]) {
+    // RBAC: Only admins can do bulk operations
+    await requirePermission(Permission.MANAGE_ALL_PLACES);
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { message: "Unauthorized", success: false };
@@ -559,6 +575,9 @@ export async function getDestinations() {
 export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUploadResult> {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
+
+    // RBAC: Only admins can do bulk upload
+    await requirePermission(Permission.MANAGE_ALL_PLACES);
 
     if (!user) {
         return { success: false, message: "Unauthorized", inserted: 0, failed: 0, errors: [] };

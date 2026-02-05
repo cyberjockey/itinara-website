@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function toggleTripVisibility(tripId: string, isPublic: boolean) {
     const supabase = await createClient();
@@ -241,4 +242,25 @@ export async function updateActivityPosition(
 
     // 3. Revalidate
     revalidatePath(`/dashboard/trips/${tripId}`);
+}
+
+export async function deleteTrip(tripId: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error("Unauthorized");
+
+    const { error } = await supabase
+        .from('trips')
+        .delete()
+        .eq('id', tripId)
+        .eq('user_id', user.id);
+
+    if (error) {
+        console.error("Error deleting trip:", error);
+        throw new Error("Failed to delete trip");
+    }
+
+    revalidatePath('/dashboard');
+    redirect('/dashboard');
 }

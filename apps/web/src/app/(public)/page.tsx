@@ -4,6 +4,7 @@ import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { DestinationsMapLazy } from "@/components/landing/DestinationsMapLazy";
+import { LatestBlog } from "@/components/landing/LatestBlog";
 
 export default function Home() {
   return (
@@ -27,6 +28,12 @@ export default function Home() {
         </ScrollReveal>
       </section>
 
+      <section id="blog">
+        <ScrollReveal>
+          <LatestBlog />
+        </ScrollReveal>
+      </section>
+
       <section id="community">
         <ScrollReveal>
           <Testimonials />
@@ -35,3 +42,4 @@ export default function Home() {
     </main>
   );
 }
+

@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
-import { ChevronDown, ChevronUp, FileText, Download, MapPin, Phone, Globe, Clock, Info, Instagram, Facebook, Twitter, Youtube, CheckCircle2, Video } from "lucide-react";
+import { ChevronDown, ChevronUp, FileText, Download, MapPin, Phone, Globe, Clock, Info, Instagram, Facebook, Twitter, Youtube, CheckCircle2, Video, Trash2, AlertCircle, Eye } from "lucide-react";
 import Link from 'next/link';
+import { useTrip } from "@/components/dashboard/TripContext";
+import { deleteTrip } from "@/app/dashboard/trips/actions";
+import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
 
 interface Place {
     id: string;
@@ -36,7 +39,74 @@ interface TripDetailsViewProps {
     activities: Activity[];
 }
 
+// Helper for parsing simple markdown-like text
+function SmartText({ text, className = "" }: { text: string; className?: string }) {
+    if (!text) return null;
+
+    // 1. Handle "Visitor Tips" or similar lists embedded with checkmarks
+    // If we detect multiple checkmarks, treat it as a list
+    if (text.includes("✓") || text.includes("✔")) {
+        const segments = text.split(/(?=✓|✔)/).filter(s => s.trim().length > 0);
+        if (segments.length > 1) {
+            return (
+                <div className={`space-y-2 ${className}`}>
+                    {segments.map((segment, i) => {
+                        const cleanSegment = segment.replace(/^[✓✔]\s*/, "").trim();
+                        // Check if this segment is a header (e.g. "Visitor Tips")
+                        if (segment.toLowerCase().includes("visitor tips") && !segment.match(/^[✓✔]/)) {
+                            const [header, ...rest] = segment.split(/(?=✓|✔)/);
+                            return (
+                                <div key={i}>
+                                    {header && <div className="font-bold text-deep-teak mb-1">{header}</div>}
+                                    {rest.map((r, ri) => (
+                                        <div key={ri} className="flex gap-2 items-start">
+                                            <CheckCircle2 className="w-4 h-4 text-terracotta shrink-0 mt-0.5" />
+                                            <span className="text-stone-600">{r.replace(/^[✓✔]\s*/, "").trim()}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        }
+
+                        // Standard checkmark item
+                        return (
+                            <div key={i} className="flex gap-2 items-start">
+                                <CheckCircle2 className="w-4 h-4 text-terracotta shrink-0 mt-0.5" />
+                                <span className={segment.match(/^[✓✔]/) ? "text-stone-600" : "font-bold text-deep-teak"}>
+                                    {cleanSegment}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+        }
+    }
+
+    // 2. Standard Text Formatting (Bold, Newlines)
+    const lines = text.split('\n');
+    return (
+        <div className={`space-y-2 ${className}`}>
+            {lines.map((line, i) => {
+                const parts = line.split(/(\*\*.*?\*\*)/g);
+                return (
+                    <p key={i} className="min-h-[1em]">
+                        {parts.map((part, j) => {
+                            if (part.startsWith('**') && part.endsWith('**')) {
+                                return <strong key={j} className="text-deep-teak">{part.slice(2, -2)}</strong>;
+                            }
+                            return part;
+                        })}
+                    </p>
+                );
+            })}
+        </div>
+    );
+}
+
 export function TripDetailsView({ trip, activities }: TripDetailsViewProps) {
+    const [viewingPdf, setViewingPdf] = useState<{ url: string, title: string } | null>(null);
+
     // Group by Day
     const activitiesByDay = activities.reduce((acc, activity) => {
         const day = activity.day_number || 1;
@@ -60,57 +130,136 @@ export function TripDetailsView({ trip, activities }: TripDetailsViewProps) {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                    <button className="flex items-center justify-between p-4 rounded-xl border border-stone-gray/20 hover:border-terracotta/50 hover:bg-stone-50 transition-all group">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-600 font-bold text-xs uppercase">PDF</div>
-                            <div className="text-left">
-                                <div className="font-bold text-deep-teak group-hover:text-terracotta transition-colors">Complete Itinerary Guide</div>
-                                <div className="text-xs text-stone-gray">2.4 MB • Updated just now</div>
+                    {(trip.guide_materials && trip.guide_materials.length > 0) ? (
+                        trip.guide_materials.map((url: string, index: number) => {
+                            const isUrl = url.startsWith('http') || url.startsWith('https');
+                            const href = isUrl ? url : `/api/files/download?file_id=${url}`;
+                            // If it's a raw ID, we don't have the filename. Use a clean placeholder.
+                            const fileName = isUrl ? decodeURIComponent(url.split('/').pop()?.split('?')[0] || `Document ${index + 1}`) : `Guide Document ${index + 1}`;
+
+                            return (
+                                <div key={index} className="flex items-center justify-between p-4 rounded-xl border border-stone-gray/20 hover:border-terracotta/50 hover:bg-stone-50 transition-all group">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                                        <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-600 font-bold text-xs uppercase shrink-0">PDF</div>
+                                        <div className="text-left min-w-0 flex-1">
+                                            <div className="font-bold text-deep-teak group-hover:text-terracotta transition-colors truncate max-w-[180px] sm:max-w-[250px]" title={fileName}>
+                                                {fileName}
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <button
+                                                    onClick={() => setViewingPdf({ url: href, title: fileName })}
+                                                    className="text-xs text-terracotta hover:underline font-medium flex items-center gap-1"
+                                                >
+                                                    <Eye className="w-3 h-3" /> Preview
+                                                </button>
+                                                <span className="text-xs text-stone-gray/50">•</span>
+                                                <a href={href} target="_blank" rel="noopener noreferrer" className="text-xs text-stone-gray hover:text-deep-teak transition-colors">
+                                                    Download
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setViewingPdf({ url: href, title: fileName })}
+                                            className="p-2 hover:bg-stone-200 rounded-full transition-colors text-stone-gray hover:text-terracotta"
+                                            title="Preview PDF"
+                                        >
+                                            <Eye className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    ) : trip.guide_material_url ? (
+                        <div className="flex items-center justify-between p-4 rounded-xl border border-stone-gray/20 hover:border-terracotta/50 hover:bg-stone-50 transition-all group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-600 font-bold text-xs uppercase">PDF</div>
+                                <div className="text-left">
+                                    <div className="font-bold text-deep-teak group-hover:text-terracotta transition-colors line-clamp-1">
+                                        Trip Guide
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        <button
+                                            onClick={() => setViewingPdf({ url: trip.guide_material_url, title: 'Trip Guide' })}
+                                            className="text-xs text-terracotta hover:underline font-medium flex items-center gap-1"
+                                        >
+                                            <Eye className="w-3 h-3" /> Preview
+                                        </button>
+                                        <span className="text-xs text-stone-gray/50">•</span>
+                                        <a href={trip.guide_material_url} target="_blank" rel="noopener noreferrer" className="text-xs text-stone-gray hover:text-deep-teak transition-colors">
+                                            Download
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <Download className="w-5 h-5 text-stone-gray group-hover:text-terracotta" />
-                    </button>
-                    {/* Placeholder for tickets */}
-                    <button className="flex items-center justify-between p-4 rounded-xl border border-dotted border-stone-gray/30 hover:border-terracotta/50 hover:bg-stone-50 transition-all group">
-                        <div className="flex items-center gap-3 opacity-60">
-                            <FileText className="w-10 h-10 p-2 bg-stone-100 rounded-lg text-stone-400" />
-                            <div className="text-left">
-                                <div className="font-medium text-stone-gray">Booking Tickets</div>
-                                <div className="text-xs text-stone-gray">Coming soon</div>
+                    ) : (
+                        <div className="p-6 rounded-xl border border-dashed border-stone-gray/20 flex flex-col items-center justify-center text-center col-span-2">
+                            <div className="w-10 h-10 bg-stone-50 rounded-full flex items-center justify-center mb-2">
+                                <span className="text-stone-gray/50">📄</span>
                             </div>
+                            <p className="text-sm text-stone-gray">No documents available for this trip yet.</p>
                         </div>
-                    </button>
+                    )}
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-dashed border-stone-gray/20 opacity-50">
+                    <div className="flex items-center gap-3 p-4 rounded-xl bg-stone-50 border border-stone-gray/10">
+                        <div className="w-10 h-10 bg-stone-200 rounded-lg flex items-center justify-center text-stone-400">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div className="font-bold text-stone-400">Booking Tickets</div>
+                            <div className="text-xs text-stone-400">Coming soon</div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* PDF Viewer Modal */}
+            <PdfViewerModal
+                isOpen={!!viewingPdf}
+                onClose={() => setViewingPdf(null)}
+                title={viewingPdf?.title || 'Document Preview'}
+                pdfUrl={viewingPdf?.url || ''}
+            />
+            />
 
             {/* Daily Details */}
             <div className="space-y-6">
                 <h3 className="font-bold text-xl text-deep-teak">Daily Activity Details</h3>
 
-                {Object.entries(activitiesByDay).map(([dayNum, dayActivities]) => {
-                    const date = trip.start_date ? format(new Date(new Date(trip.start_date).setDate(new Date(trip.start_date).getDate() + parseInt(dayNum) - 1)), "EEEE, MMMM d") : `Day ${dayNum}`;
+                {
+                    Object.entries(activitiesByDay).map(([dayNum, dayActivities]) => {
+                        const date = trip.start_date ? format(new Date(new Date(trip.start_date).setDate(new Date(trip.start_date).getDate() + parseInt(dayNum) - 1)), "EEEE, MMMM d") : `Day ${dayNum}`;
 
-                    return (
-                        <div key={dayNum} className="space-y-4">
-                            <div className="sticky top-0 bg-warm-white/95 backdrop-blur-sm py-3 z-10 border-b border-stone-gray/5 flex items-center gap-3">
-                                <span className="bg-deep-teak text-white text-xs font-bold px-2 py-1 rounded">DAY {dayNum}</span>
-                                <h4 className="font-bold text-stone-gray">{date}</h4>
-                            </div>
+                        return (
+                            <div key={dayNum} className="space-y-4">
+                                <div className="sticky top-0 bg-warm-white/95 backdrop-blur-sm py-3 z-10 border-b border-stone-gray/5 flex items-center gap-3">
+                                    <span className="bg-deep-teak text-white text-xs font-bold px-2 py-1 rounded">DAY {dayNum}</span>
+                                    <h4 className="font-bold text-stone-gray">{date}</h4>
+                                </div>
 
-                            <div className="space-y-4">
-                                {dayActivities.map((activity) => (
-                                    <DetailCard key={activity.id} activity={activity} />
-                                ))}
+                                <div className="space-y-4">
+                                    {dayActivities.map((activity) => (
+                                        <DetailCard key={activity.id} activity={activity} />
+                                    ))}
+                                </div>
                             </div>
+                        );
+                    })
+                }
+
+                {
+                    activities.length === 0 && (
+                        <div className="text-center py-12 text-stone-gray">
+                            No activities yet. Switch to Timeline view to plan your trip!
                         </div>
-                    );
-                })}
-
-                {activities.length === 0 && (
-                    <div className="text-center py-12 text-stone-gray">
-                        No activities yet. Switch to Timeline view to plan your trip!
-                    </div>
-                )}
+                    )
+                }
             </div>
         </div>
     );
@@ -174,19 +323,34 @@ function DetailCard({ activity }: { activity: Activity }) {
                                     <div className="bg-white p-4 rounded-xl border border-stone-gray/10 shadow-sm">
                                         <div className="flex items-center justify-between mb-2">
                                             <div className="text-xs text-stone-gray font-bold uppercase">About</div>
-                                            {place.price_level && (
+                                            {place.price_level && place.price_level.length <= 20 && (
                                                 <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{place.price_level}</span>
                                             )}
                                         </div>
                                         <div className="text-sm text-stone-600 leading-relaxed">
-                                            {place.description || "No description available."}
+                                            <SmartText text={place.description || "No description available."} />
                                         </div>
+
+                                        {/* Fallback for long price level / pricing info */}
+                                        {place.price_level && place.price_level.length > 20 && (
+                                            <div className="mt-4 pt-4 border-t border-dashed border-stone-gray/20">
+                                                <div className="text-xs text-green-700 font-bold uppercase mb-2 flex items-center gap-2">
+                                                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                                                    Pricing & Entry
+                                                </div>
+                                                <div className="text-sm text-stone-600 bg-green-50/50 p-3 rounded-lg border border-green-100 leading-relaxed">
+                                                    <SmartText text={place.price_level} />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {place.what_to_expect && (
                                         <div className="bg-white p-4 rounded-xl border border-stone-gray/10 shadow-sm">
                                             <div className="text-xs text-stone-gray font-bold uppercase mb-2">What to Expect</div>
-                                            <p className="text-sm text-stone-600">{place.what_to_expect}</p>
+                                            <div className="text-sm text-stone-600">
+                                                <SmartText text={place.what_to_expect} />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -195,7 +359,7 @@ function DetailCard({ activity }: { activity: Activity }) {
                                 <div className="space-y-4">
                                     {/* Contact Info */}
                                     <div className="bg-white rounded-xl border border-stone-gray/10 overflow-hidden shadow-sm">
-                                        {place.phone && (
+                                        {place.phone && place.phone.length > 3 && (
                                             <div className="flex items-center gap-3 p-3 border-b border-stone-gray/5">
                                                 <div className="p-1.5 bg-terracotta/10 rounded-md">
                                                     <Phone className="w-4 h-4 text-terracotta" />
@@ -203,7 +367,7 @@ function DetailCard({ activity }: { activity: Activity }) {
                                                 <span className="text-sm text-deep-teak font-medium">{place.phone}</span>
                                             </div>
                                         )}
-                                        {place.website && (
+                                        {place.website && place.website.length > 5 && place.website.toLowerCase() !== "blank" && (
                                             <a href={place.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 border-b border-stone-gray/5 hover:bg-stone-50 transition-colors group">
                                                 <div className="p-1.5 bg-blue-50 rounded-md group-hover:bg-blue-100 transition-colors">
                                                     <Globe className="w-4 h-4 text-blue-600" />

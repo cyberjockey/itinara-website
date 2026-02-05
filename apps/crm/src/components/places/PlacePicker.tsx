@@ -21,7 +21,8 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
 
     // Initial load
     useEffect(() => {
-        getPlaces(destinationId).then(data => {
+        // Fetch up to 1000 places to ensure we get them all for client-side filtering
+        getPlaces(destinationId, 1, 1000).then(data => {
             setPlaces(data.data);
             setLoading(false);
         });
@@ -139,8 +140,23 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
                         </button>
                     ))
                 ) : (
-                    <div className="p-4 text-center">
-                        <p className="text-xs text-gray-500 mb-2">No activities found matching &quot;{searchTerm}&quot;</p>
+                    <div className="p-2">
+                        {searchTerm ? (
+                            <button
+                                onClick={() => setIsCreating(true)}
+                                className="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg flex items-center justify-between group transition-colors"
+                            >
+                                <div>
+                                    <div className="text-sm font-medium">Create &quot;{searchTerm}&quot;</div>
+                                    <div className="text-xs text-blue-500">Add this as a new activity</div>
+                                </div>
+                                <Plus className="w-4 h-4" />
+                            </button>
+                        ) : (
+                            <div className="p-4 text-center">
+                                <p className="text-xs text-gray-500">No activities found</p>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

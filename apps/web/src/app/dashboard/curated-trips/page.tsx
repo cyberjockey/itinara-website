@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getPublishedTemplates } from "../explore/actions";
 import { Pagination } from "@/components/ui/Pagination";
+import { getImageUrl } from "@/lib/utils";
 
 export const metadata = {
     title: "Curated Trips | Itinara",
@@ -55,7 +56,7 @@ export default async function CuratedTripsPage(props: { searchParams: Promise<{ 
                                 <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
                                     <div className="relative h-60 shrink-0 overflow-hidden">
                                         <Image
-                                            src={template.featured_image || template.destinations?.image_url || "/images/hero-bg.png"}
+                                            src={getImageUrl(template.featured_image || template.destinations?.image_url)}
                                             alt={template.title}
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -89,7 +90,7 @@ export default async function CuratedTripsPage(props: { searchParams: Promise<{ 
                                         <div className="pt-4 border-t border-dashed border-stone-gray/10 flex items-center gap-3 mt-auto">
                                             <div className="w-8 h-8 rounded-full bg-gray-100 overflow-hidden relative shrink-0">
                                                 {template.profiles?.avatar_url ? (
-                                                    <Image src={template.profiles.avatar_url} alt="Guide" fill className="object-cover" />
+                                                    <Image src={getImageUrl(template.profiles.avatar_url, "/images/placeholder-avatar.png")} alt="Guide" fill className="object-cover" />
                                                 ) : (
                                                     <User className="w-4 h-4 text-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                                                 )}

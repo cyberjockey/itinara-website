@@ -3,8 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Plus, Calendar, MapPin, MoreHorizontal, Sparkles } from "lucide-react";
 import { QuotaWidget } from "@/components/dashboard/QuotaWidget";
 import { RankBadge } from "@/components/ui/RankBadge";
-
-import { verifyStripePurchase } from "../actions/stripe";
+import { TripCardActions } from "@/components/dashboard/TripCardActions";
 
 // ...
 
@@ -23,13 +22,10 @@ export default async function DashboardPage({
         .eq('id', user?.id)
         .single();
 
-    // Handle Payment Success
+    // Handle Payment Success (Legacy/Manual handling if needed, currently removing Stripe verification)
     const resolvedParams = await searchParams;
     let paymentMessage = null;
-    if (resolvedParams?.payment === 'success' && typeof resolvedParams.session_id === 'string') {
-        const result = await verifyStripePurchase(resolvedParams.session_id);
-        paymentMessage = result.message;
-    }
+    // Manual payment verification logic can go here if we add a 'success' param from email links later
 
     const { data: trips } = await supabase
         .from('trips')
@@ -94,9 +90,7 @@ export default async function DashboardPage({
                                                 </div>
                                                 <h3 className="font-bold text-xl text-deep-teak group-hover:text-terracotta transition-colors line-clamp-2 leading-tight">{trip.title}</h3>
                                             </div>
-                                            <button className="text-stone-gray hover:text-terracotta shrink-0 transition-colors">
-                                                <MoreHorizontal className="w-5 h-5" />
-                                            </button>
+                                            <TripCardActions tripId={trip.id} title={trip.title} />
                                         </div>
 
                                         <div className="mb-4">

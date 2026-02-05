@@ -77,7 +77,7 @@ export function DayColumn({ dayNumber, date, activities, onAddActivity, readOnly
                 </h3>
 
                 {/* Navigate Day Button - only show if there are activities with locations */}
-                {!readOnly && activities.length > 0 && activities.some(a => a.location) && (
+                {activities.length > 0 && activities.some(a => a.location) && (
                     <a
                         href={generateDayRouteUrl(activities)}
                         target="_blank"

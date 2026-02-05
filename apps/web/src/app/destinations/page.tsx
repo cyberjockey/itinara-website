@@ -1,6 +1,8 @@
 
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { getImageUrl } from "@/lib/utils";
+import Image from "next/image";
 import { Metadata } from "next";
 import { ArrowRight, MapPin } from "lucide-react";
 
@@ -52,10 +54,11 @@ export default async function DestinationsIndexPage() {
                         >
                             <div className="relative h-64 overflow-hidden bg-gray-200">
                                 {destination.image_url ? (
-                                    <img
-                                        src={destination.image_url}
+                                    <Image
+                                        src={getImageUrl(destination.image_url)}
                                         alt={destination.name}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        fill
+                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-stone-100 text-stone-400">

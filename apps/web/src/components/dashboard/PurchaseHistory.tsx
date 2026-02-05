@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getPurchaseHistory } from "@/app/actions/stripe";
-import { Loader2, Receipt, AlertCircle } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { Loader2, Receipt, AlertCircle, Clock, CheckCircle } from "lucide-react";
 
 interface Transaction {
     id: string;
@@ -11,16 +11,24 @@ interface Transaction {
     payment_status: string;
     created_at: string;
     metadata: any;
+    payment_method?: string;
 }
 
 export function PurchaseHistory() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
+    const supabase = createClient();
 
     useEffect(() => {
         async function fetchHistory() {
             try {
-                const data = await getPurchaseHistory();
+                // Fetch direct from payment_transactions
+                const { data, error } = await supabase
+                    .from('payment_transactions')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
                 setTransactions(data || []);
             } catch (error) {
                 console.error("Failed to load purchase history", error);
@@ -30,6 +38,22 @@ export function PurchaseHistory() {
         }
         fetchHistory();
     }, []);
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'completed':
+            case 'paid':
+                return <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700"><CheckCircle className="w-3 h-3" /> Paid</span>;
+            case 'request':
+                return <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800"><Clock className="w-3 h-3" /> Requested</span>;
+            case 'invoice_sent':
+                return <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800"><Receipt className="w-3 h-3" /> Invoice Sent</span>;
+            case 'cancelled':
+                return <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">Cancelled</span>;
+            default:
+                return <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">{status}</span>;
+        }
+    }
 
     if (loading) {
         return <div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-terracotta" /></div>;
@@ -53,7 +77,7 @@ export function PurchaseHistory() {
                         <th className="px-4 py-3">Date</th>
                         <th className="px-4 py-3">Description</th>
                         <th className="px-4 py-3">Amount</th>
-                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3 center">Status</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-gray/10">
@@ -63,22 +87,18 @@ export function PurchaseHistory() {
                                 {new Date(tx.created_at).toLocaleDateString()}
                             </td>
                             <td className="px-4 py-3 font-medium text-deep-teak">
-                                {tx.metadata?.creditType ?
-                                    `${tx.metadata.creditType === 'vip' ? 'VIP' : 'Premium'} Credits` :
-                                    'Purchase'}
+                                {tx.metadata?.plan_type ?
+                                    `${tx.metadata.plan_type === 'vip' ? 'VIP' : 'Premium'} Credits` :
+                                    (tx.metadata?.creditType || 'Purchase')}
                             </td>
                             <td className="px-4 py-3 text-deep-teak">
                                 {(tx.amount_total / 100).toLocaleString('en-US', {
                                     style: 'currency',
-                                    currency: tx.currency.toUpperCase()
+                                    currency: tx.currency ? tx.currency.toUpperCase() : 'USD'
                                 })}
                             </td>
                             <td className="px-4 py-3">
-                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                    ${tx.payment_status === 'paid' ? 'bg-rice-paddy-green/20 text-deep-teak' : 'bg-red-100 text-red-700'}
-                                `}>
-                                    {tx.payment_status}
-                                </span>
+                                {getStatusBadge(tx.payment_status || 'unknown')}
                             </td>
                         </tr>
                     ))}

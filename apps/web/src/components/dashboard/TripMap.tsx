@@ -31,6 +31,9 @@ interface Activity {
     category: string | null;
     notes: string | null;
     coordinates?: { lat: number; lng: number } | null;
+    place?: {
+        coordinates?: { lat: number; lng: number } | null;
+    };
 }
 
 interface TripMapProps {
@@ -89,9 +92,15 @@ export function TripMap({ activities }: TripMapProps) {
         useEffect(() => {
             if (activities.length > 0) {
                 const bounds = L.latLngBounds(activities.map(a => {
+                    // 1. Try activity.place.coordinates (Joined from DB)
+                    if (a.place?.coordinates && typeof a.place.coordinates === 'object') {
+                        return [a.place.coordinates.lat, a.place.coordinates.lng];
+                    }
+                    // 2. Try activity.coordinates (Old/Legacy if any)
                     if (a.coordinates && typeof a.coordinates === 'object' && 'lat' in a.coordinates && 'lng' in a.coordinates) {
                         return [a.coordinates.lat, a.coordinates.lng];
                     }
+                    // 3. Last fallback: Mock City Center
                     return getCoordinates(a.location || "Bali");
                 }));
 
@@ -121,7 +130,9 @@ export function TripMap({ activities }: TripMapProps) {
                 {activities.map((activity) => {
                     let position: [number, number];
 
-                    if (activity.coordinates && typeof activity.coordinates === 'object' && 'lat' in activity.coordinates && 'lng' in activity.coordinates) {
+                    if (activity.place?.coordinates && typeof activity.place.coordinates === 'object') {
+                        position = [activity.place.coordinates.lat, activity.place.coordinates.lng];
+                    } else if (activity.coordinates && typeof activity.coordinates === 'object' && 'lat' in activity.coordinates && 'lng' in activity.coordinates) {
                         position = [activity.coordinates.lat, activity.coordinates.lng];
                     } else {
                         position = getCoordinates(activity.location || "Bali");

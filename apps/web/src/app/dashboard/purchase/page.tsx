@@ -1,13 +1,35 @@
+"use client";
+
 import { getAllPackages, TRIP_TYPES, CREDIT_BUNDLES, formatPrice } from "@/config/pricing";
 import { Check, Sparkles, Crown } from "lucide-react";
-import { createCheckoutSession } from "@/app/actions/stripe";
+import { useState } from "react";
+import { RequestInvoiceModal } from "@/components/payment/RequestInvoiceModal";
 
 export default function PurchasePage() {
     const premium = TRIP_TYPES.PREMIUM;
     const vip = TRIP_TYPES.VIP;
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<'premium' | 'vip'>('premium');
+    const [selectedAmount, setSelectedAmount] = useState(0);
+
+    const handlePurchaseClick = (plan: 'premium' | 'vip', amount: number) => {
+        setSelectedPlan(plan);
+        setSelectedAmount(amount);
+        setIsModalOpen(true);
+    };
+
     return (
         <div className="max-w-7xl mx-auto">
+            <RequestInvoiceModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                tripId="credits"
+                planType={selectedPlan}
+                amount={selectedAmount}
+                destination="Credit Purchase"
+            />
+
             <div className="text-center mb-12">
                 <h1 className="text-3xl md:text-4xl font-heading font-bold text-deep-teak mb-3">
                     Top Up Your Credits
@@ -35,18 +57,12 @@ export default function PurchasePage() {
                         </div>
                         <p className="text-stone-gray mb-6 text-sm">{premium.description}</p>
 
-                        <form action={async () => {
-                            'use server';
-                            await createCheckoutSession(premium.stripePriceId, {
-                                type: 'credit_purchase',
-                                creditType: 'premium',
-                                amount: 1
-                            });
-                        }}>
-                            <button type="submit" className="w-full py-3 rounded-xl bg-terracotta text-white font-bold hover:bg-deep-teak transition-colors mb-6 shadow-lg shadow-terracotta/20">
-                                Buy 1 Credit
-                            </button>
-                        </form>
+                        <button
+                            onClick={() => handlePurchaseClick('premium', premium.price)}
+                            className="w-full py-3 rounded-xl bg-terracotta text-white font-bold hover:bg-deep-teak transition-colors mb-6 shadow-lg shadow-terracotta/20"
+                        >
+                            Buy 1 Credit
+                        </button>
 
                         <div className="space-y-3">
                             <p className="text-xs font-bold text-deep-teak uppercase tracking-wider">Includes:</p>
@@ -86,18 +102,12 @@ export default function PurchasePage() {
                         </div>
                         <p className="text-gray-300 mb-6 text-sm">{vip.description}</p>
 
-                        <form action={async () => {
-                            'use server';
-                            await createCheckoutSession(vip.stripePriceId, {
-                                type: 'credit_purchase',
-                                creditType: 'vip',
-                                amount: 1
-                            });
-                        }}>
-                            <button type="submit" className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-deep-teak font-bold hover:brightness-110 transition-all mb-6 shadow-lg shadow-amber-500/20">
-                                Buy 1 VIP Credit
-                            </button>
-                        </form>
+                        <button
+                            onClick={() => handlePurchaseClick('vip', vip.price)}
+                            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-deep-teak font-bold hover:brightness-110 transition-all mb-6 shadow-lg shadow-amber-500/20"
+                        >
+                            Buy 1 VIP Credit
+                        </button>
 
                         <div className="space-y-3">
                             <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Everything in Premium, plus:</p>
@@ -143,7 +153,10 @@ export default function PurchasePage() {
                                     )}
                                 </div>
 
-                                <button className="w-full py-2 rounded-lg border-2 border-deep-teak text-deep-teak font-bold hover:bg-deep-teak hover:text-white transition-colors text-xs">
+                                <button
+                                    onClick={() => handlePurchaseClick(bundle.tripType as 'premium' | 'vip', bundle.price)}
+                                    className="w-full py-2 rounded-lg border-2 border-deep-teak text-deep-teak font-bold hover:bg-deep-teak hover:text-white transition-colors text-xs"
+                                >
                                     Buy Bundle
                                 </button>
                             </div>

@@ -2,6 +2,7 @@
 
 import { Star, User } from "lucide-react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface Review {
     author: string;
@@ -58,7 +59,9 @@ export function PlaceReviews({ reviews, googleRating, googleReviewCount, googleM
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-3">
                                 {review.avatar_url ? (
-                                    <img src={review.avatar_url} alt={review.author} className="w-8 h-8 rounded-full" />
+                                    <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0">
+                                        <Image src={getImageUrl(review.avatar_url, "/images/placeholder-avatar.png")} alt={review.author} fill className="object-cover" />
+                                    </div>
                                 ) : (
                                     <div className="w-8 h-8 rounded-full bg-stone-gray/10 flex items-center justify-center text-stone-gray">
                                         <User className="w-4 h-4" />

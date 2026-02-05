@@ -46,7 +46,10 @@ export function TemplateEditor({ template }: { template: any }) {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-hidden relative">
+            <div className={cn(
+                "flex-1 relative",
+                activeTab === 'itinerary' ? "overflow-hidden" : "overflow-y-auto"
+            )}>
                 {activeTab === 'itinerary' && (
                     <ItineraryBuilder template={template} />
                 )}

@@ -13,6 +13,9 @@ interface Activity {
     category: string | null;
     notes: string | null;
     place_id?: string; // Optional place_id for linking
+    place?: {
+        destination_id: string;
+    };
 }
 
 interface SortableActivityCardProps {
@@ -70,7 +73,9 @@ export function SortableActivityCard({ activity, readOnly = false }: SortableAct
                             </h4>
                             {activity.place_id && (
                                 <a
-                                    href={`/dashboard/explore/view/place/${activity.place_id}`}
+                                    href={activity.place?.destination_id
+                                        ? `/dashboard/explore/${activity.place.destination_id}/place/${activity.place_id}`
+                                        : `/dashboard/explore/search?place=${activity.place_id}`}
                                     target="_blank"
                                     className="text-stone-gray hover:text-terracotta transition-colors"
                                     title="View Details"

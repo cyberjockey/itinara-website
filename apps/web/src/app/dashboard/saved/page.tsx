@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { MapPin, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getImageUrl } from "@/lib/utils";
 import { SaveButton } from "@/components/dashboard/SaveButton";
 
 export default async function SavedPage() {
@@ -35,7 +36,7 @@ export default async function SavedPage() {
                         <div key={destination.id} className="group bg-white rounded-2xl overflow-hidden border border-stone-gray/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                             <div className="relative h-64 overflow-hidden">
                                 <Image
-                                    src={destination.image_url || "/images/hero-bg.png"}
+                                    src={getImageUrl(destination.image_url)}
                                     alt={destination.name}
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-500"

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requirePermission, Permission } from "@/lib/rbac";
 
 export async function getUsers(roleFilter?: string) {
     const supabase = await createClient();
@@ -28,6 +29,9 @@ export async function getUsers(roleFilter?: string) {
 }
 
 export async function verifyGuide(userId: string) {
+    // RBAC: Only admins can verify guides
+    await requirePermission(Permission.MANAGE_USERS);
+
     const supabase = await createClient();
 
     // Check if admin
@@ -61,6 +65,9 @@ export async function verifyGuide(userId: string) {
 }
 
 export async function setUserRole(userId: string, role: 'traveler' | 'local_guide' | 'admin') {
+    // RBAC: Only admins can change user roles
+    await requirePermission(Permission.MANAGE_USERS);
+
     const supabase = await createClient();
 
     const { error } = await supabase

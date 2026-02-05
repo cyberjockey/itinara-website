@@ -4,6 +4,7 @@ import { MapPin, Star, Plus } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
+import { getImageUrl } from "@/lib/utils";
 
 interface Place {
     id: string;
@@ -54,7 +55,7 @@ export function PlacesList({ places, userTrips, destinationName, destinationId }
                         <Link href={`/dashboard/explore/${destinationId}/place/${place.id}`} className="block relative h-48 bg-stone-gray/10 overflow-hidden">
                             {place.image_url ? (
                                 <Image
-                                    src={place.image_url}
+                                    src={getImageUrl(place.image_url)}
                                     alt={place.name}
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-500"

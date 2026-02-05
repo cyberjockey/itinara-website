@@ -26,15 +26,17 @@
   --color-light-sand: #F5EDE4;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Enforce black text for inputs globally */
+input,
+textarea,
+select {
+  color: black;
 }

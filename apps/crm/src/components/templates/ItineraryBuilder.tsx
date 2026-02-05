@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Plus, Trash2, Clock, MapPin, Save, Loader2, X } from "lucide-react";
 import { updateTemplate } from "@/app/dashboard/templates/actions";
 import { PlacePicker } from "@/components/places/PlacePicker";
+import { useDebounce } from "@/hooks/use-debounce";
 import type { Place } from "@/app/dashboard/places/actions";
 import { useRouter } from "next/navigation";
 
@@ -83,10 +84,10 @@ export function ItineraryBuilder({ template }: { template: any }) {
         setDays(newDays);
     };
 
-    const handleSave = async () => {
+    const handleSave = async (dataToSave = days) => {
         setIsSaving(true);
         try {
-            const itinerary = { days };
+            const itinerary = { days: dataToSave };
             const formData = new FormData();
             formData.append("itinerary_json", JSON.stringify(itinerary));
             // Ensure we handle the response/error properly in a real app
@@ -94,11 +95,23 @@ export function ItineraryBuilder({ template }: { template: any }) {
             router.refresh(); // Refresh server text
         } catch (error) {
             console.error("Failed to save", error);
-            alert("Failed to save changes");
         } finally {
             setIsSaving(false);
         }
     };
+
+    // Auto-save logic
+    const debouncedDays = useDebounce(days, 2000);
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        handleSave(debouncedDays);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedDays]);
 
     return (
         <div className="h-full flex flex-col">
