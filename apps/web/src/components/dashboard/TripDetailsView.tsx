@@ -250,6 +250,7 @@ export function TripDetailsView({ trip, activities }: TripDetailsViewProps) {
                 title={viewingPdf?.title || 'Document Preview'}
                 pdfUrl={viewingPdf?.url || ''}
             />
+
         </div>
     );
 }
