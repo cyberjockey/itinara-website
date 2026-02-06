@@ -83,7 +83,10 @@ export function ColumnMapper({ csvHeaders, onMappingComplete, onCancel }: Column
             }
         });
 
-        setMapping(autoMapping);
+        const t = setTimeout(() => {
+            setMapping(autoMapping);
+        }, 0);
+        return () => clearTimeout(t);
     }, [csvHeaders]);
 
     const handleMappingChange = (csvHeader: string, dbColumn: string) => {

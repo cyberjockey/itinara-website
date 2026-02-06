@@ -5,6 +5,7 @@ import { MapPin, Calendar, Clock, User, ChevronLeft, Map, Star, FileText } from 
 import { getPublishedTemplate } from "../../actions";
 import UseTemplateButton from "@/components/explore/UseTemplateButton";
 import { createClient } from "@/lib/supabase/server";
+import { getImageUrl } from "@/lib/utils";
 
 export default async function TripDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -48,7 +49,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
             {/* Hero Section */}
             <div className="relative rounded-3xl overflow-hidden aspect-[21/9] mb-12 shadow-xl">
                 <Image
-                    src={template.featured_image || destinations?.image_url || "/images/hero-bg.png"}
+                    src={getImageUrl(template.featured_image || destinations?.image_url)}
                     alt={template.title}
                     fill
                     className="object-cover"
@@ -151,7 +152,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                 <div className="space-y-8">
                     {/* Booking Card */}
 
-                    <div className="bg-white p-6 rounded-2xl shadow-lg border border-stone-gray/10 sticky top-8">
+                    <div className="bg-white p-6 rounded-2xl shadow-lg border border-stone-gray/10">
                         <div className="mb-6">
                             <span className="text-sm text-stone-gray font-medium">Estimated Budget</span>
                             <div className="flex items-baseline gap-1">
@@ -205,23 +206,24 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                         Secure your dates with a local expert.
                     </p>
 
-                    <div className="space-y-4 pt-6 border-t border-stone-gray/10">
+                    {/* Guide Card */}
+                    <div className="bg-white p-6 rounded-2xl shadow-lg border border-stone-gray/10">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden relative">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 overflow-hidden relative flex-shrink-0">
                                 {guide?.avatar_url ? (
                                     <Image src={guide.avatar_url} alt={guide.full_name} fill className="object-cover" />
                                 ) : (
-                                    <User className="w-5 h-5 text-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                    <User className="w-6 h-6 text-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                                 )}
                             </div>
                             <div>
-                                <p className="text-xs text-stone-gray uppercase tracking-wider font-bold">Your Guide</p>
+                                <p className="text-xs text-stone-gray uppercase tracking-wider font-bold">Your Local Guide</p>
                                 <p className="font-bold text-deep-teak">{guide?.full_name || "Itinara Expert"}</p>
                             </div>
                         </div>
 
                         {guide?.bio && (
-                            <p className="text-sm text-stone-gray/80 italic">
+                            <p className="text-sm text-stone-gray/80 italic mt-4 pt-4 border-t border-stone-gray/10">
                                 "{guide.bio}"
                             </p>
                         )}

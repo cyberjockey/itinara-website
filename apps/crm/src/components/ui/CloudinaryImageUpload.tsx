@@ -4,6 +4,7 @@ import { CldUploadWidget } from 'next-cloudinary';
 import { ImagePlus, X } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/utils';
 
 interface CloudinaryResource {
     secure_url: string;
@@ -52,7 +53,7 @@ export default function CloudinaryImageUpload({
                 {uploadedImages.map((url, index) => (
                     <div key={url} className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200 group">
                         <Image
-                            src={url}
+                            src={getImageUrl(url)}
                             alt="Uploaded"
                             fill
                             className="object-cover"

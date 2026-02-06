@@ -76,7 +76,7 @@ export function SpreadsheetTable({
             return '';
         }
         if (field === 'created_at' || field === 'updated_at') {
-            const dateStr = (place as any)[field];
+            const dateStr = (place as unknown as Record<string, string>)[field];
             if (dateStr) {
                 return new Date(dateStr).toLocaleDateString() + ' ' + new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }

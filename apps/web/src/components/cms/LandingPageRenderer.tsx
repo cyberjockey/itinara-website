@@ -54,7 +54,7 @@ type GalleryBlock = {
 
 type PageBlock = HeroBlock | FeaturesBlock | CTABlock | RichtextBlock | GalleryBlock;
 
-type LandingPage = {
+export type LandingPage = {
     id: string;
     slug: string;
     title: string;

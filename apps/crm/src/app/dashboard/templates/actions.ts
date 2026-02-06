@@ -149,6 +149,23 @@ export async function updateTemplate(id: string, formData: FormData) {
     if (formData.has('estimated_budget')) updates.estimated_budget = formData.get('estimated_budget') as string;
     if (formData.has('trip_preference')) updates.trip_preference = formData.get('trip_preference') as string;
 
+    // Handle Arrays (JSON parsed)
+    if (formData.has('gallery_images')) {
+        try {
+            updates.gallery_images = JSON.parse(formData.get('gallery_images') as string);
+        } catch (e) {
+            console.error("Invalid gallery_images JSON", e);
+        }
+    }
+
+    if (formData.has('guide_materials')) {
+        try {
+            updates.guide_materials = JSON.parse(formData.get('guide_materials') as string);
+        } catch (e) {
+            console.error("Invalid guide_materials JSON", e);
+        }
+    }
+
     // Add logic to save JSON itinerary if passed strictly (e.g. from the builder)
     // We might parse a JSON string if sent via form
     if (formData.has('itinerary_json')) {

@@ -7,20 +7,35 @@ import { TripVisibilityToggle } from "@/components/dashboard/TripVisibilityToggl
 import { CalendarExportButton } from "@/components/dashboard/CalendarExportButton";
 import { LikeButton } from "@/components/dashboard/LikeButton";
 import { CommentPopover } from "@/components/dashboard/CommentPopover";
-import { ShareButton } from "@/components/dashboard/ShareButton"; // Add import
-import { TripViewToggle } from "@/components/dashboard/TripViewToggle"; // New Component for client-side toggle
+import { ShareButton } from "@/components/dashboard/ShareButton";
+import { TripViewToggle } from "@/components/dashboard/TripViewToggle";
+import { TripDeleteButton } from "@/components/dashboard/TripDeleteButton";
+import { TripCommitButton } from "@/components/dashboard/TripCommitButton";
 
-export default async function TripDetailPage(props: { params: Promise<{ id: string }> }) {
+
+export default async function TripDetailPage(props: {
+    params: Promise<{ id: string }>,
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
     const params = await props.params;
+    const searchParams = await props.searchParams;
     const supabase = await createClient();
+
+    // Map query param to view
+    const tab = typeof searchParams.tab === 'string' ? searchParams.tab : undefined;
+    let initialView: "timeline" | "map" | "details" | "emergency" | "guide" = "timeline";
+
+    if (tab === 'chat') initialView = 'guide';
+    else if (tab === 'map') initialView = 'map';
+    else if (tab === 'details') initialView = 'details';
 
     // Fetch User
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Fetch trip details
+    // Fetch trip details (include source_template_id for Ask Guide tab)
     const { data: trip, error: tripError } = await supabase
         .from("trips")
-        .select("*")
+        .select("*, source_template_id")
         .eq("id", params.id)
         .single();
 
@@ -90,11 +105,11 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                                     <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1">
                                         <span>👑</span> VIP
                                     </div>
-                                ) : (
+                                ) : trip.source_template_id ? (
                                     <div className="bg-white border border-stone-gray/20 text-stone-gray px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm">
-                                        <Sparkles className="w-3 h-3 text-terracotta" /> Premium
+                                        <Sparkles className="w-3 h-3 text-terracotta" /> Curated Trip
                                     </div>
-                                )}
+                                ) : null}
                             </div>
                         </div>
                         <div className="flex gap-2 items-center relative self-end md:self-auto">
@@ -116,14 +131,21 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                             {/* Actions only for owner or specific allowed actions for visitors */}
                             {isOwner && (
                                 <>
+                                    <TripCommitButton
+                                        tripId={trip.id}
+                                        initialIsCommitted={trip.status === 'active' || trip.status === 'completed'}
+                                    />
                                     <CalendarExportButton
                                         tripTitle={trip.title}
                                         tripStartDate={trip.start_date}
                                         activities={activities || []}
                                     />
                                     <ShareButton tripId={trip.id} />
+                                    <div className="w-px h-6 bg-stone-gray/20 mx-2"></div>
+                                    <TripDeleteButton tripId={trip.id} />
                                 </>
                             )}
+
                         </div>
                     </div>
                 </div>
@@ -135,9 +157,10 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                     trip={trip}
                     activities={activities || []}
                     readOnly={!isOwner}
+                    isCommitted={trip.status === 'active' || trip.status === 'completed'}
+                    initialView={initialView}
                 />
             </div>
         </div>
     );
 }
-

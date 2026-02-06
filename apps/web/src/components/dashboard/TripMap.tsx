@@ -31,6 +31,10 @@ interface Activity {
     category: string | null;
     notes: string | null;
     coordinates?: { lat: number; lng: number } | null;
+    place?: {
+        coordinates?: { lat: number; lng: number } | null;
+        [key: string]: any;
+    } | null;
 }
 
 interface TripMapProps {
@@ -92,6 +96,9 @@ export function TripMap({ activities }: TripMapProps) {
                     if (a.coordinates && typeof a.coordinates === 'object' && 'lat' in a.coordinates && 'lng' in a.coordinates) {
                         return [a.coordinates.lat, a.coordinates.lng];
                     }
+                    if (a.place?.coordinates && typeof a.place.coordinates === 'object' && 'lat' in a.place.coordinates && 'lng' in a.place.coordinates) {
+                        return [a.place.coordinates.lat, a.place.coordinates.lng];
+                    }
                     return getCoordinates(a.location || "Bali");
                 }));
 
@@ -123,6 +130,8 @@ export function TripMap({ activities }: TripMapProps) {
 
                     if (activity.coordinates && typeof activity.coordinates === 'object' && 'lat' in activity.coordinates && 'lng' in activity.coordinates) {
                         position = [activity.coordinates.lat, activity.coordinates.lng];
+                    } else if (activity.place?.coordinates && typeof activity.place.coordinates === 'object' && 'lat' in activity.place.coordinates && 'lng' in activity.place.coordinates) {
+                        position = [activity.place.coordinates.lat, activity.place.coordinates.lng];
                     } else {
                         position = getCoordinates(activity.location || "Bali");
                     }

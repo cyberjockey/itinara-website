@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Plus, MapPin, Calendar, Star } from "lucide-react";
 import { getTemplates } from "./actions";
 
@@ -30,58 +31,74 @@ export default async function TemplatesPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {templates.map((template: any) => (
-                        <Link
-                            key={template.id}
-                            href={`/dashboard/templates/${template.id}`}
-                            className="block bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group overflow-hidden"
-                        >
-                            <div className="h-40 bg-gray-200 relative">
-                                {template.featured_image ? (
-                                    <img
-                                        src={template.featured_image}
-                                        alt={template.title}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
-                                        <MapPin className="w-8 h-8 opacity-20" />
-                                    </div>
-                                )}
-                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-semibold text-gray-700 uppercase">
-                                    {template.status}
-                                </div>
-                            </div>
-                            <div className="p-5">
-                                <div className="flex items-start justify-between mb-2">
-                                    <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">{template.title}</h3>
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-                                    <span className="flex items-center gap-1">
-                                        <MapPin className="w-3 h-3" />
-                                        {template.destinations?.name || 'Unknown'}
-                                    </span>
-                                    <span>•</span>
-                                    <span className="flex items-center gap-1">
-                                        <Calendar className="w-3 h-3" />
-                                        {template.duration_days} Days
-                                    </span>
-                                </div>
-                                <p className="text-sm text-gray-600 line-clamp-2 mb-4 h-10">
-                                    {template.description || 'No description provided.'}
-                                </p>
-                                <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-                                    <div className="flex items-center gap-1 text-yellow-500  text-xs font-medium">
-                                        <Star className="w-3 h-3 fill-current" />
-                                        {template.rating || 'New'}
-                                    </div>
-                                    <span className="text-xs font-medium text-blue-600 group-hover:underline">Edit Itinerary →</span>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table className="w-full">
+                        <thead className="bg-gray-50 border-b border-gray-100">
+                            <tr>
+                                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Template</th>
+                                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Duration</th>
+                                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Uses</th>
+                                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            {templates.map((template: any) => (
+                                <tr key={template.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                                {template.featured_image ? (
+                                                    <img
+                                                        src={template.featured_image}
+                                                        alt={template.title}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                        <MapPin className="w-5 h-5 opacity-40" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-900 line-clamp-1">{template.title}</p>
+                                                <p className="text-xs text-gray-500 line-clamp-1">{template.description || 'No description'}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className="text-sm text-gray-700">{template.destinations?.name || 'Unknown'}</span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className="text-sm text-gray-700">{template.duration_days} Days</span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className="text-sm text-gray-700">{template.use_count || 0}</span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${template.status === 'published'
+                                            ? 'bg-green-100 text-green-700'
+                                            : template.status === 'pending_review'
+                                                ? 'bg-yellow-100 text-yellow-700'
+                                                : 'bg-gray-100 text-gray-700'
+                                            }`}>
+                                            {template.status === 'pending_review' ? 'Pending' : template.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <Link
+                                            href={`/dashboard/templates/${template.id}`}
+                                            className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                                        >
+                                            Edit →
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
         </div>

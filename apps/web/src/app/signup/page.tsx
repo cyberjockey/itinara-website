@@ -100,20 +100,7 @@ export default function SignupPage() {
                             />
                         </div>
 
-                        <div>
-                            <label htmlFor="betaCode" className="block text-sm font-medium text-stone-gray mb-1">
-                                Beta Access Code <span className="text-terracotta ml-1">*</span>
-                            </label>
-                            <input
-                                id="betaCode"
-                                name="betaCode"
-                                type="text"
-                                required
-                                className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50"
-                                placeholder="Enter code"
-                            />
-                            <p className="text-xs text-stone-gray/60 mt-1">Required for beta access</p>
-                        </div>
+
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-stone-gray mb-1">

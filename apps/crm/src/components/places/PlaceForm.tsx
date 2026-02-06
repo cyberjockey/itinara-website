@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useActionState } from "react";
-import { createPlace, updatePlace, generateCoordinates, generatePlaceDescription } from "@/app/dashboard/places/actions";
+import { useState, useActionState } from "react";
+import { createPlace, updatePlace, deletePlace, generateCoordinates, generatePlaceDescription } from "@/app/dashboard/places/actions";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Sparkles, Wand2, Plus } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles, Wand2, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CloudinaryImageUpload from "@/components/ui/CloudinaryImageUpload";
 import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
-import { useRef } from "react";
+import { useRef, useTransition } from "react";
+import { DeleteModal } from "@/components/ui/DeleteModal";
 
 function DescriptionGenerator() {
     const [loading, setLoading] = useState(false);
@@ -151,6 +152,9 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
     // Provide a valid initial state that matches the return type of the action
     const initialState = { message: "" };
 
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleting, startTransition] = useTransition();
+
     const [state, formAction, isPending] = useActionState(async (prev: unknown, formData: FormData) => {
         const result = await action(prev, formData);
 
@@ -160,6 +164,20 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
         }
         return result;
     }, initialState);
+
+    const handleDelete = async () => {
+        if (!initialData?.id) return;
+
+        startTransition(async () => {
+            try {
+                await deletePlace(initialData.id);
+                router.push('/dashboard/places');
+                router.refresh();
+            } catch (err) {
+                console.error("Delete failed", err);
+            }
+        });
+    };
 
     return (
         <div className="max-w-2xl mx-auto">
@@ -573,6 +591,17 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
                     </div>
 
                     <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-50">
+                        {mode === 'edit' && (
+                            <button
+                                type="button"
+                                onClick={() => setIsDeleteModalOpen(true)}
+                                className="mr-auto px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors flex items-center gap-2"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                Delete Activity
+                            </button>
+                        )}
+
                         <Link href="/dashboard/places" className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
                             Cancel
                         </Link>
@@ -587,6 +616,15 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
                     </div>
                 </form>
             </div >
+
+            <DeleteModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDelete}
+                title="Delete Activity"
+                description={`Are you sure you want to delete "${initialData?.name}"? This will permanently remove this activity from our database. This action cannot be undone.`}
+                isPending={isDeleting}
+            />
         </div >
     )
 }

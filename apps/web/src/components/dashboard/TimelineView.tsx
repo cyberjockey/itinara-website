@@ -54,9 +54,10 @@ interface TimelineViewProps {
     trip: Trip;
     activities: Activity[];
     readOnly?: boolean;
+    isCommitted?: boolean; // NEW: Disable editing after commit
 }
 
-export function TimelineView({ trip, activities: initialActivities, readOnly = false }: TimelineViewProps) {
+export function TimelineView({ trip, activities: initialActivities, readOnly = false, isCommitted = false }: TimelineViewProps) {
     const startDate = parseISO(trip.start_date);
     const endDate = parseISO(trip.end_date);
     const totalDays = differenceInDays(endDate, startDate) + 1;
@@ -238,7 +239,7 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
     };
 
     const handleAddActivity = (dayNumber: number) => {
-        if (readOnly) return;
+        if (readOnly || isCommitted) return; // Prevent adding activities if committed
         setSelectedDayForAdd(dayNumber);
         setIsAddModalOpen(true);
     };
@@ -261,7 +262,7 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
             )}
 
             {/* Empty State / Onboarding CTA */}
-            {!readOnly && activities.length === 0 && (
+            {!readOnly && !isCommitted && activities.length === 0 && (
                 <div className="mx-6 mt-6 mb-2 p-8 bg-white border border-dashed border-stone-gray/20 rounded-2xl flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-4">
                     <div className="w-16 h-16 bg-warm-white rounded-full flex items-center justify-center mb-4">
                         <MapPin className="w-8 h-8 text-terracotta" />

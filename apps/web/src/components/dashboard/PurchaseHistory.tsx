@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getPurchaseHistory } from "@/app/actions/stripe";
-import { Loader2, Receipt, AlertCircle } from "lucide-react";
+import { getTransactionHistory } from "@/app/actions/payment";
+import { Loader2, Receipt } from "lucide-react";
 
 interface Transaction {
     id: string;
-    amount_total: number;
+    amount: number;
     currency: string;
-    payment_status: string;
+    status: string;
     created_at: string;
-    metadata: any;
+    package_type: string;
+    credits_purchased: number;
 }
 
 export function PurchaseHistory() {
@@ -20,7 +21,7 @@ export function PurchaseHistory() {
     useEffect(() => {
         async function fetchHistory() {
             try {
-                const data = await getPurchaseHistory();
+                const data = await getTransactionHistory();
                 setTransactions(data || []);
             } catch (error) {
                 console.error("Failed to load purchase history", error);
@@ -63,21 +64,17 @@ export function PurchaseHistory() {
                                 {new Date(tx.created_at).toLocaleDateString()}
                             </td>
                             <td className="px-4 py-3 font-medium text-deep-teak">
-                                {tx.metadata?.creditType ?
-                                    `${tx.metadata.creditType === 'vip' ? 'VIP' : 'Premium'} Credits` :
-                                    'Purchase'}
+                                {tx.package_type?.includes('vip') ? 'VIP' : 'Premium'} Credits ({tx.credits_purchased})
                             </td>
                             <td className="px-4 py-3 text-deep-teak">
-                                {(tx.amount_total / 100).toLocaleString('en-US', {
-                                    style: 'currency',
-                                    currency: tx.currency.toUpperCase()
-                                })}
+                                ${tx.amount?.toFixed(2)} {tx.currency?.toUpperCase()}
                             </td>
                             <td className="px-4 py-3">
                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                    ${tx.payment_status === 'paid' ? 'bg-rice-paddy-green/20 text-deep-teak' : 'bg-red-100 text-red-700'}
+                                    ${tx.status === 'completed' ? 'bg-rice-paddy-green/20 text-deep-teak' :
+                                        tx.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}
                                 `}>
-                                    {tx.payment_status}
+                                    {tx.status}
                                 </span>
                             </td>
                         </tr>

@@ -2,7 +2,7 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { BackgroundMusic } from "@/components/ui/BackgroundMusic";
+
 
 export default function PublicLayout({
     children,
@@ -14,7 +14,7 @@ export default function PublicLayout({
             <Navbar />
             <main>{children}</main>
             <Footer />
-            <BackgroundMusic />
+
         </>
     );
 }

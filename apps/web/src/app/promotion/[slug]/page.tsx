@@ -1,22 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-import { LandingPageRenderer } from "@/components/cms/LandingPageRenderer";
+import { LandingPageRenderer, type LandingPage } from "@/components/cms/LandingPageRenderer";
 import type { Metadata } from 'next';
-
-type PageBlock = {
-    type: string;
-    data: Record<string, unknown>;
-};
-
-type LandingPage = {
-    id: string;
-    slug: string;
-    title: string;
-    content: PageBlock[];
-    meta_title: string | null;
-    meta_description: string | null;
-    status: string;
-};
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;

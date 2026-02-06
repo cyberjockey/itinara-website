@@ -25,10 +25,11 @@ export async function getProfile() {
 
 export async function updateProfile(prevState: unknown, formData: FormData) {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (!user) {
-        return { message: "Unauthorized" };
+    if (authError || !user) {
+        console.error("Update Profile Auth Error:", authError);
+        return { message: "Unauthorized: Please log in again." };
     }
 
     const full_name = formData.get('full_name') as string;

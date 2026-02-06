@@ -74,7 +74,7 @@ export function PdfViewerModal({ isOpen, onClose, title, pdfUrl }: PdfViewerModa
                             {/* Content - Real PDF Viewer */}
                             <div className="flex-1 bg-stone-100 relative overflow-hidden flex flex-col items-center justify-center p-0">
                                 <iframe
-                                    src={`${pdfUrl}#toolbar=0`}
+                                    src={pdfUrl}
                                     className="w-full h-full border-none"
                                     title={title}
                                 />

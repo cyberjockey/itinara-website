@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CommunityTripCard } from "@/components/dashboard/CommunityTripCard";
+import { SocialPostCard } from "@/components/dashboard/SocialPostCard";
 import { TripThreadSheet } from "@/components/dashboard/TripThreadSheet";
 
 interface CommunityFeedProps {
@@ -15,9 +15,10 @@ export function CommunityFeed({ trips, currentUserId, likedTripIds }: CommunityF
 
     return (
         <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Single-column feed like X/Threads */}
+            <div className="max-w-xl mx-auto bg-white rounded-2xl border border-stone-gray/10 overflow-hidden shadow-sm">
                 {trips.map((trip) => (
-                    <CommunityTripCard
+                    <SocialPostCard
                         key={trip.id}
                         trip={trip}
                         currentUserId={currentUserId}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, ChevronsUpDown, Plus, MapPin, Loader2 } from "lucide-react";
+import { Check, Plus, MapPin, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createPlace, getPlaces, type Place } from "@/app/dashboard/places/actions";
 import { useActionState } from "react";
@@ -13,23 +13,38 @@ interface PlacePickerProps {
     onCancel: () => void;
 }
 
-export function PlacePicker({ destinationId, value, onChange, onCancel }: PlacePickerProps) {
+export function PlacePicker({ destinationId, value, onChange }: PlacePickerProps) {
     const [places, setPlaces] = useState<Place[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [isCreating, setIsCreating] = useState(false);
 
-    // Initial load
+    // Fetch places with server-side search - debounced
     useEffect(() => {
-        getPlaces(destinationId).then(data => {
-            setPlaces(data.data);
-            setLoading(false);
-        });
-    }, [destinationId]);
+        if (!destinationId) {
+            const t = setTimeout(() => {
+                setPlaces([]);
+                setLoading(false);
+            }, 0);
+            return () => clearTimeout(t);
+        }
 
-    const filteredPlaces = places.filter(place =>
-        place.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        const tLoading = setTimeout(() => setLoading(true), 0);
+        const timeoutId = setTimeout(() => {
+            // Use search query parameter for server-side filtering
+            getPlaces(destinationId, 1, 100, searchTerm || undefined).then(data => {
+                setPlaces(data.data);
+                setLoading(false);
+            });
+        }, 300); // Debounce 300ms
+
+        return () => {
+            clearTimeout(timeoutId);
+            clearTimeout(tLoading);
+        };
+    }, [destinationId, searchTerm]);
+
+    // No need for client-side filtering - server handles it
 
     // --- Create New Place Logic ---
     const [createState, createAction, isCreatePending] = useActionState(async (prev: unknown, formData: FormData) => {
@@ -116,10 +131,14 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
 
             {/* List */}
             <div className="max-h-60 overflow-y-auto border border-gray-100 rounded-lg bg-white shadow-sm divide-y divide-gray-50">
-                {loading ? (
-                    <div className="p-4 text-center text-gray-400 text-xs">Loading activities...</div>
-                ) : filteredPlaces.length > 0 ? (
-                    filteredPlaces.map((place) => (
+                {!destinationId ? (
+                    <div className="p-4 text-center text-amber-600 text-xs bg-amber-50">
+                        ⚠️ Please select a destination for this template first
+                    </div>
+                ) : loading ? (
+                    <div className="p-4 text-center text-gray-400 text-xs">Loading activities for this destination...</div>
+                ) : places.length > 0 ? (
+                    places.map((place) => (
                         <button
                             key={place.id}
                             onClick={() => onChange(place)}

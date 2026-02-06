@@ -3,7 +3,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
 }
 
 @theme inline {
@@ -25,13 +25,6 @@
   --color-warm-white: #FFF9F5;
   --color-stone-gray: #4A4A4A;
   --color-light-sand: #F5EDE4;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 html {

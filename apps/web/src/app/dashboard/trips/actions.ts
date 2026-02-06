@@ -58,16 +58,19 @@ export async function toggleLike(tripId: string) {
     revalidatePath('/dashboard/community');
 }
 
-export async function addComment(tripId: string, content: string, parentId?: string) {
+export async function addComment(tripId: string, content: string, parentId?: string, attachmentUrl?: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) throw new Error("Unauthorized");
 
+    console.log("DEBUG ADD COMMENT:", { tripId, content, attachmentUrl });
+
     const payload: any = {
         user_id: user.id,
         trip_id: tripId,
-        content: content
+        content: content,
+        attachment_url: attachmentUrl
     };
     if (parentId) {
         payload.parent_id = parentId;
@@ -241,4 +244,92 @@ export async function updateActivityPosition(
 
     // 3. Revalidate
     revalidatePath(`/dashboard/trips/${tripId}`);
+}
+
+export async function deleteTrip(tripId: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { message: "Unauthorized", success: false };
+    }
+
+    // 1. Verify Ownership
+    const { data: trip } = await supabase
+        .from("trips")
+        .select("user_id")
+        .eq("id", tripId)
+        .single();
+
+    if (!trip) {
+        return { message: "Trip not found", success: false };
+    }
+
+    if (trip.user_id !== user.id) {
+        return { message: "You are not authorized to delete this trip.", success: false };
+    }
+
+    // 2. Delete Trip (Cascading delete handles activities)
+    const { error } = await supabase
+        .from("trips")
+        .delete()
+        .eq("id", tripId);
+
+    if (error) {
+        console.error("Error deleting trip:", error);
+        return { message: "Failed to delete trip.", success: false };
+    }
+
+    // 3. Revalidate
+    revalidatePath("/dashboard");
+    return { message: "Trip deleted successfully.", success: true };
+}
+
+/**
+ * Commit/activate a trip - locks the itinerary and enables travel-mode features
+ * Changes status from 'upcoming' to 'active'
+ */
+export async function commitTrip(tripId: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { message: "Unauthorized", success: false };
+    }
+
+    // 1. Verify Ownership
+    const { data: trip } = await supabase
+        .from("trips")
+        .select("user_id, status")
+        .eq("id", tripId)
+        .single();
+
+    if (!trip) {
+        return { message: "Trip not found", success: false };
+    }
+
+    if (trip.user_id !== user.id) {
+        return { message: "You are not authorized to commit this trip.", success: false };
+    }
+
+    // Already committed
+    if (trip.status === 'active' || trip.status === 'completed') {
+        return { message: "Trip is already committed.", success: true };
+    }
+
+    // 2. Update status to 'active'
+    const { error } = await supabase
+        .from("trips")
+        .update({ status: 'active' })
+        .eq("id", tripId);
+
+    if (error) {
+        console.error("Error committing trip:", error);
+        return { message: "Failed to commit trip.", success: false };
+    }
+
+    // 3. Revalidate
+    revalidatePath(`/dashboard/trips/${tripId}`);
+    revalidatePath("/dashboard");
+    return { message: "Trip committed successfully!", success: true };
 }

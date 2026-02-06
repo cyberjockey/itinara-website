@@ -8,23 +8,28 @@ export async function QuotaWidget() {
 
     if (!user) return null;
 
-    const { data: credits, error } = await supabase
-        .rpc('get_total_credits_by_type', { p_user_id: user.id });
+    // Fetch credits directly from user_quotas table
+    // This is the source of truth for trip limits
+    const { data: quota, error } = await supabase
+        .from("user_quotas")
+        .select("premium_trips_remaining, vip_trips_remaining")
+        .eq("user_id", user.id)
+        .single();
 
-    if (error) {
-        console.error("Error fetching credits:", error);
+    if (error && error.code !== 'PGRST116') { // Ignore not found error, treat as 0
+        console.error("Error fetching quotas:", error);
         return null;
     }
 
     // Default to 0 if null
-    const premiumCredits = credits?.premium || 0;
-    const vipCredits = credits?.vip || 0;
+    const premiumCredits = quota?.premium_trips_remaining || 0;
+    const vipCredits = quota?.vip_trips_remaining || 0;
 
     return (
         <div className="bg-white rounded-2xl p-4 border border-stone-gray/10 shadow-sm">
             <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold text-stone-gray uppercase tracking-wider">Your Balance</span>
-                <Link href="/pricing" className="text-xs font-bold text-terracotta hover:underline flex items-center gap-1">
+                <Link href="/dashboard/purchase" className="text-xs font-bold text-terracotta hover:underline flex items-center gap-1">
                     <Plus className="w-3 h-3" /> Buy Credits
                 </Link>
             </div>

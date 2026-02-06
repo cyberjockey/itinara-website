@@ -127,7 +127,8 @@ export async function useTemplate(templateId: string, startDateStr: string) {
             destination: template.destinations?.name || "Unknown Destination",
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
-            status: 'planning'
+            status: 'planning',
+            source_template_id: templateId
         })
         .select()
         .single();

@@ -1,11 +1,88 @@
-import { getAllPackages, TRIP_TYPES, CREDIT_BUNDLES, formatPrice } from "@/config/pricing";
+"use client";
+
+import { useState } from "react";
 import { Check, Sparkles, Crown } from "lucide-react";
 import Link from "next/link";
-import { createCheckoutSession } from "../actions/stripe";
+import { TRIP_TYPES, CREDIT_BUNDLES, formatPrice } from "@/config/pricing";
+import { PayPalCheckoutModal } from "@/components/billing/PayPalCheckoutModal";
+import { PayPalProvider } from "@/components/providers/PayPalProvider";
 
-export default function PricingPage() {
+type PackageType = "starter" | "explorer" | "adventurer" | "premium_3" | "premium_5" | "vip_2" | "vip_3";
+
+interface SelectedPackage {
+    type: PackageType;
+    name: string;
+    credits: number;
+    price: string;
+    features: string[];
+}
+
+// Map our pricing config to PayPal package types
+const PAYPAL_PACKAGES: Record<string, SelectedPackage> = {
+    premium: {
+        type: "starter",
+        name: "Premium Trip",
+        credits: 1,
+        price: "9.00",
+        features: [...TRIP_TYPES.PREMIUM.features],
+    },
+    vip: {
+        type: "adventurer",
+        name: "VIP Trip",
+        credits: 1,
+        price: "30.00",
+        features: [...TRIP_TYPES.VIP.features],
+    },
+    // Bundle mappings
+    PREMIUM_3: {
+        type: "premium_3",
+        name: "Explorer Pack",
+        credits: 3,
+        price: "24.00",
+        features: ["3 Premium Trip Credits", "Save 11%", "Never expires"],
+    },
+    PREMIUM_5: {
+        type: "premium_5",
+        name: "Adventurer Pack",
+        credits: 5,
+        price: "35.00",
+        features: ["5 Premium Trip Credits", "Save 22%", "Best value"],
+    },
+    VIP_2: {
+        type: "vip_2",
+        name: "VIP Duo",
+        credits: 2,
+        price: "50.00",
+        features: ["2 VIP Trip Credits", "Save 17%", "Unlimited adventures"],
+    },
+    VIP_3: {
+        type: "vip_3",
+        name: "Digital Nomad",
+        credits: 3,
+        price: "70.00",
+        features: ["3 VIP Trip Credits", "Save 22%", "Ultimate package"],
+    },
+};
+
+function PricingContent() {
+    const [selectedPackage, setSelectedPackage] = useState<SelectedPackage | null>(null);
+    const [showCheckout, setShowCheckout] = useState(false);
+
     const premium = TRIP_TYPES.PREMIUM;
     const vip = TRIP_TYPES.VIP;
+
+    const handlePurchase = (packageId: string) => {
+        const pkg = PAYPAL_PACKAGES[packageId];
+        if (pkg) {
+            setSelectedPackage(pkg);
+            setShowCheckout(true);
+        }
+    };
+
+    const handleSuccess = (credits: number) => {
+        // Refresh page or show success message
+        window.location.href = "/dashboard?payment=success";
+    };
 
     return (
         <div className="min-h-screen bg-stone-50 py-20 px-4 md:px-6">
@@ -36,18 +113,12 @@ export default function PricingPage() {
                                 <span className="text-stone-gray">/ trip</span>
                             </div>
 
-                            <form action={async () => {
-                                'use server';
-                                await createCheckoutSession(premium.stripePriceId, {
-                                    type: 'credit_purchase',
-                                    creditType: 'premium',
-                                    amount: 1
-                                });
-                            }}>
-                                <button type="submit" className="w-full py-3 rounded-xl bg-terracotta text-white font-bold hover:bg-deep-teak transition-colors mb-8 shadow-lg shadow-terracotta/20">
-                                    Buy 1 Credit
-                                </button>
-                            </form>
+                            <button
+                                onClick={() => handlePurchase("premium")}
+                                className="w-full py-3 rounded-xl bg-terracotta text-white font-bold hover:bg-deep-teak transition-colors mb-8 shadow-lg shadow-terracotta/20"
+                            >
+                                Buy 1 Credit
+                            </button>
 
                             <div className="space-y-4">
                                 <p className="text-sm font-bold text-deep-teak uppercase tracking-wider">Includes:</p>
@@ -86,18 +157,12 @@ export default function PricingPage() {
                                 <span className="text-gray-300">/ trip</span>
                             </div>
 
-                            <form action={async () => {
-                                'use server';
-                                await createCheckoutSession(vip.stripePriceId, {
-                                    type: 'credit_purchase',
-                                    creditType: 'vip',
-                                    amount: 1
-                                });
-                            }}>
-                                <button type="submit" className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-deep-teak font-bold hover:brightness-110 transition-all mb-8 shadow-lg shadow-amber-500/20">
-                                    Buy 1 VIP Credit
-                                </button>
-                            </form>
+                            <button
+                                onClick={() => handlePurchase("vip")}
+                                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-deep-teak font-bold hover:brightness-110 transition-all mb-8 shadow-lg shadow-amber-500/20"
+                            >
+                                Buy 1 VIP Credit
+                            </button>
 
                             <div className="space-y-4">
                                 <p className="text-sm font-bold text-amber-400 uppercase tracking-wider">Everything in Premium, plus:</p>
@@ -141,7 +206,10 @@ export default function PricingPage() {
                                         )}
                                     </div>
 
-                                    <button className="w-full py-2.5 rounded-lg border-2 border-deep-teak text-deep-teak font-bold hover:bg-deep-teak hover:text-white transition-colors text-sm">
+                                    <button
+                                        onClick={() => handlePurchase(bundle.id)}
+                                        className="w-full py-2.5 rounded-lg border-2 border-deep-teak text-deep-teak font-bold hover:bg-deep-teak hover:text-white transition-colors text-sm"
+                                    >
                                         Buy Bundle
                                     </button>
                                 </div>
@@ -156,6 +224,25 @@ export default function PricingPage() {
                     </Link>
                 </div>
             </div>
+
+            {/* PayPal Checkout Modal */}
+            {selectedPackage && (
+                <PayPalCheckoutModal
+                    isOpen={showCheckout}
+                    onClose={() => setShowCheckout(false)}
+                    packageType={selectedPackage.type}
+                    packageDetails={selectedPackage}
+                    onSuccess={handleSuccess}
+                />
+            )}
         </div>
+    );
+}
+
+export function PricingClient() {
+    return (
+        <PayPalProvider>
+            <PricingContent />
+        </PayPalProvider>
     );
 }

@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createDestination, updateDestination, type Destination } from '@/app/dashboard/destinations/actions';
+import { createDestination, updateDestination, deleteDestination, type Destination } from '@/app/dashboard/destinations/actions';
 import CloudinaryImageUpload from '@/components/ui/CloudinaryImageUpload';
-import { Loader2, ArrowLeft, Save } from 'lucide-react';
+import { Loader2, ArrowLeft, Save, Trash2 } from 'lucide-react';
+import { DeleteModal } from '@/components/ui/DeleteModal';
 
 interface DestinationFormProps {
     destination?: Destination;
@@ -15,6 +16,8 @@ interface DestinationFormProps {
 export default function DestinationForm({ destination, isEditing = false }: DestinationFormProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleting, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>(destination?.image_url ? [destination.image_url] : []);
 
@@ -46,6 +49,24 @@ export default function DestinationForm({ destination, isEditing = false }: Dest
             setError('An unexpected error occurred');
             setIsSubmitting(false);
         }
+    };
+
+    const handleDelete = async () => {
+        if (!destination) return;
+
+        startTransition(async () => {
+            try {
+                const result = await deleteDestination(destination.id);
+                if (result && result.error) {
+                    setError(result.error);
+                } else {
+                    router.push('/dashboard/destinations');
+                    router.refresh();
+                }
+            } catch (err) {
+                setError('Failed to delete destination');
+            }
+        });
     };
 
     return (
@@ -80,7 +101,7 @@ export default function DestinationForm({ destination, isEditing = false }: Dest
                             type="text"
                             required
                             defaultValue={destination?.name}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-black"
                             placeholder="e.g., Bali"
                         />
                     </div>
@@ -94,7 +115,7 @@ export default function DestinationForm({ destination, isEditing = false }: Dest
                             type="text"
                             required
                             defaultValue={destination?.country}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-black"
                             placeholder="e.g., Indonesia"
                         />
                     </div>
@@ -107,7 +128,7 @@ export default function DestinationForm({ destination, isEditing = false }: Dest
                             name="description"
                             rows={4}
                             defaultValue={destination?.description}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-black"
                             placeholder="Brief description of the destination..."
                         />
                     </div>
@@ -126,7 +147,18 @@ export default function DestinationForm({ destination, isEditing = false }: Dest
                     </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-3">
+                    {isEditing && (
+                        <button
+                            type="button"
+                            onClick={() => setIsDeleteModalOpen(true)}
+                            className="mr-auto px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors flex items-center gap-2"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                        </button>
+                    )}
+
                     <Link
                         href="/dashboard/destinations"
                         className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
@@ -152,6 +184,15 @@ export default function DestinationForm({ destination, isEditing = false }: Dest
                     </button>
                 </div>
             </form>
+
+            <DeleteModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDelete}
+                title="Delete Destination"
+                description={`Are you sure you want to delete ${destination?.name}? All regions and linked places will remain but this destination entry will be removed. This action cannot be undone.`}
+                isPending={isDeleting}
+            />
         </div>
     );
 }

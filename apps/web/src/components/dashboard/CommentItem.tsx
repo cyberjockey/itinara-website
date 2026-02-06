@@ -114,7 +114,19 @@ export function CommentItem({
                             </div>
                         </div>
                     ) : (
-                        <p className="text-stone-gray text-sm mt-1 break-words">{comment.content}</p>
+                        <div>
+                            <p className="text-stone-gray text-sm mt-1 break-words">{comment.content}</p>
+                            {comment.attachment_url && (
+                                <div className="mt-2">
+                                    <img
+                                        src={comment.attachment_url}
+                                        alt="Attachment"
+                                        className="max-h-60 rounded-lg border border-stone-gray/10 object-cover hover:opacity-95 transition-opacity cursor-pointer"
+                                        onClick={() => window.open(comment.attachment_url, '_blank')}
+                                    />
+                                </div>
+                            )}
+                        </div>
                     )}
 
                     {/* Actions Bar */}

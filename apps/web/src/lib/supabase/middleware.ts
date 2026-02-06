@@ -26,6 +26,9 @@ export async function updateSession(request: NextRequest) {
                     )
                 },
             },
+            cookieOptions: {
+                name: 'itinara-web-auth',
+            },
         }
     )
 
