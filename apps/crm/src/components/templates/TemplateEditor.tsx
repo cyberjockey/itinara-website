@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ItineraryBuilder } from "./ItineraryBuilder";
 import { TemplateDetailsForm } from "./TemplateDetailsForm";
-import { Layout, Map, Settings } from "lucide-react";
+import { Layout, Settings } from "lucide-react";
 import { cn } from "@/lib/utils"; // Make sure to have a utils file or use clsx directly
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -55,7 +55,9 @@ export function TemplateEditor({ template }: { template: any }) {
                 )}
 
                 {activeTab === 'details' && (
-                    <TemplateDetailsForm template={template} />
+                    <div className="h-full overflow-y-auto">
+                        <TemplateDetailsForm template={template} />
+                    </div>
                 )}
             </div>
         </div>

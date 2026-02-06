@@ -18,7 +18,6 @@ export const TRIP_TYPES = {
         displayName: 'Standard',
         description: 'Perfect for weekend getaways and city explorations',
         price: 900, // $9.00 in cents
-        stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_TRIP_PRICE_ID || '',
 
         // Limits
         maxDays: 7,
@@ -46,7 +45,6 @@ export const TRIP_TYPES = {
         displayName: 'Extended',
         description: 'For multi-city adventures and long vacations',
         price: 3000, // $30.00 in cents
-        stripePriceId: process.env.NEXT_PUBLIC_STRIPE_VIP_TRIP_PRICE_ID || '',
 
         // Limits (unlimited)
         maxDays: null,
@@ -83,7 +81,6 @@ export const CREDIT_BUNDLES = [
         tripType: 'premium',
         tripCount: 3,
         price: 2400, // $24 (save $3 = 11%)
-        stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_3_PRICE_ID || '',
         savings: 11,
         badge: 'Popular',
         popular: true,
@@ -95,7 +92,6 @@ export const CREDIT_BUNDLES = [
         tripType: 'premium',
         tripCount: 5,
         price: 3500, // $35 (save $10 = 22%)
-        stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_5_PRICE_ID || '',
         savings: 22,
         badge: 'Best Value',
         popular: false,
@@ -109,7 +105,6 @@ export const CREDIT_BUNDLES = [
         tripType: 'vip',
         tripCount: 2,
         price: 5000, // $50 (save $10 = 17%)
-        stripePriceId: process.env.NEXT_PUBLIC_STRIPE_VIP_2_PRICE_ID || '',
         savings: 17,
         badge: null,
         popular: false,
@@ -121,7 +116,6 @@ export const CREDIT_BUNDLES = [
         tripType: 'vip',
         tripCount: 3,
         price: 7000, // $70 (save $20 = 22%)
-        stripePriceId: process.env.NEXT_PUBLIC_STRIPE_VIP_3_PRICE_ID || '',
         savings: 22,
         badge: 'Ultimate',
         popular: false,
@@ -219,7 +213,6 @@ export const getAllPackages = () => {
         tripType: trip.id,
         tripCount: 1,
         price: trip.price,
-        stripePriceId: trip.stripePriceId,
         savings: 0,
         badge: trip.badge,
         popular: trip.popular,

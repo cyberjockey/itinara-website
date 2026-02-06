@@ -1,55 +1,63 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { MoreHorizontal, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { Trash2, MoreVertical, Loader2 } from "lucide-react";
 import { deleteTrip } from "@/app/dashboard/trips/actions";
-import { useRouter } from "next/navigation";
 
 interface TripCardActionsProps {
     tripId: string;
-    title: string;
+    tripName: string;
 }
 
-export function TripCardActions({ tripId, title }: TripCardActionsProps) {
+export function TripCardActions({ tripId, tripName }: TripCardActionsProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [isPending, startTransition] = useTransition();
-    const router = useRouter();
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [confirmText, setConfirmText] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = async () => {
-        startTransition(async () => {
-            try {
-                await deleteTrip(tripId);
-                setShowDeleteConfirm(false);
-                // Optional: Toast success
-            } catch (error) {
-                console.error(error);
-                alert("Failed to delete trip");
-            }
-        });
+        if (confirmText !== "DELETE") return;
+        setIsDeleting(true);
+        try {
+            await deleteTrip(tripId);
+            // Redirect happens in server action
+        } catch (error) {
+            console.error("Delete error:", error);
+            setIsDeleting(false);
+            setShowConfirm(false);
+            setConfirmText("");
+        }
     };
 
     return (
-        <div className="relative" onClick={(e) => e.stopPropagation()}>
-            {/* Trigger Button */}
+        <div className="relative">
+            {/* Menu Toggle */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="text-stone-gray hover:text-terracotta shrink-0 transition-colors p-1 rounded-full hover:bg-stone-50"
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsOpen(!isOpen);
+                }}
+                className="p-2 hover:bg-stone-100 rounded-full transition-colors"
             >
-                <MoreHorizontal className="w-5 h-5" />
+                <MoreVertical className="w-4 h-4 text-stone-gray" />
             </button>
 
             {/* Dropdown Menu */}
-            {isOpen && (
+            {isOpen && !showConfirm && (
                 <>
-                    <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-                    <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-stone-gray/10 z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                    <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setIsOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-stone-gray/10 py-1 z-20 min-w-[140px]">
                         <button
-                            onClick={() => {
-                                setIsOpen(false);
-                                setShowDeleteConfirm(true);
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowConfirm(true);
                             }}
-                            className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors font-medium"
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                         >
                             <Trash2 className="w-4 h-4" />
                             Delete Trip
@@ -58,36 +66,68 @@ export function TripCardActions({ tripId, title }: TripCardActionsProps) {
                 </>
             )}
 
-            {/* Custom Confirmation Dialog */}
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in" onClick={(e) => e.stopPropagation()}>
-                    <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-stone-gray/10" onClick={(e) => e.stopPropagation()}>
-                        <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4 mx-auto">
-                            <AlertCircle className="w-6 h-6 text-red-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-deep-teak text-center mb-2">Delete Trip?</h3>
-                        <p className="text-stone-gray text-center text-sm mb-6">
-                            Are you sure you want to delete <span className="font-bold text-deep-teak">"{title}"</span>? This action cannot be undone.
-                        </p>
+            {/* Confirmation Dialog */}
+            {showConfirm && (
+                <>
+                    <div
+                        className="fixed inset-0 bg-black/30 z-40"
+                        onClick={() => {
+                            setShowConfirm(false);
+                            setIsOpen(false);
+                            setConfirmText("");
+                        }}
+                    />
+                    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl p-6 z-50 w-[90%] max-w-sm">
+                        <div className="text-center">
+                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Trash2 className="w-6 h-6 text-red-600" />
+                            </div>
+                            <h3 className="font-bold text-lg text-deep-teak mb-2">Delete Trip?</h3>
+                            <div className="w-full text-left mb-6">
+                                <label className="block text-[10px] font-bold text-stone-gray uppercase mb-1.5 opacity-60">Type "DELETE" to confirm</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-stone-800 font-bold placeholder:font-normal transition-all text-sm"
+                                    placeholder="DELETE"
+                                    value={confirmText}
+                                    onChange={(e) => setConfirmText(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
 
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setShowDeleteConfirm(false)}
-                                disabled={isPending}
-                                className="flex-1 py-2.5 text-stone-gray font-bold text-sm bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                disabled={isPending}
-                                className="flex-1 py-2.5 text-white font-bold text-sm bg-red-600 hover:bg-red-700 rounded-xl transition-colors flex items-center justify-center gap-2"
-                            >
-                                {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
-                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setShowConfirm(false);
+                                        setIsOpen(false);
+                                        setConfirmText("");
+                                    }}
+                                    className="flex-1 px-4 py-2 border border-stone-gray/20 rounded-xl text-stone-gray hover:bg-stone-50 transition-colors font-medium text-sm"
+                                    disabled={isDeleting}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    disabled={isDeleting || confirmText !== 'DELETE'}
+                                    className={`flex-1 px-4 py-2 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-sm ${confirmText === 'DELETE'
+                                        ? 'bg-red-600 text-white hover:bg-red-700 shadow-sm'
+                                        : 'bg-stone-100 text-stone-300 cursor-not-allowed border border-stone-gray/10'
+                                        }`}
+                                >
+                                    {isDeleting ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            Deleting...
+                                        </>
+                                    ) : (
+                                        "Delete"
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </>
             )}
         </div>
     );

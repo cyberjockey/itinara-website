@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from 'next/link';
+import { signOut } from "@/app/auth/actions";
+import { LogOut } from "lucide-react";
 
 import { MobileNav } from "@/components/layout/MobileNav";
 
@@ -32,8 +34,8 @@ export default async function DashboardLayout({
             <MobileNav user={user} role={profile?.role || 'Guest'} />
 
             {/* Sidebar (Desktop) */}
-            <aside className="w-64 bg-white border-r fixed h-full overflow-y-auto hidden md:block z-20">
-                <div className="p-6 border-b">
+            <aside className="w-64 bg-white border-r fixed h-full hidden md:flex md:flex-col z-20 overflow-y-auto">
+                <div className="p-6 border-b flex-shrink-0">
                     <Link href="/dashboard" className="flex items-center gap-3">
                         <img src="/logo.svg" alt="Itinara Logo" className="w-8 h-8" />
                         <div>
@@ -42,7 +44,7 @@ export default async function DashboardLayout({
                         </div>
                     </Link>
                 </div>
-                <nav className="p-4 space-y-1">
+                <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
                     <Link href="/dashboard" className="block px-4 py-2 text-sm font-medium text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
                         Overview
                     </Link>
@@ -73,11 +75,17 @@ export default async function DashboardLayout({
                             <Link href="/dashboard/landing-pages" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
                                 Landing Pages
                             </Link>
+                            <Link href="/dashboard/transactions" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
+                                Transactions
+                            </Link>
                         </>
                     )}
                     {(isGuide || isAdmin) && (
                         <>
                             <div className="pt-6 pb-2 px-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Local Guide</div>
+                            <Link href="/dashboard/guide-inbox" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
+                                💬 Guide Inbox
+                            </Link>
                             <Link href="/dashboard/templates" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
                                 My Templates
                             </Link>
@@ -91,7 +99,7 @@ export default async function DashboardLayout({
                     )}
                 </nav>
 
-                <div className="absolute bottom-0 w-full p-4 border-t bg-white">
+                <div className="p-4 border-t bg-white flex-shrink-0">
                     <div className="flex items-center gap-3 px-2">
                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
                             {user.email?.[0].toUpperCase()}
@@ -99,6 +107,15 @@ export default async function DashboardLayout({
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
                         </div>
+                        <form action={signOut}>
+                            <button
+                                type="submit"
+                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-gray-100 rounded-full transition-colors"
+                                title="Sign Out"
+                            >
+                                <LogOut className="w-4 h-4" />
+                            </button>
+                        </form>
                     </div>
                 </div>
             </aside>

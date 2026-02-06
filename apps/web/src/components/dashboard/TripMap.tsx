@@ -33,7 +33,8 @@ interface Activity {
     coordinates?: { lat: number; lng: number } | null;
     place?: {
         coordinates?: { lat: number; lng: number } | null;
-    };
+        [key: string]: any;
+    } | null;
 }
 
 interface TripMapProps {
@@ -41,7 +42,6 @@ interface TripMapProps {
 }
 
 // Helper to "geocode" locations for demo purposes if we don't have lat/long yet
-// In a real app, 'activity' should save lat/long from the database
 const MOCK_COORDS: Record<string, [number, number]> = {
     "Bali": [-8.409518, 115.188919],
     "Ubud": [-8.5069, 115.2625],
@@ -56,19 +56,15 @@ const MOCK_COORDS: Record<string, [number, number]> = {
 };
 
 function getCoordinates(location: string): [number, number] {
-    // 1. Try exact match
     if (MOCK_COORDS[location]) return MOCK_COORDS[location];
 
-    // 2. Try partial match
     for (const key of Object.keys(MOCK_COORDS)) {
         if (location.includes(key)) {
-            // Add random jitter for multiple items in same city so they don't overlap perfectly
             const jitter = (Math.random() - 0.5) * 0.01;
             return [MOCK_COORDS[key][0] + jitter, MOCK_COORDS[key][1] + jitter];
         }
     }
 
-    // Default to Bali center
     return [-8.409518, 115.188919];
 }
 
@@ -83,24 +79,20 @@ export function TripMap({ activities }: TripMapProps) {
         return <div className="w-full h-full bg-stone-gray/5 rounded-2xl animate-pulse" />;
     }
 
-    const startPos: [number, number] = getCoordinates("Bali"); // Default fallback
+    const startPos: [number, number] = getCoordinates("Bali");
 
-    // Sub-component to handle map bounds
     function MapBounds() {
         const map = useMap();
 
         useEffect(() => {
             if (activities.length > 0) {
                 const bounds = L.latLngBounds(activities.map(a => {
-                    // 1. Try activity.place.coordinates (Joined from DB)
-                    if (a.place?.coordinates && typeof a.place.coordinates === 'object') {
+                    if (a.place?.coordinates && typeof a.place.coordinates === 'object' && 'lat' in a.place.coordinates && 'lng' in a.place.coordinates) {
                         return [a.place.coordinates.lat, a.place.coordinates.lng];
                     }
-                    // 2. Try activity.coordinates (Old/Legacy if any)
                     if (a.coordinates && typeof a.coordinates === 'object' && 'lat' in a.coordinates && 'lng' in a.coordinates) {
                         return [a.coordinates.lat, a.coordinates.lng];
                     }
-                    // 3. Last fallback: Mock City Center
                     return getCoordinates(a.location || "Bali");
                 }));
 
@@ -130,7 +122,7 @@ export function TripMap({ activities }: TripMapProps) {
                 {activities.map((activity) => {
                     let position: [number, number];
 
-                    if (activity.place?.coordinates && typeof activity.place.coordinates === 'object') {
+                    if (activity.place?.coordinates && typeof activity.place.coordinates === 'object' && 'lat' in activity.place.coordinates && 'lng' in activity.place.coordinates) {
                         position = [activity.place.coordinates.lat, activity.place.coordinates.lng];
                     } else if (activity.coordinates && typeof activity.coordinates === 'object' && 'lat' in activity.coordinates && 'lng' in activity.coordinates) {
                         position = [activity.coordinates.lat, activity.coordinates.lng];

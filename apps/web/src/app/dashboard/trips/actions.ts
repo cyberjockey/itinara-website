@@ -59,7 +59,7 @@ export async function toggleLike(tripId: string) {
     revalidatePath('/dashboard/community');
 }
 
-export async function addComment(tripId: string, content: string, parentId?: string) {
+export async function addComment(tripId: string, content: string, parentId?: string, attachmentUrl?: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -68,7 +68,8 @@ export async function addComment(tripId: string, content: string, parentId?: str
     const payload: any = {
         user_id: user.id,
         trip_id: tripId,
-        content: content
+        content: content,
+        attachment_url: attachmentUrl
     };
     if (parentId) {
         payload.parent_id = parentId;
@@ -98,7 +99,7 @@ export async function editComment(commentId: string, newContent: string, tripId:
             updated_at: new Date().toISOString()
         })
         .eq('id', commentId)
-        .eq('user_id', user.id); // Security: only update own
+        .eq('user_id', user.id);
 
     if (error) throw new Error("Failed to edit comment");
     revalidatePath(`/dashboard/trips/${tripId}`);
@@ -110,7 +111,6 @@ export async function deleteComment(commentId: string, tripId: string) {
 
     if (!user) throw new Error("Unauthorized");
 
-    // RLS ensures they can only delete their own
     await supabase
         .from('trip_comments')
         .delete()
@@ -148,7 +148,6 @@ export async function fetchComments(
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Query builder
     let query = supabase
         .from('trip_comments')
         .select(`
@@ -157,7 +156,7 @@ export async function fetchComments(
             comment_likes(user_id)
         `)
         .eq('trip_id', tripId)
-        .is('parent_id', null) // Only fetch root comments for pagination
+        .is('parent_id', null)
         .range(offset, offset + limit - 1);
 
     if (sortBy === 'recent') {
@@ -222,10 +221,6 @@ export async function updateActivityPosition(
 
     if (!user) throw new Error("Unauthorized");
 
-    // 1. Verify ownership (optional but good practice)
-    // We trust RLS for now.
-
-    // 2. Update the specific activity
     const { error } = await supabase
         .from('activities')
         .update({
@@ -233,14 +228,13 @@ export async function updateActivityPosition(
             order_index: newIndex
         })
         .eq('id', activityId)
-        .eq('trip_id', tripId); // Extra safety to ensure it belongs to this trip
+        .eq('trip_id', tripId);
 
     if (error) {
         console.error("Error updating activity position:", error);
         throw new Error("Failed to update activity position");
     }
 
-    // 3. Revalidate
     revalidatePath(`/dashboard/trips/${tripId}`);
 }
 
@@ -248,19 +242,86 @@ export async function deleteTrip(tripId: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) throw new Error("Unauthorized");
+    if (!user) {
+        return { message: "Unauthorized", success: false };
+    }
 
+    // 1. Verify Ownership
+    const { data: trip } = await supabase
+        .from("trips")
+        .select("user_id")
+        .eq("id", tripId)
+        .single();
+
+    if (!trip) {
+        return { message: "Trip not found", success: false };
+    }
+
+    if (trip.user_id !== user.id) {
+        return { message: "You are not authorized to delete this trip.", success: false };
+    }
+
+    // 2. Delete Trip (Cascading delete handles activities)
     const { error } = await supabase
-        .from('trips')
+        .from("trips")
         .delete()
-        .eq('id', tripId)
-        .eq('user_id', user.id);
+        .eq("id", tripId);
 
     if (error) {
         console.error("Error deleting trip:", error);
-        throw new Error("Failed to delete trip");
+        return { message: "Failed to delete trip.", success: false };
     }
 
-    revalidatePath('/dashboard');
-    redirect('/dashboard');
+    // 3. Revalidate
+    revalidatePath("/dashboard");
+    return { message: "Trip deleted successfully.", success: true };
+}
+
+/**
+ * Commit/activate a trip - locks the itinerary and enables travel-mode features
+ * Changes status from 'upcoming' to 'active'
+ */
+export async function commitTrip(tripId: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { message: "Unauthorized", success: false };
+    }
+
+    // 1. Verify Ownership
+    const { data: trip } = await supabase
+        .from("trips")
+        .select("user_id, status")
+        .eq("id", tripId)
+        .single();
+
+    if (!trip) {
+        return { message: "Trip not found", success: false };
+    }
+
+    if (trip.user_id !== user.id) {
+        return { message: "You are not authorized to commit this trip.", success: false };
+    }
+
+    // Already committed
+    if (trip.status === 'active' || trip.status === 'completed') {
+        return { message: "Trip is already committed.", success: true };
+    }
+
+    // 2. Update status to 'active'
+    const { error } = await supabase
+        .from("trips")
+        .update({ status: 'active' })
+        .eq("id", tripId);
+
+    if (error) {
+        console.error("Error committing trip:", error);
+        return { message: "Failed to commit trip.", success: false };
+    }
+
+    // 3. Revalidate
+    revalidatePath(`/dashboard/trips/${tripId}`);
+    revalidatePath("/dashboard");
+    return { message: "Trip committed successfully!", success: true };
 }

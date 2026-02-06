@@ -11,12 +11,6 @@ export async function getTemplates() {
 
     if (!user) return [];
 
-    // If admin, show all? For now, let's just show own for guides, and all for admin in a different view if needed.
-    // The policy says guides can select rows where guide_id = auth.uid()
-    // Admins can select all.
-    // Let's filter by current user if they are a guide, or maybe just rely on RLS?
-    // RLS: USING (guide_id = auth.uid() OR (SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
     const { data, error } = await supabase
         .from('trip_templates')
         .select(`
@@ -110,9 +104,9 @@ export async function createTemplate(prevState: unknown, formData: FormData) {
             duration_days,
             difficulty_level,
             trip_type,
-            estimated_budget, // Insert budget
+            estimated_budget,
             trip_preference,
-            itinerary, // Initial empty itinerary
+            itinerary,
             status: 'draft'
         })
         .select()
@@ -120,8 +114,6 @@ export async function createTemplate(prevState: unknown, formData: FormData) {
 
     if (error) {
         console.error("Error creating template:", error);
-        // If insert failed but we deducted quota, we should ideally rollback (refund) the quota.
-        // For MVP, we'll just log it. In production, use a transaction or logic to refund.
         if (trip_type === 'vip') {
             await supabase.rpc('add_trip_credits_by_type', {
                 p_user_id: user.id,
@@ -140,12 +132,8 @@ export async function updateTemplate(id: string, formData: FormData) {
     // RBAC: Guides and admins can update templates
     await requirePermission(Permission.MANAGE_TEMPLATES);
 
-    // This action handles basic info updates. 
-    // Complex JSON updates for the itinerary might need a separate API endpoint or specific handling.
-
     const supabase = await createClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any = {};
     if (formData.has('title')) updates.title = formData.get('title') as string;
     if (formData.has('description')) updates.description = formData.get('description') as string;
@@ -155,12 +143,11 @@ export async function updateTemplate(id: string, formData: FormData) {
     if (formData.has('estimated_budget')) updates.estimated_budget = formData.get('estimated_budget') as string;
     if (formData.has('trip_preference')) updates.trip_preference = formData.get('trip_preference') as string;
 
-    // Handle Arrays (sent as JSON strings from frontend)
     if (formData.has('gallery_images')) {
         try {
             updates.gallery_images = JSON.parse(formData.get('gallery_images') as string);
         } catch (e) {
-            console.error("Invalid gallery_images JSON");
+            console.error("Invalid gallery_images JSON", e);
             updates.gallery_images = [];
         }
     }
@@ -169,13 +156,11 @@ export async function updateTemplate(id: string, formData: FormData) {
         try {
             updates.guide_materials = JSON.parse(formData.get('guide_materials') as string);
         } catch (e) {
-            console.error("Invalid guide_materials JSON");
+            console.error("Invalid guide_materials JSON", e);
             updates.guide_materials = [];
         }
     }
 
-    // Add logic to save JSON itinerary if passed strictly (e.g. from the builder)
-    // We might parse a JSON string if sent via form
     if (formData.has('itinerary_json')) {
         try {
             updates.itinerary = JSON.parse(formData.get('itinerary_json') as string);
@@ -223,8 +208,6 @@ export async function publishTemplate(id: string) {
     await requirePermission(Permission.MANAGE_TEMPLATES);
 
     const supabase = await createClient();
-
-    // Optional: Add validation here (e.g. check if itinerary has content)
 
     const { error } = await supabase
         .from('trip_templates')

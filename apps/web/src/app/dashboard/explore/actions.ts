@@ -128,6 +128,7 @@ export async function useTemplate(templateId: string, startDateStr: string) {
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
             status: 'planning',
+            source_template_id: templateId,
             guide_material_url: template.guide_material_url || null,
             guide_materials: template.guide_materials || []
         })

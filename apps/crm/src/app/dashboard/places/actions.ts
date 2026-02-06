@@ -17,11 +17,11 @@ export type Place = {
     coordinates?: { lat: number; lng: number };
     phone?: string;
     website?: string;
-    social_media?: any;
+    social_media?: unknown;
     price_level?: string;
-    amenities?: any;
+    amenities?: unknown;
     what_to_expect?: string;
-    highlight_and_tips?: any; // JSONB
+    highlight_and_tips?: unknown; // JSONB
     created_at?: string;
     updated_at?: string;
 }
@@ -50,13 +50,11 @@ export async function generateCoordinates(placeName: string, location: string) {
 }
 
 export async function generatePlaceDescription(placeName: string, location: string, type: string) {
-    console.log("generatePlaceDescription called for:", placeName);
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
         console.error("GROQ_API_KEY is missing in environment variables.");
         return "Please configure GROQ_API_KEY to use AI generation.";
     }
-    console.log("GROQ_API_KEY found (length):", apiKey.length);
 
     try {
         const groq = new Groq({ apiKey });
@@ -699,7 +697,7 @@ export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUplo
         }
 
         // Parse highlight_and_tips (JSON Array)
-        let highlightAndTips: any = null;
+        let highlightAndTips: unknown = null;
         const highlightStr = getValue(row, 'highlight_and_tips', 'highlight and tips');
         if (highlightStr) {
             try {
@@ -715,7 +713,7 @@ export async function bulkUploadPlaces(rows: ParsedPlaceRow[]): Promise<BulkUplo
         }
 
         // Parse amenities (JSON Array)
-        let amenities: any = null;
+        let amenities: unknown = null;
         const amenitiesStr = getValue(row, 'amenities');
         if (amenitiesStr) {
             try {

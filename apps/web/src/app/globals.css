@@ -3,7 +3,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
 }
 
 @theme inline {
@@ -27,8 +27,11 @@
   --color-light-sand: #F5EDE4;
 }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> dev
 html {
   scroll-behavior: smooth;
 }

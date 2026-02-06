@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTemplate } from "@/app/dashboard/explore/actions";
+import { purchaseTemplate } from "@/app/actions/marketplace";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -26,10 +26,13 @@ export default function UseTemplateButton({ templateId, durationDays, vipQuota }
 
         startTransition(async () => {
             try {
-                await useTemplate(templateId, startDate);
-            } catch (error) {
+                const res = await purchaseTemplate(templateId, startDate);
+                if (res.success) {
+                    router.push(`/dashboard/trips/${res.tripId}`);
+                }
+            } catch (error: any) {
                 console.error(error);
-                alert("Failed to book trip. Please try again.");
+                alert(error.message || "Failed to purchase trip.");
             }
         });
     };
@@ -110,7 +113,7 @@ export default function UseTemplateButton({ templateId, durationDays, vipQuota }
                         disabled={isPending}
                         className="flex-[2] bg-terracotta hover:bg-[#B54B35] text-white font-bold py-3 rounded-xl shadow-lg shadow-terracotta/20 transition-all flex items-center justify-center gap-2"
                     >
-                        {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : "Confirm Booking"}
+                        {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : "Confirm Purchase (1 VIP Credit)"}
                     </button>
                 </div>
             </div>

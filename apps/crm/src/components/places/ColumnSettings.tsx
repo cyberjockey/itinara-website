@@ -161,7 +161,11 @@ export function useColumnSettings() {
     const [columns, setColumns] = useState<ColumnConfig[]>(DEFAULT_COLUMNS);
 
     useEffect(() => {
-        setColumns(loadColumnsFromStorage());
+        // Hydrate from storage (delayed to avoid sync issues)
+        const t = setTimeout(() => {
+            setColumns(loadColumnsFromStorage());
+        }, 0);
+        return () => clearTimeout(t);
     }, []);
 
     const updateColumns = (newColumns: ColumnConfig[]) => {

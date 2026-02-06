@@ -1,40 +1,51 @@
+"use server";
 
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-    const searchParams = request.nextUrl.searchParams;
-    const fileId = searchParams.get('file_id');
+    const { searchParams } = new URL(request.url);
+    const fileId = searchParams.get("file_id");
 
     if (!fileId) {
         return NextResponse.json({ error: "Missing file_id" }, { status: 400 });
     }
 
-    const token = process.env.TELEGRAM_FILES_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
-
-    if (!token) {
-        return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+    const botToken = process.env.TELEGRAM_FILES_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
+    if (!botToken) {
+        return NextResponse.json({ error: "Bot token not configured" }, { status: 500 });
     }
 
     try {
-        // 1. Get file path from Telegram
-        const response = await fetch(`https://api.telegram.org/bot${token}/getFile?file_id=${fileId}`);
-        const data = await response.json();
+        // Get file path from Telegram
+        const fileInfoRes = await fetch(
+            `https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`
+        );
+        const fileInfo = await fileInfoRes.json();
 
-        if (!data.ok || !data.result?.file_path) {
-            console.error("Telegram getFile error:", data);
-            return NextResponse.json({ error: "File not found or expired" }, { status: 404 });
+        if (!fileInfo.ok || !fileInfo.result?.file_path) {
+            return NextResponse.json({ error: "File not found" }, { status: 404 });
         }
 
-        const filePath = data.result.file_path;
+        // Proxy file content securely
+        const fileUrl = `https://api.telegram.org/file/bot${botToken}/${fileInfo.result.file_path}`;
+        const fileRes = await fetch(fileUrl);
 
-        // 2. Construct download URL
-        const downloadUrl = `https://api.telegram.org/file/bot${token}/${filePath}`;
+        if (!fileRes.ok) {
+            return NextResponse.json({ error: "Failed to download file from Telegram" }, { status: 502 });
+        }
 
-        // 3. Redirect to the actual file
-        return NextResponse.redirect(downloadUrl);
+        // Stream the response
+        const contentType = fileRes.headers.get("content-type") || "application/octet-stream";
+        const headers = new Headers();
+        headers.set("Content-Type", contentType);
+        headers.set("Cache-Control", "public, max-age=3600");
 
+        return new NextResponse(fileRes.body, {
+            status: 200,
+            headers,
+        });
     } catch (error) {
-        console.error("Proxy error:", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        console.error("Error fetching file:", error);
+        return NextResponse.json({ error: "Failed to fetch file" }, { status: 500 });
     }
 }

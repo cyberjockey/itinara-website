@@ -5,7 +5,7 @@ import { Upload, X, FileSpreadsheet, AlertCircle, CheckCircle2, Loader2, ArrowLe
 import { bulkUploadPlaces, type ParsedPlaceRow, type BulkUploadResult } from '@/app/dashboard/places/actions';
 import { ColumnMapper, type ColumnMapping } from './ColumnMapper';
 
-type PreviewRow = Record<string, string> & { _rowNum: number };
+type PreviewRow = Record<string, string | number | unknown>;
 
 interface BulkUploadProps {
     onClose: () => void;
@@ -25,7 +25,7 @@ function transformRows(rows: PreviewRow[], mapping: ColumnMapping): ParsedPlaceR
 
         for (const [csvHeader, dbColumn] of Object.entries(mapping)) {
             if (dbColumn && row[csvHeader] !== undefined) {
-                transformed[dbColumn] = row[csvHeader];
+                transformed[dbColumn] = String(row[csvHeader] ?? '');
             }
         }
 
@@ -55,8 +55,8 @@ export function BulkUpload({ onClose, onImportComplete }: BulkUploadProps) {
             complete: (results) => {
                 setCsvHeaders(results.meta.fields || []);
                 // Add _rowNum manually
-                const rowsWithNum = results.data.map((row: any, index: number) => ({
-                    ...row,
+                const rowsWithNum = results.data.map((row: unknown, index: number) => ({
+                    ...(row as Record<string, unknown>),
                     _rowNum: index + 2 // +2 because 1-indexed and header row
                 }));
                 setRawRows(rowsWithNum);
@@ -117,7 +117,7 @@ export function BulkUpload({ onClose, onImportComplete }: BulkUploadProps) {
             const mapped: Record<string, string> = { _rowNum: String(row._rowNum) };
             for (const [csvHeader, dbColumn] of Object.entries(mapping)) {
                 if (dbColumn) {
-                    mapped[dbColumn] = row[csvHeader] || '';
+                    mapped[dbColumn] = String(row[csvHeader] || '');
                 }
             }
             return mapped;

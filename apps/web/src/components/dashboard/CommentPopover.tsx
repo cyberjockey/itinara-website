@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, Heart, X, Send, Loader2, Filter } from "lucide-react";
+import { MessageCircle, Heart, X, Send, Loader2, Filter, Image as ImageIcon, Trash2 } from "lucide-react";
 import { fetchComments, addComment } from "@/app/dashboard/trips/actions";
 import { CommentItem } from "@/components/dashboard/CommentItem";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,12 @@ export function CommentPopover({ tripId, currentUserId }: CommentPopoverProps) {
     const [hasMore, setHasMore] = useState(true);
     const [newComment, setNewComment] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // File upload state
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const LIMIT = 3;
 
@@ -63,20 +69,61 @@ export function CommentPopover({ tripId, currentUserId }: CommentPopoverProps) {
         }
     }, [sortBy]);
 
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        }
+    };
+
+    const clearFile = () => {
+        setSelectedFile(null);
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newComment.trim()) return;
+        if (!newComment.trim() && !selectedFile) return;
 
         setIsSubmitting(true);
         try {
-            await addComment(tripId, newComment);
+            let attachmentUrl = undefined;
+
+            // 1. Upload file if exists
+            if (selectedFile) {
+                setIsUploading(true);
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                const uploadRes = await fetch('/api/upload/telegram', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadRes.ok) throw new Error("Upload failed");
+                const data = await uploadRes.json();
+                attachmentUrl = data.url;
+                setIsUploading(false);
+            }
+
+            // 2. Post comment with attachment URL
+            await addComment(tripId, newComment, undefined, attachmentUrl);
+
             setNewComment("");
+            clearFile();
+
             // Refresh comments to show new one (ideally optimism, but this is safer)
             loadComments(true);
         } catch (e) {
+            console.error(e);
             alert("Failed to post");
         } finally {
             setIsSubmitting(false);
+            setIsUploading(false);
         }
     };
 
@@ -149,21 +196,52 @@ export function CommentPopover({ tripId, currentUserId }: CommentPopoverProps) {
 
                     {/* Footer Input */}
                     <div className="p-4 border-t border-stone-gray/10 bg-white rounded-b-2xl">
-                        <form onSubmit={handleSubmit} className="relative">
+                        {/* Image Preview */}
+                        {previewUrl && (
+                            <div className="relative mb-3 inline-block">
+                                <img src={previewUrl} alt="Preview" className="h-20 w-auto rounded-lg border border-stone-gray/20 object-cover" />
+                                <button
+                                    onClick={clearFile}
+                                    className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md border border-stone-gray/10 text-red-500 hover:bg-red-50"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
                             <input
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                placeholder="Write a comment..."
-                                className="w-full pl-4 pr-12 py-3 rounded-xl border border-stone-gray/20 text-sm focus:border-deep-teak outline-none bg-stone-gray/5 text-black"
-                                disabled={isSubmitting}
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileSelect}
+                                accept="image/*"
+                                className="hidden"
                             />
                             <button
-                                type="submit"
-                                disabled={!newComment.trim() || isSubmitting}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-deep-teak text-white rounded-lg hover:bg-terracotta disabled:opacity-50 transition-colors"
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="p-2 text-stone-gray hover:text-deep-teak hover:bg-stone-gray/10 rounded-full transition-colors"
+                                title="Attach Image"
                             >
-                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                <ImageIcon className="w-5 h-5" />
                             </button>
+
+                            <div className="relative flex-1">
+                                <input
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    placeholder="Write a comment..."
+                                    className="w-full pl-4 pr-12 py-3 rounded-xl border border-stone-gray/20 text-sm focus:border-deep-teak outline-none bg-stone-gray/5 text-black"
+                                    disabled={isSubmitting}
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={(!newComment.trim() && !selectedFile) || isSubmitting}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-deep-teak text-white rounded-lg hover:bg-terracotta disabled:opacity-50 transition-colors"
+                                >
+                                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, ChevronsUpDown, Plus, MapPin, Loader2 } from "lucide-react";
+import { Check, Plus, MapPin, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createPlace, getPlaces, type Place } from "@/app/dashboard/places/actions";
 import { useActionState } from "react";
@@ -13,32 +13,40 @@ interface PlacePickerProps {
     onCancel: () => void;
 }
 
-export function PlacePicker({ destinationId, value, onChange, onCancel }: PlacePickerProps) {
+export function PlacePicker({ destinationId, value, onChange }: PlacePickerProps) {
     const [places, setPlaces] = useState<Place[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [isCreating, setIsCreating] = useState(false);
 
-    // Initial load
+    // Fetch places with server-side search - debounced
     useEffect(() => {
-        // Fetch up to 1000 places to ensure we get them all for client-side filtering
-        getPlaces(destinationId, 1, 1000).then(data => {
-            setPlaces(data.data);
+        if (!destinationId) {
+            setPlaces([]);
             setLoading(false);
-        });
-    }, [destinationId]);
+            return;
+        }
 
-    const filteredPlaces = places.filter(place =>
-        place.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        const tLoading = setTimeout(() => setLoading(true), 0);
+        const timeoutId = setTimeout(() => {
+            getPlaces(destinationId, 1, 100, searchTerm || undefined).then(data => {
+                setPlaces(data.data);
+                setLoading(false);
+            });
+        }, 300); // Debounce 300ms
+
+        return () => {
+            clearTimeout(timeoutId);
+            clearTimeout(tLoading);
+        };
+    }, [destinationId, searchTerm]);
 
     // --- Create New Place Logic ---
     const [createState, createAction, isCreatePending] = useActionState(async (prev: unknown, formData: FormData) => {
         const result = await createPlace(prev, formData);
         if (result.place) {
-            // Optimistically update list and select it
             setPlaces([...places, result.place]);
-            onChange(result.place); // Auto-select parent
+            onChange(result.place);
             setIsCreating(false);
         }
         return result;
@@ -60,7 +68,7 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
                             placeholder="Place Name"
                             required
                             className="w-full text-sm px-3 py-2 border rounded-md"
-                            defaultValue={searchTerm} // Type something -> click create -> autofill name
+                            defaultValue={searchTerm}
                         />
                     </div>
 
@@ -103,7 +111,6 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
 
     return (
         <div className="relative">
-            {/* Search / Filter Input */}
             <div className="relative mb-2">
                 <input
                     type="text"
@@ -115,12 +122,15 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
                 />
             </div>
 
-            {/* List */}
             <div className="max-h-60 overflow-y-auto border border-gray-100 rounded-lg bg-white shadow-sm divide-y divide-gray-50">
-                {loading ? (
-                    <div className="p-4 text-center text-gray-400 text-xs">Loading activities...</div>
-                ) : filteredPlaces.length > 0 ? (
-                    filteredPlaces.map((place) => (
+                {!destinationId ? (
+                    <div className="p-4 text-center text-amber-600 text-xs bg-amber-50">
+                        ⚠️ Please select a destination for this template first
+                    </div>
+                ) : loading ? (
+                    <div className="p-4 text-center text-gray-400 text-xs">Loading activities for this destination...</div>
+                ) : places.length > 0 ? (
+                    places.map((place) => (
                         <button
                             key={place.id}
                             onClick={() => onChange(place)}
@@ -161,7 +171,6 @@ export function PlacePicker({ destinationId, value, onChange, onCancel }: PlaceP
                 )}
             </div>
 
-            {/* Create Button */}
             <button
                 onClick={() => setIsCreating(true)}
                 className="w-full mt-2 py-2 flex items-center justify-center gap-2 text-sm text-blue-600 font-medium hover:bg-blue-50 rounded-lg border border-dashed border-blue-200 transition-colors"

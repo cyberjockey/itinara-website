@@ -36,6 +36,9 @@ export async function middleware(request: NextRequest) {
                     })
                 },
             },
+            cookieOptions: {
+                name: 'itinara-crm-auth',
+            },
         }
     )
 

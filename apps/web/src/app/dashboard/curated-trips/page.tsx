@@ -66,6 +66,11 @@ export default async function CuratedTripsPage(props: { searchParams: Promise<{ 
                                                 {template.duration_days} Days
                                             </div>
                                         </div>
+                                        <div className="absolute top-4 right-4 animate-in fade-in slide-in-from-top-2">
+                                            <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+                                                <span>👑</span> 1 VIP Credit
+                                            </div>
+                                        </div>
                                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                     </div>
 
@@ -117,7 +122,8 @@ export default async function CuratedTripsPage(props: { searchParams: Promise<{ 
                     <p className="text-lg text-stone-gray mb-2">No trips found for <span className="font-bold text-deep-teak">"{preference}"</span>.</p>
                     <p className="text-stone-gray/60">Try selecting a different category.</p>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }

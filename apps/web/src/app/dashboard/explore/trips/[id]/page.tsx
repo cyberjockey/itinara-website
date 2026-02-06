@@ -165,8 +165,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                 {/* Sidebar */}
                 <div className="space-y-8">
                     {/* Booking Card */}
-
-                    <div className="bg-white p-6 rounded-2xl shadow-lg border border-stone-gray/10 sticky top-8">
+                    <div className="bg-white p-6 rounded-2xl shadow-lg border border-stone-gray/10">
                         <div className="mb-6">
                             <span className="text-sm text-stone-gray font-medium">Estimated Budget</span>
                             <div className="flex items-baseline gap-1">
@@ -208,15 +207,13 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                             </a>
                         )}
 
-
-
                         <UseTemplateButton
                             templateId={template.id}
                             durationDays={template.duration_days}
                             vipQuota={vipCredits}
                         />
 
-                        <p className="text-center text-xs text-stone-gray/60 mb-6">
+                        <p className="text-center text-xs text-stone-gray/60 mb-6 font-medium bg-stone-50 py-2 rounded-lg mt-2">
                             Secure your dates with a local expert.
                         </p>
 
@@ -245,6 +242,5 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                 </div>
             </div>
         </div>
-
     );
 }

@@ -30,17 +30,7 @@ export default function LoginPage() {
                     )}
 
                     <div className="rounded-md shadow-sm -space-y-px">
-                        <div>
-                            <label htmlFor="beta-code" className="sr-only">Beta Access Code</label>
-                            <input
-                                id="beta-code"
-                                name="betaCode"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Beta Access Code"
-                            />
-                        </div>
+
                         <div>
                             <label htmlFor="email-address" className="sr-only">Email address</label>
                             <input
@@ -49,7 +39,7 @@ export default function LoginPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                                 placeholder="Email address"
                             />
                         </div>

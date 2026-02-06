@@ -9,6 +9,47 @@ const PAYPAL_API_URL = process.env.PAYPAL_API_URL || 'https://api-m.sandbox.payp
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || '';
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || '';
 
+interface PayPalAccessToken {
+    access_token: string;
+    token_type: string;
+    expires_in: number;
+}
+
+interface PayPalOrderResponse {
+    id: string;
+    status: string;
+    links: Array<{ href: string; rel: string; method: string }>;
+}
+
+interface PayPalCaptureResponse {
+    id: string;
+    status: string;
+    purchase_units: Array<{
+        reference_id: string;
+        payments: {
+            captures: Array<{
+                id: string;
+                status: string;
+                amount: { currency_code: string; value: string };
+                custom_id?: string;
+            }>;
+        };
+    }>;
+    payer: {
+        email_address: string;
+        payer_id: string;
+        name: { given_name: string; surname: string };
+    };
+}
+
+interface OrderMetadata {
+    userId: string;
+    userEmail: string;
+    planType: 'premium' | 'vip';
+    tripCount: number;
+    tripId?: string;
+}
+
 /**
  * Generate PayPal OAuth2 Access Token
  */
@@ -30,16 +71,8 @@ export async function getPayPalAccessToken(): Promise<string> {
         throw new Error('Failed to get PayPal access token');
     }
 
-    const data = await response.json();
+    const data: PayPalAccessToken = await response.json();
     return data.access_token;
-}
-
-interface OrderMetadata {
-    userId: string;
-    userEmail: string;
-    planType: 'premium' | 'vip';
-    tripCount: number;
-    tripId?: string;
 }
 
 /**
@@ -94,7 +127,7 @@ export async function createPayPalOrder(
         throw new Error('Failed to create PayPal order');
     }
 
-    const order = await response.json();
+    const order: PayPalOrderResponse = await response.json();
     const approvalLink = order.links?.find((link: any) => link.rel === 'approve');
 
     return {
@@ -128,15 +161,15 @@ export async function capturePayPalOrder(orderId: string): Promise<{
         return { success: false };
     }
 
-    const capture = await response.json();
+    const capture: PayPalCaptureResponse = await response.json();
     const captureDetails = capture.purchase_units?.[0]?.payments?.captures?.[0];
 
     // Parse custom metadata
     let metadata: OrderMetadata | undefined;
     try {
-        const customId = capture.purchase_units?.[0]?.payments?.captures?.[0]?.custom_id
-            || capture.purchase_units?.[0]?.custom_id;
-        if (customId) {
+        const customId = captureDetails?.custom_id || capture.purchase_units?.[0]?.reference_id;
+        // Note: The original HEAD code had a more complex check for customId
+        if (customId && customId.startsWith('{')) {
             metadata = JSON.parse(customId);
         }
     } catch (e) {
@@ -149,4 +182,24 @@ export async function capturePayPalOrder(orderId: string): Promise<{
         status: capture.status,
         metadata,
     };
+}
+
+/**
+ * Get PayPal Order Details
+ */
+export async function getPayPalOrderDetails(orderId: string): Promise<any> {
+    const accessToken = await getPayPalAccessToken();
+
+    const response = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders/${orderId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to get PayPal order details');
+    }
+
+    return response.json();
 }

@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import { Markdown } from 'tiptap-markdown';
-import { Bold, Italic, Strikethrough, Heading1, Heading2, Heading3, List, Quote, Code, Link as LinkIcon, Undo, Redo, Image as ImageIcon } from 'lucide-react';
+import { Bold, Italic, Strikethrough, Heading1, Heading2, Heading3, List, Quote, Code, Link as LinkIcon, Undo, Redo } from 'lucide-react';
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 
 interface MarkdownEditorProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -12,7 +12,7 @@ interface MarkdownEditorProps extends React.TextareaHTMLAttributes<HTMLTextAreaE
 }
 
 export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProps>(
-    ({ className, onChange, defaultValue, value, ...props }, ref) => {
+    ({ className, defaultValue, value, ...props }, ref) => {
         // Hidden textarea ref to maintain form compatibility and allow AI updates
         const hiddenTextareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -46,6 +46,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
             },
             onUpdate: ({ editor }) => {
                 // Sync editor content to hidden textarea
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const markdown = (editor.storage as any).markdown.getMarkdown();
                 if (hiddenTextareaRef.current && hiddenTextareaRef.current.value !== markdown) {
                     hiddenTextareaRef.current.value = markdown;
@@ -85,6 +86,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
 
             const handleExternalInput = () => {
                 // Only update if content is different to avoid cursor jumping loops
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const currentMarkdown = (editor.storage as any).markdown.getMarkdown();
                 if (textarea.value !== currentMarkdown) {
                     const processed = ensureMarkdownBreaks(textarea.value);
@@ -99,6 +101,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
 
         // Propagation of controlled value prop (if used)
         useEffect(() => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if (editor && value && value !== (editor.storage as any).markdown.getMarkdown()) {
                 editor.commands.setContent(ensureMarkdownBreaks(value.toString()), { emitUpdate: false });
             }
@@ -174,6 +177,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
 
 MarkdownEditor.displayName = "MarkdownEditor";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function ToolbarBtn({ onClick, icon: Icon, title, isActive }: { onClick: () => void, icon: any, title: string, isActive?: boolean }) {
     return (
         <button

@@ -134,7 +134,6 @@ export function TripDetailsView({ trip, activities }: TripDetailsViewProps) {
                         trip.guide_materials.map((url: string, index: number) => {
                             const isUrl = url.startsWith('http') || url.startsWith('https');
                             const href = isUrl ? url : `/api/files/download?file_id=${url}`;
-                            // If it's a raw ID, we don't have the filename. Use a clean placeholder.
                             const fileName = isUrl ? decodeURIComponent(url.split('/').pop()?.split('?')[0] || `Document ${index + 1}`) : `Guide Document ${index + 1}`;
 
                             return (
@@ -219,6 +218,38 @@ export function TripDetailsView({ trip, activities }: TripDetailsViewProps) {
                 </div>
             </div>
 
+            {/* Daily Details */}
+            <div className="space-y-6">
+                <h3 className="font-bold text-xl text-deep-teak">Daily Activity Details</h3>
+
+                {Object.entries(activitiesByDay).map(([dayNum, dayActivities]) => {
+                    const date = trip.start_date
+                        ? format(new Date(new Date(trip.start_date).setDate(new Date(trip.start_date).getDate() + parseInt(dayNum) - 1)), "EEEE, MMMM d")
+                        : `Day ${dayNum}`;
+
+                    return (
+                        <div key={dayNum} className="space-y-4">
+                            <div className="sticky top-0 bg-warm-white/95 backdrop-blur-sm py-3 z-10 border-b border-stone-gray/5 flex items-center gap-3">
+                                <span className="bg-deep-teak text-white text-xs font-bold px-2 py-1 rounded">DAY {dayNum}</span>
+                                <h4 className="font-bold text-stone-gray">{date}</h4>
+                            </div>
+
+                            <div className="space-y-4">
+                                {dayActivities.map((activity) => (
+                                    <DetailCard key={activity.id} activity={activity} />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+
+                {activities.length === 0 && (
+                    <div className="text-center py-12 text-stone-gray">
+                        No activities yet. Switch to Timeline view to plan your trip!
+                    </div>
+                )}
+            </div>
+
             {/* PDF Viewer Modal */}
             <PdfViewerModal
                 isOpen={!!viewingPdf}
@@ -226,41 +257,6 @@ export function TripDetailsView({ trip, activities }: TripDetailsViewProps) {
                 title={viewingPdf?.title || 'Document Preview'}
                 pdfUrl={viewingPdf?.url || ''}
             />
-            />
-
-            {/* Daily Details */}
-            <div className="space-y-6">
-                <h3 className="font-bold text-xl text-deep-teak">Daily Activity Details</h3>
-
-                {
-                    Object.entries(activitiesByDay).map(([dayNum, dayActivities]) => {
-                        const date = trip.start_date ? format(new Date(new Date(trip.start_date).setDate(new Date(trip.start_date).getDate() + parseInt(dayNum) - 1)), "EEEE, MMMM d") : `Day ${dayNum}`;
-
-                        return (
-                            <div key={dayNum} className="space-y-4">
-                                <div className="sticky top-0 bg-warm-white/95 backdrop-blur-sm py-3 z-10 border-b border-stone-gray/5 flex items-center gap-3">
-                                    <span className="bg-deep-teak text-white text-xs font-bold px-2 py-1 rounded">DAY {dayNum}</span>
-                                    <h4 className="font-bold text-stone-gray">{date}</h4>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {dayActivities.map((activity) => (
-                                        <DetailCard key={activity.id} activity={activity} />
-                                    ))}
-                                </div>
-                            </div>
-                        );
-                    })
-                }
-
-                {
-                    activities.length === 0 && (
-                        <div className="text-center py-12 text-stone-gray">
-                            No activities yet. Switch to Timeline view to plan your trip!
-                        </div>
-                    )
-                }
-            </div>
         </div>
     );
 }
