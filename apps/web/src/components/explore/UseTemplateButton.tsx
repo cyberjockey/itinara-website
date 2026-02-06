@@ -26,8 +26,17 @@ export default function UseTemplateButton({ templateId, durationDays, vipQuota }
 
         startTransition(async () => {
             try {
-                const res = await purchaseTemplate(templateId, startDate);
+                //  Retrieve referral tracking data from localStorage
+                const refCode = localStorage.getItem('template_ref_code') || undefined;
+                const sessionId = localStorage.getItem('itinara_session_id') || undefined;
+
+                const res = await purchaseTemplate(templateId, startDate, refCode, sessionId);
+
                 if (res.success) {
+                    // Clear referral tracking after successful purchase
+                    if (refCode) {
+                        localStorage.removeItem('template_ref_code');
+                    }
                     router.push(`/dashboard/trips/${res.tripId}`);
                 }
             } catch (error: any) {

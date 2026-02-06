@@ -5,16 +5,7 @@ import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import { Menu, X, Home, Map, Users, DollarSign, ShieldAlert, FileText, Layout, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet"; // We need to check if Sheet exists in CRM, if not we build a simple one or install it. 
-// Actually, to avoid spiral of missing shadcn components, I will build a custom simple mobile nav without heavy dependencies if possible, 
-// OR I check for Sheet. Given the previous error, I suspect Sheet is missing too. 
-// I will build a custom simple overlay for now to ensure robustness.
+// Custom mobile nav implementation that doesn't depend on Sheet component
 
 export function MobileNav({ user, role }: { user: User; role: string }) {
     const [isOpen, setIsOpen] = useState(false);

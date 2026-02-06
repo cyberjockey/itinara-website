@@ -89,9 +89,14 @@ export async function createCheckoutOrder(packageType: PackageType) {
 
     // Create PayPal order
     const paypalOrder = await createPayPalOrder(
-        pkg.price,
+        Math.round(parseFloat(pkg.price) * 100),
         "USD",
-        `${pkg.name} - ${pkg.credits} Trip Credit(s)`
+        {
+            userId: user.id,
+            userEmail: user.email || "",
+            planType: pkg.creditType as 'premium' | 'vip',
+            tripCount: pkg.credits
+        }
     );
 
     // Record pending transaction - use correct column names
@@ -102,7 +107,7 @@ export async function createCheckoutOrder(packageType: PackageType) {
             amount_total: Math.round(parseFloat(pkg.price) * 100),
             currency: "USD",
             payment_status: "pending",
-            paypal_order_id: paypalOrder.id,
+            paypal_order_id: paypalOrder.orderId,
             payer_email: null,
             package_type: packageType,
             metadata: {
@@ -119,7 +124,7 @@ export async function createCheckoutOrder(packageType: PackageType) {
     }
 
     return {
-        orderId: paypalOrder.id,
+        orderId: paypalOrder.orderId,
         transactionId: transaction.id,
     };
 }
@@ -177,7 +182,7 @@ export async function capturePayment(orderId: string) {
             .from("payment_transactions")
             .update({
                 payment_status: "completed",
-                payer_email: captureResult.payer?.email_address,
+                payer_email: captureResult.metadata?.userEmail,
                 completed_at: new Date().toISOString(),
             })
             .eq("id", transaction.id);
@@ -199,7 +204,7 @@ export async function capturePayment(orderId: string) {
                 currency: capturedAmount?.currency_code || "USD",
                 payment_status: "completed",
                 paypal_order_id: orderId,
-                payer_email: captureResult.payer?.email_address,
+                payer_email: captureResult.metadata?.userEmail,
                 completed_at: new Date().toISOString(),
                 package_type: packageType,
                 metadata: {
@@ -215,7 +220,7 @@ export async function capturePayment(orderId: string) {
         creditsToAdd,
         packageTypeDisplay,
         creditType,
-        captureResult.payer?.email_address,
+        captureResult.metadata?.userEmail,
         orderId
     );
 

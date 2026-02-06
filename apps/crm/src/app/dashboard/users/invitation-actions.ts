@@ -11,6 +11,7 @@ export type Invitation = {
     role: "admin" | "local_guide";
     invited_by: string | null;
     created_at: string;
+    expires_at: string;
     // Status inferred from auth.users or local tracking
     status: 'pending' | 'accepted';
 };
@@ -160,7 +161,7 @@ export async function resendInvitation(id: string) {
 
 // These are no longer used but kept for interface compatibility if needed, 
 // or can be removed.
-export async function validateInvitation(token: string) {
+export async function validateInvitation(token: string): Promise<{ valid: boolean; error?: string; email?: string; role?: string }> {
     return { valid: false, error: "Deprecated" };
 }
 

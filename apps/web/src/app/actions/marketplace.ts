@@ -1,10 +1,11 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceRoleClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function purchaseTemplate(templateId: string, startDateStr: string) {
+export async function purchaseTemplate(templateId: string, startDateStr: string, refCode?: string, sessionId?: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -115,7 +116,32 @@ export async function purchaseTemplate(templateId: string, startDateStr: string)
     // 6. Increment use_count
     await supabase.rpc('increment_template_use_count', { template_id: templateId });
 
-    // 7. Revalidate and Redirect
+    // 7. Track referral purchase (if applicable)
+    if (refCode && sessionId) {
+        try {
+            const serviceSupabase = createServiceRoleClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.SUPABASE_SERVICE_ROLE_KEY!
+            );
+
+            await serviceSupabase.from('template_referral_events').insert({
+                ref_code: refCode,
+                event_type: 'purchase',
+                user_id: user.id,
+                session_id: sessionId,
+                metadata: {
+                    trip_id: trip.id,
+                    template_id: templateId,
+                    timestamp: new Date().toISOString(),
+                }
+            });
+        } catch (error) {
+            console.error('Failed to track referral purchase:', error);
+            // Don't fail the entire purchase if tracking fails
+        }
+    }
+
+    // 8. Revalidate and Redirect
     revalidatePath('/dashboard');
     return { success: true, tripId: trip.id };
 }

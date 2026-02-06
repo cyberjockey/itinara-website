@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { validateInvitation, acceptInvitation } from "../../dashboard/users/invitation-actions";
 import { Loader2, CheckCircle, XCircle, Eye, EyeOff } from "lucide-react";
 
-export default function AcceptInvitePage() {
+function AcceptInviteContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const token = searchParams.get("token");
@@ -263,5 +263,17 @@ export default function AcceptInvitePage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function AcceptInvitePage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+            </div>
+        }>
+            <AcceptInviteContent />
+        </Suspense>
     );
 }
