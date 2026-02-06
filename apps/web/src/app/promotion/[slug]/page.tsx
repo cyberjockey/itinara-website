@@ -39,5 +39,5 @@ export default async function LandingPageRoute({ params }: { params: Promise<{ s
         notFound();
     }
 
-    return <LandingPageRenderer page={page as LandingPage} />;
+    return <LandingPageRenderer page={page as unknown as LandingPage} />;
 }

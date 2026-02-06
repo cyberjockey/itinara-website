@@ -93,7 +93,7 @@ export default function SignupPage() {
                                 name="phone"
                                 type="tel"
                                 required
-                                pattern="^\+?[0-9\s-]{7,15}$"
+                                pattern="^\+?[0-9\s\-]{7,15}$"
                                 title="Phone number must start with + and contain 7-15 digits"
                                 className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50"
                                 placeholder="+62 812 3456 7890"

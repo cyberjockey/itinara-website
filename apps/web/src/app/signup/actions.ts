@@ -29,6 +29,11 @@ export async function signup(prevState: any, formData: FormData) {
     });
 
     if (error) {
+        console.error("Signup error:", error);
+        // Supabase specific error handling for clearer messages
+        if (error.message.includes("Error sending confirmation email")) {
+            return { message: "Failed to send confirmation email. Please check Supabase SMTP settings or try again later." };
+        }
         return { message: error.message };
     }
 
