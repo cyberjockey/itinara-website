@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Use service role for public insert operations
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Use dynamic to ensure environment variables are loaded at runtime
+export const dynamic = 'force-dynamic';
 
 /**
  * Public API endpoint for tracking referral events
@@ -20,6 +17,11 @@ const supabase = createClient(
  * }
  */
 export async function POST(request: NextRequest) {
+    // Use service role for public insert operations
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     try {
         const body = await request.json();
         const { ref_code, event_type, session_id, user_id, metadata = {} } = body;
