@@ -12,6 +12,7 @@ import remarkBreaks from 'remark-breaks';
 import { ArrowLeft, User, Calendar, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { ShareButtons } from "@/components/blog/ShareButtons";
+import { ClientAnalytics } from "@/components/analytics/ClientAnalytics";
 
 // Dynamic Metadata Generation
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -133,6 +134,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             </div>
                         </div>
                     </div>
+
+                    {/* Analytics */}
+                    <ClientAnalytics
+                        event="view_item"
+                        params={{
+                            content_type: 'blog_post',
+                            item_id: post.slug,
+                            item_name: post.title,
+                            author: post.author?.email?.split('@')[0] || 'Itinara Team'
+                        }}
+                    />
 
                     {/* Featured Image */}
                     {post.featured_image && (

@@ -6,6 +6,8 @@ import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
 import { SaveButton } from "@/components/dashboard/SaveButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function SavedPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

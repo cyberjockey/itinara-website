@@ -47,6 +47,20 @@ export function PayPalCheckoutModal({
         try {
             const result = await capturePayment(data.orderID);
             if (result.success) {
+                // Track purchase
+                if (typeof window !== 'undefined' && (window as any).gtag) {
+                    (window as any).gtag('event', 'purchase', {
+                        transaction_id: data.orderID,
+                        value: amount / 100,
+                        currency: 'USD',
+                        items: [{
+                            item_id: `plan_${planType}_${tripCount}`,
+                            item_name: `${planType.toUpperCase()} Plan (${tripCount} Credits)`,
+                            price: amount / 100,
+                            quantity: 1
+                        }]
+                    });
+                }
                 setIsSuccess(true);
                 toast.success(`${result.tripCount} ${result.planType} credit(s) added!`);
             }

@@ -4,6 +4,8 @@ import { Calendar, MapPin, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { PrintPageButton } from "@/components/dashboard/PrintPageButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function PrintTripPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const supabase = await createClient();

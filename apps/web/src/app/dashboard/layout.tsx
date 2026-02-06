@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { TripTypeModal } from "@/components/dashboard/TripTypeModal";
 import { SidebarQuota } from "@/components/dashboard/SidebarQuota";
 import { NotificationBell } from "@/components/dashboard/NotificationBell";
+import { AuthTracker } from "@/components/analytics/AuthTracker";
 
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -38,6 +39,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     return (
         <div className="min-h-screen bg-warm-white flex">
+            <AuthTracker />
             <TripTypeModal isOpen={isTripModalOpen} onClose={() => setIsTripModalOpen(false)} />
 
             {/* Mobile Header */}

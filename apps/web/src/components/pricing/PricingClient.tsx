@@ -21,6 +21,20 @@ function PricingContent() {
         setSelectedAmount(amount);
         setSelectedTripCount(tripCount);
         setIsModalOpen(true);
+
+        // Track begin_checkout
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'begin_checkout', {
+                currency: 'USD',
+                value: amount / 100, // amount is in cents
+                items: [{
+                    item_id: `plan_${plan}_${tripCount}`,
+                    item_name: `${plan.toUpperCase()} Plan (${tripCount} Credits)`,
+                    price: amount / 100,
+                    quantity: 1
+                }]
+            });
+        }
     };
 
     return (

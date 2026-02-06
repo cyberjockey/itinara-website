@@ -5,6 +5,9 @@ import { Plus, Calendar, MapPin, Sparkles } from "lucide-react";
 import { QuotaWidget } from "@/components/dashboard/QuotaWidget";
 import { RankBadge } from "@/components/ui/RankBadge";
 import { TripCardActions } from "@/components/dashboard/TripCardActions";
+import { ClientAnalytics } from "@/components/analytics/ClientAnalytics";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage({
     searchParams,
@@ -31,6 +34,9 @@ export default async function DashboardPage({
     if (resolvedParams?.payment === 'success') {
         paymentMessage = "Payment successful! Your credits have been added.";
     }
+
+    // Handle Auth Events
+    const authEvent = resolvedParams?.event;
 
     // Fetch unread messages count per trip
     const { data: conversations } = await supabase
@@ -186,6 +192,13 @@ export default async function DashboardPage({
                     <span className="font-medium">{paymentMessage}</span>
                     <Link href="/dashboard" className="text-sm underline opacity-70 hover:opacity-100">Dismiss</Link>
                 </div>
+            )}
+
+            {authEvent && (
+                <ClientAnalytics
+                    event={authEvent as string}
+                    params={{ method: 'email' }}
+                />
             )}
 
             {trips && trips.length > 0 ? (

@@ -33,6 +33,20 @@ export default function UseTemplateButton({ templateId, durationDays, vipQuota }
                 const res = await purchaseTemplate(templateId, startDate, refCode, sessionId);
 
                 if (res.success) {
+                    // Analytics: Spend Virtual Currency & Create Trip
+                    if (typeof window !== 'undefined' && (window as any).gtag) {
+                        (window as any).gtag('event', 'spend_virtual_currency', {
+                            value: 1,
+                            virtual_currency_name: 'VIP_Credit',
+                            item_name: `Template_${templateId}`
+                        });
+
+                        (window as any).gtag('event', 'create_trip', {
+                            trip_id: res.tripId,
+                            destination: 'template'
+                        });
+                    }
+
                     // Clear referral tracking after successful purchase
                     if (refCode) {
                         localStorage.removeItem('template_ref_code');

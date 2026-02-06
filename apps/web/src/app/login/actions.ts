@@ -19,5 +19,5 @@ export async function login(prevState: any, formData: FormData) {
     }
 
     revalidatePath("/", "layout");
-    redirect("/dashboard");
+    redirect("/dashboard?event=login");
 }

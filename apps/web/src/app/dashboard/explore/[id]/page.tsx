@@ -7,6 +7,7 @@ import { PlacesList } from "@/components/destinations/PlacesList";
 import { getImageUrl } from "@/lib/utils";
 
 export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic';
 
 export default async function DestinationDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;

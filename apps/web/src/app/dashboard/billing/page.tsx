@@ -4,6 +4,8 @@ import { format } from "date-fns";
 import { CreditCard, Check, Clock, X, ArrowLeft, Receipt, Coins } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function BillingPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

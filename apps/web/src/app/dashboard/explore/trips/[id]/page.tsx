@@ -8,6 +8,8 @@ import { TripGallery } from "@/components/dashboard/TripGallery";
 import { createClient } from "@/lib/supabase/server";
 import { getImageUrl } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export default async function TripDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const { id } = params;
@@ -113,51 +115,75 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                             {/* Connector Line */}
                             <div className="absolute left-[27px] top-4 bottom-4 w-0.5 bg-dashed border-l-2 border-stone-gray/20"></div>
 
-                            {itinerary?.days?.map((day: any, i: number) => (
-                                <div key={i} className="relative pl-16">
-                                    {/* Day Marker */}
-                                    <div className="absolute left-0 top-0 w-14 h-14 bg-white border-2 border-terracotta rounded-xl flex flex-col items-center justify-center z-10 shadow-sm">
-                                        <span className="text-xs font-bold text-stone-gray uppercase">Day</span>
-                                        <span className="text-xl font-bold text-deep-teak">{day.day}</span>
-                                    </div>
+                            {itinerary?.days?.map((day: any, i: number) => {
+                                const stops = day.activities
+                                    ?.map((a: any) => a.location || a.title)
+                                    .filter(Boolean) || [];
 
-                                    <div className="bg-white rounded-2xl p-6 border border-stone-gray/10 shadow-sm">
-                                        <h3 className="text-lg font-bold text-deep-teak mb-4">{day.title}</h3>
+                                const mapsUrl = stops.length > 0
+                                    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(stops[stops.length - 1])}&waypoints=${stops.slice(0, stops.length - 1).map((s: string) => encodeURIComponent(s)).join('|')}`
+                                    : null;
 
-                                        {day.activities && day.activities.length > 0 ? (
-                                            <div className="space-y-6">
-                                                {day.activities.map((activity: any) => (
-                                                    <div key={activity.id} className="flex gap-4 group">
-                                                        <div className="w-16 pt-1 text-right text-sm font-mono font-medium text-stone-gray shrink-0">
-                                                            {activity.start_time}
-                                                        </div>
-                                                        <div className="flex-1 pb-4 border-b border-stone-gray/10 last:border-0 last:pb-0">
-                                                            <div className="flex items-start justify-between">
-                                                                <h4 className="font-bold text-deep-teak group-hover:text-terracotta transition-colors">
-                                                                    {activity.title}
-                                                                </h4>
-                                                            </div>
-                                                            {activity.location && (
-                                                                <div className="flex items-center gap-1.5 text-xs text-stone-gray/70 mt-1 mb-2">
-                                                                    <MapPin className="w-3 h-3" />
-                                                                    {activity.location}
-                                                                </div>
-                                                            )}
-                                                            {activity.description && (
-                                                                <p className="text-sm text-stone-gray leading-relaxed">
-                                                                    {activity.description}
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                ))}
+                                return (
+                                    <div key={i} className="relative pl-16">
+                                        {/* Day Marker */}
+                                        <div className="absolute left-0 top-0 w-14 h-14 bg-white border-2 border-terracotta rounded-xl flex flex-col items-center justify-center z-10 shadow-sm">
+                                            <span className="text-xs font-bold text-stone-gray uppercase">Day</span>
+                                            <span className="text-xl font-bold text-deep-teak">{day.day}</span>
+                                        </div>
+
+                                        <div className="bg-white rounded-2xl p-6 border border-stone-gray/10 shadow-sm">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                                <h3 className="text-lg font-bold text-deep-teak">{day.title}</h3>
+
+                                                {mapsUrl && (
+                                                    <a
+                                                        href={mapsUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-xs font-bold hover:bg-blue-100 transition-colors border border-blue-200"
+                                                    >
+                                                        <Map className="w-4 h-4" />
+                                                        Navigate Day {day.day}
+                                                    </a>
+                                                )}
                                             </div>
-                                        ) : (
-                                            <p className="text-stone-gray/60 italic text-sm">Free time to explore.</p>
-                                        )}
+
+                                            {day.activities && day.activities.length > 0 ? (
+                                                <div className="space-y-6">
+                                                    {day.activities.map((activity: any) => (
+                                                        <div key={activity.id} className="flex gap-4 group">
+                                                            <div className="w-16 pt-1 text-right text-sm font-mono font-medium text-stone-gray shrink-0">
+                                                                {activity.start_time}
+                                                            </div>
+                                                            <div className="flex-1 pb-4 border-b border-stone-gray/10 last:border-0 last:pb-0">
+                                                                <div className="flex items-start justify-between">
+                                                                    <h4 className="font-bold text-deep-teak group-hover:text-terracotta transition-colors">
+                                                                        {activity.title}
+                                                                    </h4>
+                                                                </div>
+                                                                {activity.location && (
+                                                                    <div className="flex items-center gap-1.5 text-xs text-stone-gray/70 mt-1 mb-2">
+                                                                        <MapPin className="w-3 h-3" />
+                                                                        {activity.location}
+                                                                    </div>
+                                                                )}
+                                                                {activity.description && (
+                                                                    <p className="text-sm text-stone-gray leading-relaxed">
+                                                                        {activity.description}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className="text-stone-gray/60 italic text-sm">Free time to explore.</p>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     </section>
                 </div>

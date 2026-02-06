@@ -6,6 +6,8 @@ import { SearchBar } from "@/components/dashboard/SearchBar";
 import { SaveButton } from "@/components/dashboard/SaveButton";
 import { getImageUrl } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export default async function ExplorePage(props: { searchParams: Promise<{ query?: string }> }) {
     const searchParams = await props.searchParams;
     const query = searchParams.query || "";

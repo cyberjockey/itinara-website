@@ -12,6 +12,7 @@ import { TripViewToggle } from "@/components/dashboard/TripViewToggle";
 import { TripDeleteButton } from "@/components/dashboard/TripDeleteButton";
 import { TripCommitButton } from "@/components/dashboard/TripCommitButton";
 
+export const dynamic = "force-dynamic";
 
 export default async function TripDetailPage(props: {
     params: Promise<{ id: string }>,

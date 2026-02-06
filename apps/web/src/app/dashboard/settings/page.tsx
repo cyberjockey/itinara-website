@@ -1,12 +1,10 @@
-"use client";
-
-import { useState } from "react";
 import { User, Save, Asterisk } from "lucide-react";
 import { updateProfile } from "@/app/dashboard/settings/actions";
-import { createClient } from "@/lib/supabase/client"; // Use client for initial fetch if needed, or pass prop. Here we'll use a wrapper or just fetch in useEffect.
-// Actually, better to make this a Server Component that passes data to a Client Form.
+import { createClient } from "@/lib/supabase/client";
 import { PurchaseHistory } from "@/components/dashboard/PurchaseHistory";
 import { SettingsForm } from "@/components/dashboard/SettingsForm";
+
+export const dynamic = "force-dynamic";
 
 export default function SettingsPage() {
     return (

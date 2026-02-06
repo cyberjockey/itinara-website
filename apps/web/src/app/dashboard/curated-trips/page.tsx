@@ -11,6 +11,8 @@ export const metadata = {
     description: "Explore curated trips by local guides.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function CuratedTripsPage(props: { searchParams: Promise<{ query?: string; page?: string; limit?: string; preference?: string }> }) {
     const searchParams = await props.searchParams;
     const query = searchParams.query || "";
