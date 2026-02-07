@@ -5,9 +5,10 @@ import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import { Menu, X, Home, Map, Users, DollarSign, ShieldAlert, FileText, Layout, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 // Custom mobile nav implementation that doesn't depend on Sheet component
 
-export function MobileNav({ user, role }: { user: User; role: string }) {
+export function MobileNav({ user, role, avatarUrl }: { user: User; role: string; avatarUrl?: string | null }) {
     const [isOpen, setIsOpen] = useState(false);
 
     const isAdmin = role === 'admin';
@@ -61,8 +62,11 @@ export function MobileNav({ user, role }: { user: User; role: string }) {
 
                         <div className="border-t mt-6 pt-4 px-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                                    {user.email?.[0].toUpperCase()}
+                                <div className="shrink-0">
+                                    <UserAvatar
+                                        avatarUrl={avatarUrl}
+                                        size="sm"
+                                    />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>

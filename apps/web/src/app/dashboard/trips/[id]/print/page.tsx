@@ -52,38 +52,47 @@ export default async function PrintTripPage(props: { params: Promise<{ id: strin
     const emergencyNumbers = countryCode ? getEmergencyNumbers(countryCode) : null;
 
     return (
-        <div id="print-content" className="max-w-[297mm] mx-auto bg-white p-12 min-h-screen print:p-0 print:max-w-none">
+        <div id="print-content" className="w-full md:max-w-[297mm] mx-auto bg-white p-4 md:p-12 min-h-screen print:p-0 print:max-w-none">
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @page { 
-                    size: landscape; 
+                    size: auto; 
                     margin: 10mm;
                 }
                 @media print {
                     body {
                         background: white;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                    /* Ensure containers take full width in print */
+                    #print-content {
+                        width: 100% !important;
+                        max-width: none !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
                     }
                 }
             ` }} />
             {/* Navigation (Hidden in Print) */}
-            <div className="mb-8 print:hidden flex justify-between items-center bg-stone-50 p-4 rounded-xl border border-stone-gray/10" data-html2canvas-ignore="true">
+            <div className="mb-6 md:mb-8 print:hidden flex flex-col sm:flex-row justify-between items-center bg-stone-50 p-4 rounded-xl border border-stone-gray/10 gap-4" data-html2canvas-ignore="true">
                 <Link
                     href={`/dashboard/trips/${params.id}`}
-                    className="flex items-center gap-2 text-stone-gray hover:text-deep-teak transition-colors font-medium"
+                    className="flex items-center gap-2 text-stone-gray hover:text-deep-teak transition-colors font-medium text-sm md:text-base w-full sm:w-auto"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Back to Dashboard
                 </Link>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 w-full sm:w-auto">
                     <PrintPageButton />
                 </div>
             </div>
 
             {/* Header with Logo */}
-            <div className="flex justify-between items-start border-b-2 border-deep-teak pb-6 mb-8">
-                <div>
-                    <h1 className="text-4xl font-heading font-bold text-deep-teak mb-2 leading-tight">{trip.title}</h1>
-                    <div className="flex items-center gap-6 text-stone-gray text-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start border-b-2 border-deep-teak pb-6 mb-8 gap-4">
+                <div className="w-full">
+                    <h1 className="text-2xl md:text-4xl font-heading font-bold text-deep-teak mb-2 leading-tight">{trip.title}</h1>
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-stone-gray text-xs md:text-sm">
                         <div className="flex items-center gap-1.5">
                             <MapPin className="w-4 h-4 text-terracotta" />
                             <span className="font-medium">{trip.destination}</span>
@@ -96,7 +105,7 @@ export default async function PrintTripPage(props: { params: Promise<{ id: strin
                         </div>
                     </div>
                 </div>
-                <div className="relative w-32 h-10">
+                <div className="relative w-24 h-8 md:w-32 md:h-10 self-end sm:self-auto shrink-0">
                     <Image
                         src="/logo.png"
                         alt="Itinara"
@@ -107,7 +116,7 @@ export default async function PrintTripPage(props: { params: Promise<{ id: strin
             </div>
 
             {/* Trip Details & Emergency Info Grid */}
-            <div className="grid grid-cols-2 gap-8 mb-10 break-inside-avoid">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-10 break-inside-avoid">
                 {/* Trip Summary/About */}
                 <div className="bg-stone-gray/5 p-6 rounded-xl border border-stone-gray/10">
                     <h2 className="text-lg font-heading font-bold text-deep-teak mb-3 flex items-center gap-2">
@@ -167,12 +176,12 @@ export default async function PrintTripPage(props: { params: Promise<{ id: strin
                     return (
                         <div key={dayNum} className="break-inside-avoid print:break-before-page">
                             {/* Day Header */}
-                            <div className="flex justify-between items-center mb-8 border-b-2 border-stone-gray/10 pb-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-deep-teak text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 border-b-2 border-stone-gray/10 pb-4 gap-4">
+                                <div className="flex items-center gap-3 md:gap-4">
+                                    <div className="bg-deep-teak text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-base md:text-lg shadow-sm">
                                         {dayNum}
                                     </div>
-                                    <h2 className="text-3xl font-heading font-bold text-deep-teak">
+                                    <h2 className="text-2xl md:text-3xl font-heading font-bold text-deep-teak">
                                         {format(dayDate, "EEEE, MMMM d")}
                                     </h2>
                                 </div>
@@ -182,7 +191,7 @@ export default async function PrintTripPage(props: { params: Promise<{ id: strin
                                         href={routeUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-xs font-bold text-terracotta hover:text-deep-teak flex items-center gap-1 uppercase tracking-wide border border-terracotta/30 px-4 py-2 rounded-full hover:bg-terracotta/5 transition-colors"
+                                        className="text-xs font-bold text-terracotta hover:text-deep-teak flex items-center gap-1 uppercase tracking-wide border border-terracotta/30 px-4 py-2 rounded-full hover:bg-terracotta/5 transition-colors self-end md:self-auto"
                                     >
                                         <MapPin className="w-4 h-4" />
                                         View Day Route
@@ -198,35 +207,35 @@ export default async function PrintTripPage(props: { params: Promise<{ id: strin
                                     return (
                                         <div key={act.id} className="bg-white rounded-2xl border border-stone-gray/10 shadow-sm overflow-hidden break-inside-avoid ring-1 ring-black/5">
                                             {/* Activity Header */}
-                                            <div className="p-5 border-b border-stone-gray/10 bg-stone-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                            <div className="p-4 md:p-5 border-b border-stone-gray/10 bg-stone-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <div className="flex items-center gap-1.5 text-xs font-bold text-stone-gray bg-white border border-stone-gray/10 px-2 py-1 rounded">
+                                                        <div className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-stone-gray bg-white border border-stone-gray/10 px-2 py-1 rounded">
                                                             <Clock className="w-3 h-3 text-terracotta" />
                                                             {act.start_time ? act.start_time.slice(0, 5) : "--:--"}
                                                         </div>
-                                                        <span className="text-xs font-bold text-stone-gray/50 uppercase tracking-widest">{act.category || "Activity"}</span>
+                                                        <span className="text-[10px] md:text-xs font-bold text-stone-gray/50 uppercase tracking-widest">{act.category || "Activity"}</span>
                                                     </div>
-                                                    <h3 className="font-heading font-bold text-xl text-deep-teak">
+                                                    <h3 className="font-heading font-bold text-lg md:text-xl text-deep-teak">
                                                         {act.title}
                                                     </h3>
                                                     {fallbackLocation && (
-                                                        <div className="flex items-center gap-1.5 text-sm text-stone-gray mt-1">
+                                                        <div className="flex items-center gap-1.5 text-xs md:text-sm text-stone-gray mt-1">
                                                             <MapPin className="w-3.5 h-3.5 text-stone-gray/60" />
-                                                            <span className="italic">{fallbackLocation}</span>
+                                                            <span className="italic line-clamp-1">{fallbackLocation}</span>
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-2 self-end sm:self-auto">
                                                     <a
                                                         href={generateGoogleMapsUrl(fallbackLocation || act.title)}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-stone-gray/20 text-stone-gray hover:text-terracotta hover:border-terracotta/50 transition-colors shadow-sm"
+                                                        className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-white border border-stone-gray/20 text-stone-gray hover:text-terracotta hover:border-terracotta/50 transition-colors shadow-sm"
                                                         title="View on Maps"
                                                     >
-                                                        <ExternalLink className="w-4 h-4" />
+                                                        <ExternalLink className="w-4 h-4 md:w-4 md:h-4" />
                                                     </a>
                                                 </div>
                                             </div>

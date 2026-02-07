@@ -23,6 +23,20 @@ export default async function CommunityPage() {
         console.error("Community Fetch Error:", tripsError);
     }
 
+    // Fetch trip counts for guides (for avatars)
+    const userIds = Array.from(new Set(trips?.map(t => t.user_id) || []));
+    const tripCounts: Record<string, number> = {};
+
+    // Parallel fetch (optimization: in real prod, use a view or RPC)
+    await Promise.all(userIds.map(async (uid) => {
+        const { count } = await supabase
+            .from('trips')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', uid)
+            .eq('is_public', true); // Count public trips only? Or all? Usually all.
+        tripCounts[uid] = count || 0;
+    }));
+
     // Fetch user likes to show "red heart" state
     const likedTripIds = new Set<string>();
     if (user) {
@@ -60,6 +74,7 @@ export default async function CommunityPage() {
                     trips={trips}
                     currentUserId={user?.id}
                     likedTripIds={likedTripIds}
+                    tripCounts={tripCounts}
                 />
             ) : (
                 <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-stone-gray/20">

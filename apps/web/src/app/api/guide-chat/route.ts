@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         .from("guide_conversations")
         .select(`
             *,
-            guide:profiles!guide_conversations_guide_id_fkey(id, full_name, avatar_url, guide_bio, guide_expertise, guide_verified, local_guide_stars, google_guide_level),
+            guide:profiles!guide_conversations_guide_id_fkey(id, full_name, avatar_url, guide_bio, guide_expertise, guide_verified),
             tourist:profiles!guide_conversations_tourist_id_fkey(id, full_name, avatar_url)
         `)
         .eq("trip_id", tripId)
@@ -60,14 +60,19 @@ export async function GET(request: NextRequest) {
                 // Fetch guide profile directly
                 const { data: guideProfile } = await supabase
                     .from("profiles")
-                    .select("id, full_name, avatar_url, guide_bio, guide_expertise, guide_verified, local_guide_stars, google_guide_level")
+                    .select("id, full_name, avatar_url, guide_bio, guide_expertise, guide_verified")
                     .eq("id", template.guide_id)
                     .single();
 
-                guide = guideProfile;
+                // Fetch trip count for guide
+                const { count } = await supabase
+                    .from('trips')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', template.guide_id);
+
+                guide = { ...guideProfile, total_trips: count || 0 };
             }
         }
-
         return NextResponse.json({
             conversation: null,
             messages: [],

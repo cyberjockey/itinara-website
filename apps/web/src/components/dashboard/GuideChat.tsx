@@ -23,6 +23,7 @@ import {
     Sparkles,
     ShieldCheck
 } from "lucide-react";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 import { format, formatDistanceToNow } from "date-fns";
 
 interface Guide {
@@ -32,8 +33,7 @@ interface Guide {
     guide_bio?: string;
     guide_expertise?: string[];
     guide_verified?: boolean;
-    local_guide_stars?: number;
-    google_guide_level?: number;
+    total_trips?: number;
 }
 
 interface Message {
@@ -365,20 +365,20 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
             {/* Guide Header */}
             <div className="bg-white border-b border-stone-gray/10 p-4">
                 <div className="max-w-3xl mx-auto flex items-center gap-4">
-                    {guide?.avatar_url ? (
-                        <Image
-                            src={guide.avatar_url}
-                            alt={guide.full_name}
-                            width={56}
-                            height={56}
-                            className="w-14 h-14 rounded-full object-cover border-2 border-ocean-turquoise"
-                        />
-                    ) : (
-                        <div className="w-14 h-14 rounded-full bg-ocean-turquoise/10 flex items-center justify-center overflow-hidden">
-                            <Image src="/logo.png" alt="Logo" width={56} height={56} className="w-full h-full object-cover opacity-50" />
-                        </div>
-                    )}
-                    <Link href={`/guides/${guide?.id}`} className="flex-1 hover:opacity-80 transition-opacity">
+                    <div className="shrink-0">
+                        {guide?.avatar_url ? (
+                            <UserAvatar
+                                avatarUrl={guide.avatar_url}
+                                size="md"
+                                className="mr-2"
+                            />
+                        ) : (
+                            <div className="w-14 h-14 rounded-full bg-ocean-turquoise/10 flex items-center justify-center overflow-hidden mr-2">
+                                <Image src="/logo.png" alt="Logo" width={56} height={56} className="w-full h-full object-cover opacity-50" />
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex-1">
                         <div className="flex items-center gap-2">
                             <h3 className="font-bold text-deep-teak text-lg">{guide?.full_name || "Local Guide"}</h3>
                             {/* Badges Row */}
@@ -389,16 +389,6 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
                                         Verified
                                     </span>
                                 )}
-                                {/* Gimmick: Star Rating */}
-                                <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5 border border-amber-200" title="Local Guide Rating">
-                                    <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
-                                    {guide?.local_guide_stars || "5.0"}
-                                </span>
-                                {/* Gimmick: Google Local Guide */}
-                                <span className="bg-orange-100 text-orange-700 text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5 border border-orange-200" title="Google Local Guide Level">
-                                    <MapPin className="w-2.5 h-2.5 text-orange-500" />
-                                    Level {guide?.google_guide_level || "5"}
-                                </span>
                             </div>
                         </div>
                         {guide?.guide_expertise && guide.guide_expertise.length > 0 && (
@@ -413,7 +403,7 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
                         {guide?.guide_bio && (
                             <p className="text-xs text-stone-gray mt-1 line-clamp-1">{guide.guide_bio}</p>
                         )}
-                    </Link>
+                    </div>
                 </div>
             </div>
 

@@ -3,18 +3,19 @@ import { notFound } from "next/navigation";
 import { Calendar, MapPin, Share2 } from "lucide-react";
 import { TripViewToggle } from "@/components/dashboard/TripViewToggle";
 import Link from "next/link";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 // import { Button } from "@/components/ui/button";
 
 export default async function PublicTripPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const supabase = await createClient();
 
-    // Fetch trip details - relies on RLS policy: "Public trips are viewable by everyone"
+    // Fetch trip details with profile
     const { data: trip, error: tripError } = await supabase
         .from("trips")
-        .select("*")
+        .select("*, profiles(*)")
         .eq("id", params.id)
-        .eq("is_public", true) // Explicitly ensure it's public
+        .eq("is_public", true)
         .single();
 
     if (tripError || !trip) {
@@ -28,6 +29,7 @@ export default async function PublicTripPage(props: { params: Promise<{ id: stri
         .eq("trip_id", params.id)
         .order("day_number", { ascending: true })
         .order("start_time", { ascending: true });
+
 
     return (
         <div className="h-screen flex flex-col bg-warm-white">
@@ -63,6 +65,22 @@ export default async function PublicTripPage(props: { params: Promise<{ id: stri
                                 <div className="flex items-center gap-1">
                                     <Calendar className="w-4 h-4 text-terracotta" />
                                     {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Guide Section */}
+                        <div className="flex items-center gap-3 bg-white/50 p-2 pr-4 rounded-full border border-stone-gray/10 backdrop-blur-sm">
+                            <div className="flex items-center gap-3">
+                                <UserAvatar
+                                    avatarUrl={trip.profiles?.avatar_url}
+                                    size="sm"
+                                />
+                                <div>
+                                    <p className="text-[10px] uppercase font-bold text-stone-gray tracking-wider">Hosted by</p>
+                                    <p className="text-sm font-bold text-deep-teak transition-colors">
+                                        {trip.profiles?.full_name || 'Guide'}
+                                    </p>
                                 </div>
                             </div>
                         </div>

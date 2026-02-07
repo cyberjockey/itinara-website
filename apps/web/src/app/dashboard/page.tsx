@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Plus, Calendar, MapPin, Sparkles } from "lucide-react";
 import { QuotaWidget } from "@/components/dashboard/QuotaWidget";
-import { RankBadge } from "@/components/ui/RankBadge";
 import { TripCardActions } from "@/components/dashboard/TripCardActions";
 import { ClientAnalytics } from "@/components/analytics/ClientAnalytics";
 
@@ -37,7 +36,7 @@ export default async function DashboardPage({
     // Fetch user profile with rank data
     const { data: profile } = await supabase
         .from('profiles')
-        .select('rank_points, rank_tier')
+        .select('full_name') // Select something safe or just '*'
         .eq('id', user?.id)
         .single();
 
@@ -186,13 +185,6 @@ export default async function DashboardPage({
                     <h1 className="text-4xl md:text-5xl font-heading font-bold text-deep-teak mb-2">My Trips</h1>
                     <div className="flex items-center gap-3 flex-wrap">
                         <p className="text-lg text-stone-gray/80">Welcome back, {user?.user_metadata?.first_name || 'Traveler'}!</p>
-                        {profile && (
-                            <RankBadge
-                                tier={profile.rank_tier || 'Pendatang'}
-                                points={profile.rank_points || 0}
-                                compact
-                            />
-                        )}
                     </div>
                 </div>
                 <div className="md:min-w-[280px]">

@@ -23,9 +23,10 @@ interface CommunityFeedProps {
     trips: Trip[];
     currentUserId?: string;
     likedTripIds: Set<string>;
+    tripCounts?: Record<string, number>;
 }
 
-export function CommunityFeed({ trips, currentUserId, likedTripIds }: CommunityFeedProps) {
+export function CommunityFeed({ trips, currentUserId, likedTripIds, tripCounts = {} }: CommunityFeedProps) {
     const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
     return (
@@ -39,6 +40,7 @@ export function CommunityFeed({ trips, currentUserId, likedTripIds }: CommunityF
                         currentUserId={currentUserId}
                         isLiked={likedTripIds.has(trip.id)}
                         onCommentClick={() => setSelectedTrip(trip)}
+                        guideTripCount={tripCounts[trip.user_id] || 0}
                     />
                 ))}
             </div>

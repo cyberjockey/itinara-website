@@ -124,27 +124,27 @@ export function ActivitiesManager({ places, totalCount, pagination }: Activities
     return (
         <div className="space-y-4">
             {/* Toolbar */}
-            <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col md:flex-row md:items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100 gap-4">
+                <div className="flex flex-wrap items-center gap-2">
                     <ColumnSettings columns={columns} onChange={setColumns} />
                     <PlaceFilter />
                     <ExportButton selectedIds={Array.from(selectedIds)} totalCount={totalCount} />
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 w-full md:w-auto">
                     <BulkUploadButton onImportComplete={handleImportComplete} />
                 </div>
             </div>
 
             {/* Bulk Actions Bar */}
             {selectedIds.size > 0 && (
-                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-center justify-between animate-in slide-in-from-top-2">
+                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in slide-in-from-top-2">
                     <div className="flex items-center gap-2 text-blue-700 font-medium text-sm">
                         <span>{selectedIds.size} selected</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3 w-full md:w-auto">
                         <button
                             onClick={() => setSelectedIds(new Set())}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-gray-600 text-sm font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                            className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-gray-600 text-sm font-medium hover:bg-gray-100 rounded-lg transition-colors bg-white/50 border border-transparent md:bg-transparent md:border-transparent"
                         >
                             <Trash2 className="w-3.5 h-3.5" />
                             Clear
@@ -152,7 +152,7 @@ export function ActivitiesManager({ places, totalCount, pagination }: Activities
                         <button
                             onClick={() => handleBulkAction('coordinates')}
                             disabled={isProcessing}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-white border border-blue-200 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 disabled:opacity-50 transition-colors"
+                            className="flex items-center justify-center gap-2 px-3 py-1.5 bg-white border border-blue-200 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 disabled:opacity-50 transition-colors"
                         >
                             {isProcessing && processingAction === 'coordinates' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
                             Generate Coordinates
@@ -160,7 +160,7 @@ export function ActivitiesManager({ places, totalCount, pagination }: Activities
                         <button
                             onClick={() => handleBulkAction('description')}
                             disabled={isProcessing}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm"
+                            className="flex items-center justify-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm"
                         >
                             {isProcessing && processingAction === 'description' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
                             Generate AI Descriptions

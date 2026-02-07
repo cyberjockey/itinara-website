@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Calendar, Users } from "lucide-react";
 import { TemplatePreviewClient } from "./TemplatePreviewClient";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 export default async function TemplateReferralPage({ params }: { params: Promise<{ refCode: string }> }) {
     const { refCode } = await params;
@@ -103,20 +104,15 @@ export default async function TemplateReferralPage({ params }: { params: Promise
                     <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200">
                         <div className="max-w-6xl mx-auto px-4 py-6">
                             <div className="flex items-center gap-4">
-                                {guide.avatar_url ? (
-                                    <img
-                                        src={guide.avatar_url}
-                                        alt={guide.full_name}
-                                        className="w-12 h-12 rounded-full border-2 border-gray-200"
+                                <div className="shrink-0 -ml-2">
+                                    <UserAvatar
+                                        avatarUrl={guide.avatar_url}
+                                        size="md"
                                     />
-                                ) : (
-                                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                                        {guide.full_name?.charAt(0) || 'G'}
-                                    </div>
-                                )}
+                                </div>
                                 <div>
-                                    <div className="text-sm text-gray-500">Created by</div>
-                                    <div className="font-semibold text-gray-900">{guide.full_name || 'Local Guide'}</div>
+                                    <div className="text-sm text-gray-500 mb-0.5">Created by</div>
+                                    <div className="font-bold text-gray-900 text-lg">{guide.full_name || 'Local Guide'}</div>
                                 </div>
                             </div>
                         </div>

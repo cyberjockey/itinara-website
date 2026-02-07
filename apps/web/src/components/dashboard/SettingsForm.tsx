@@ -6,8 +6,6 @@ import { getImageUrl } from "@/lib/utils";
 import NextImage from "next/image";
 import { updateProfile } from "@/app/dashboard/settings/actions";
 import { User, Save, Globe, Loader2 } from "lucide-react";
-import { RankBadge } from "@/components/ui/RankBadge";
-import { RankProgress } from "@/components/ui/RankProgress";
 
 export function SettingsForm() {
     const supabase = createClient();
@@ -28,9 +26,6 @@ export function SettingsForm() {
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-    // Rank State
-    const [rankPoints, setRankPoints] = useState(0);
-    const [rankTier, setRankTier] = useState("Newcomer");
 
     useEffect(() => {
         async function fetchProfile() {
@@ -50,8 +45,6 @@ export function SettingsForm() {
                     setFullName(profile.full_name || "");
                     setWebsite(profile.website || "");
                     setAvatarUrl(profile.avatar_url || "");
-                    setRankPoints(profile.rank_points || 0);
-                    setRankTier(profile.rank_tier || "Newcomer");
                 }
             }
             setLoading(false);
@@ -208,10 +201,6 @@ export function SettingsForm() {
                     <p className="text-xs text-stone-gray/50 mt-1">Email cannot be changed.</p>
                 </div>
 
-                <div className="md:col-span-2 p-6 bg-gradient-to-br from-terracotta/5 via-deep-teak/5 to-rice-paddy-green/5 rounded-xl border border-terracotta/20">
-                    <label className="block text-sm font-bold text-deep-teak mb-4">Your Rank Progress</label>
-                    <RankProgress currentTier={rankTier} currentPoints={rankPoints} />
-                </div>
             </div>
 
             <div className="pt-6 border-t border-stone-gray/10 flex items-center justify-between">

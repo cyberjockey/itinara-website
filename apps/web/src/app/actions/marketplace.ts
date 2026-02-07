@@ -147,7 +147,10 @@ export async function purchaseTemplate(templateId: string, startDateStr: string,
     }
 
     // 6. Increment use_count
-    await supabase.rpc('increment_template_use_count', { template_id: templateId });
+    const { error: rpcError } = await supabase.rpc('increment_template_use_count', { template_id: templateId });
+    if (rpcError) {
+        console.error('Failed to increment template use count:', rpcError);
+    }
 
     // 7. Track referral purchase (if applicable)
     if (refCode && sessionId) {

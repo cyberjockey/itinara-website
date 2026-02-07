@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, MapPin, Star, Calendar, DollarSign } from "lucide-react";
 import { PlacesList } from "@/components/destinations/PlacesList";
 import { getImageUrl } from "@/lib/utils";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 export const revalidate = 3600; // Revalidate every hour
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,7 @@ interface TemplateProfile {
 
 interface Template {
     id: string;
+    guide_id: string; // Added for lookups
     title: string;
     description: string | null;
     duration_days: number;
@@ -53,11 +55,13 @@ export default async function DestinationDetailPage(props: { params: Promise<{ i
         .eq("destination_id", params.id)
         .order("use_count", { ascending: false });
 
-    // 2. Fetch Places for this Destination
+    // 2. Fetch Places for this Destination (excluding accommodation)
     const { data: places } = await supabase
         .from("places")
         .select("*")
-        .eq("destination_id", params.id);
+        .eq("destination_id", params.id)
+        .not('type', 'ilike', 'Accomodation')
+        .not('type', 'ilike', 'Accommodation');
 
     // 3. Fetch User's Trips (for Add to Trip functionality)
     const { data: { user } } = await supabase.auth.getUser();
@@ -190,12 +194,12 @@ export default async function DestinationDetailPage(props: { params: Promise<{ i
                                                 </p>
                                                 <div className="flex items-center justify-between pt-4 border-t border-dashed border-stone-gray/10 mt-auto">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-gray-100 overflow-hidden relative">
-                                                            {template.profiles?.avatar_url ? (
-                                                                <Image src={getImageUrl(template.profiles.avatar_url, "/images/placeholder-avatar.png")} alt="Guide" fill className="object-cover" />
-                                                            ) : (
-                                                                <div className="w-full h-full bg-gray-200" />
-                                                            )}
+                                                        <div className="shrink-0 group-avatar">
+                                                            <UserAvatar
+                                                                avatarUrl={template.profiles?.avatar_url}
+                                                                size="sm"
+                                                                className="scale-75 origin-left"
+                                                            />
                                                         </div>
                                                         <span className="text-xs font-bold text-stone-gray">{template.profiles?.full_name}</span>
                                                     </div>

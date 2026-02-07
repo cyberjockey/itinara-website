@@ -9,12 +9,12 @@ export default async function TemplatesPage() {
 
     return (
         <div>
-            <header className="flex justify-between items-center mb-8">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">My Templates</h2>
                     <p className="text-gray-500 text-sm mt-1">Manage your curated trip itineraries.</p>
                 </div>
-                <Link href="/dashboard/templates/new" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors">
+                <Link href="/dashboard/templates/new" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-colors w-full md:w-auto">
                     <Plus className="w-4 h-4" />
                     Create Template
                 </Link>
@@ -32,7 +32,7 @@ export default async function TemplatesPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-gray-50 border-b border-gray-100">
                             <tr>
@@ -65,7 +65,9 @@ export default async function TemplatesPage() {
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-medium text-gray-900 line-clamp-1">{template.title}</p>
+                                                <Link href={`/dashboard/templates/${template.id}`} className="font-medium text-gray-900 line-clamp-1 hover:text-blue-600 hover:underline">
+                                                    {template.title}
+                                                </Link>
                                                 <p className="text-xs text-gray-500 line-clamp-1">{template.description || 'No description'}</p>
                                             </div>
                                         </div>

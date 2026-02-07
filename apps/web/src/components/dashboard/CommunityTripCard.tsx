@@ -3,6 +3,7 @@ import Image from "next/image";
 import { MapPin, Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
 import { formatDistanceToNow, differenceInDays, parseISO } from "date-fns";
 import { getImageUrl } from "@/lib/utils";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 interface Trip {
     id: string;
@@ -13,6 +14,7 @@ interface Trip {
     start_date?: string;
     end_date?: string;
     profiles?: {
+        id?: string;
         full_name: string | null;
         avatar_url: string | null;
     } | null;
@@ -41,15 +43,13 @@ export function CommunityTripCard({ trip, currentUserId, isLiked = false, onComm
             {/* Header: Author Info (Social Style) */}
             <div className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10 rounded-full bg-stone-gray/10 overflow-hidden ring-2 ring-white shadow-sm">
-                        {avatarUrl ? (
-                            <Image src={getImageUrl(avatarUrl, "/images/placeholder-avatar.png")} alt={authorName} fill className="object-cover" />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center font-bold text-stone-gray text-sm">
-                                {authorInitials}
-                            </div>
-                        )}
-                    </div>
+                    <Link href={`/guide/${trip.profiles?.id}`} className="block relative group-avatar">
+                        <UserAvatar
+                            avatarUrl={avatarUrl}
+                            size="sm"
+                            className="scale-90"
+                        />
+                    </Link>
                     <div>
                         <p className="text-sm font-bold text-deep-teak leading-tight">{authorName}</p>
                         <p className="text-xs text-stone-gray">{timeAgo}</p>

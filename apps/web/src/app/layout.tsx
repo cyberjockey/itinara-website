@@ -71,11 +71,12 @@ export const metadata: Metadata = {
 
 import Script from "next/script";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" className={`${jakarta.variable} ${inter.variable} ${crimson.variable}`} suppressHydrationWarning>
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-C4MD92V7TE" strategy="afterInteractive" />
@@ -89,7 +90,6 @@ export default function RootLayout({
         `}
       </Script>
       <body className="font-sans antialiased bg-warm-white text-deep-teak" suppressHydrationWarning>
-
         {children}
         <Analytics />
       </body>

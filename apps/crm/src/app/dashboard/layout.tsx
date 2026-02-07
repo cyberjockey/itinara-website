@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from 'next/link';
 import { signOut } from "@/app/auth/actions";
 import { LogOut } from "lucide-react";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 import { MobileNav } from "@/components/layout/MobileNav";
 
@@ -21,17 +22,19 @@ export default async function DashboardLayout({
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, avatar_url')
         .eq('id', user.id)
         .single();
 
     const isAdmin = profile?.role === 'admin';
     const isGuide = profile?.role === 'local_guide';
 
+    // Fetch stats for leveling
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
             {/* Mobile Navigation */}
-            <MobileNav user={user} role={profile?.role || 'Guest'} />
+            <MobileNav user={user} role={profile?.role || 'Guest'} avatarUrl={profile?.avatar_url} />
 
             {/* Sidebar (Desktop) */}
             <aside className="w-64 bg-white border-r fixed h-full hidden md:flex md:flex-col z-20 overflow-y-auto">
@@ -75,9 +78,6 @@ export default async function DashboardLayout({
                             <Link href="/dashboard/landing-pages" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
                                 Landing Pages
                             </Link>
-                            <Link href="/dashboard/transactions" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
-                                Transactions
-                            </Link>
                         </>
                     )}
                     {(isGuide || isAdmin) && (
@@ -101,8 +101,11 @@ export default async function DashboardLayout({
 
                 <div className="p-4 border-t bg-white flex-shrink-0">
                     <div className="flex items-center gap-3 px-2">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                            {user.email?.[0].toUpperCase()}
+                        <div className="shrink-0">
+                            <UserAvatar
+                                avatarUrl={profile?.avatar_url}
+                                size="sm"
+                            />
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>

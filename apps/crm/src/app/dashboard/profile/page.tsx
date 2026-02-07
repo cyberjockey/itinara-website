@@ -5,6 +5,7 @@ import { getProfile, updateProfile } from "./actions";
 import { Loader2, User, Save } from "lucide-react";
 import CloudinaryImageUpload from "@/components/ui/CloudinaryImageUpload";
 import Image from "next/image";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 export default function ProfilePage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,10 +18,14 @@ export default function ProfilePage() {
     const [avatarUrl, setAvatarUrl] = useState("");
 
     useEffect(() => {
-        getProfile().then(data => {
-            setProfile(data);
-            setLoading(false);
-            if (data?.avatar_url) setAvatarUrl(data.avatar_url);
+        getProfile().then(async (data) => {
+            if (data) {
+                setProfile(data);
+                setLoading(false);
+                if (data.avatar_url) setAvatarUrl(data.avatar_url);
+            } else {
+                setLoading(false);
+            }
         });
     }, []);
 
@@ -28,9 +33,11 @@ export default function ProfilePage() {
 
     return (
         <div className="max-w-2xl mx-auto">
-            <header className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-                <p className="text-gray-500 text-sm mt-1">Manage your public guide profile details.</p>
+            <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
+                    <p className="text-gray-500 text-sm mt-1">Manage your public guide profile details.</p>
+                </div>
             </header>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -44,13 +51,10 @@ export default function ProfilePage() {
                     {/* Avatar Section */}
                     <div className="flex items-start gap-6">
                         <div className="shrink-0">
-                            <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-white shadow-sm overflow-hidden relative">
-                                {avatarUrl ? (
-                                    <Image src={avatarUrl} alt="Avatar" fill className="object-cover" />
-                                ) : (
-                                    <User className="w-8 h-8 text-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                                )}
-                            </div>
+                            <UserAvatar
+                                avatarUrl={avatarUrl}
+                                size="lg"
+                            />
                         </div>
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>

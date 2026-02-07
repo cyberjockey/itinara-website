@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow, parseISO } from "date-fns";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 interface Trip {
     id: string;
@@ -23,9 +24,10 @@ interface SocialPostCardProps {
     currentUserId?: string;
     isLiked?: boolean;
     onCommentClick?: () => void;
+    guideTripCount?: number;
 }
 
-export function SocialPostCard({ trip, currentUserId, isLiked = false, onCommentClick }: SocialPostCardProps) {
+export function SocialPostCard({ trip, currentUserId, isLiked = false, onCommentClick, guideTripCount = 0 }: SocialPostCardProps) {
     // Safe fallbacks
     const authorName = trip.profiles?.full_name || "Traveler";
     const authorInitials = authorName[0]?.toUpperCase() || "?";
@@ -41,16 +43,12 @@ export function SocialPostCard({ trip, currentUserId, isLiked = false, onComment
                 {/* Header: Author */}
                 <div className="flex items-start gap-3">
                     {/* Avatar */}
-                    <Link href={`/profile/${trip.user_id}`} className="flex-shrink-0">
-                        <div className="relative w-10 h-10 rounded-full bg-stone-gray/10 overflow-hidden ring-2 ring-white shadow-sm hover:ring-terracotta/30 transition-all">
-                            {avatarUrl ? (
-                                <Image src={avatarUrl} alt={authorName} fill className="object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center font-bold text-stone-gray text-sm bg-gradient-to-br from-rice-paddy-green/20 to-ocean-turquoise/20">
-                                    {authorInitials}
-                                </div>
-                            )}
-                        </div>
+                    <Link href={`/guide/${trip.user_id}`} className="flex-shrink-0 group-avatar">
+                        <UserAvatar
+                            avatarUrl={avatarUrl}
+                            size="sm"
+                            className="scale-90"
+                        />
                     </Link>
 
                     {/* Content */}

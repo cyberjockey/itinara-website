@@ -8,6 +8,7 @@ import { fetchComments, addComment } from "@/app/dashboard/trips/actions";
 import { CommentItem } from "@/components/dashboard/CommentItem";
 import { cn, getImageUrl } from "@/lib/utils";
 import Link from "next/link";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 interface Comment {
     id: string;
@@ -162,12 +163,11 @@ export function TripThreadSheet({ trip, currentUserId, isOpen, onClose, initialI
                         <div className="p-6 pt-4">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-stone-gray/10 overflow-hidden relative">
-                                        {trip.profiles?.avatar_url ? (
-                                            <Image src={getImageUrl(trip.profiles.avatar_url, "/images/placeholder-avatar.png")} alt="Ava" fill className="object-cover" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center font-bold text-stone-gray">?</div>
-                                        )}
+                                    <div className="shrink-0">
+                                        <UserAvatar
+                                            avatarUrl={trip.profiles?.avatar_url}
+                                            size="sm"
+                                        />
                                     </div>
                                     <div>
                                         <p className="font-bold text-deep-teak text-sm">{trip.profiles?.full_name || "Traveler"}</p>

@@ -120,7 +120,7 @@ export function TripActionsMenu({
                             <TripVisibilityToggle tripId={tripId} initialIsPublic={!!isPublic} variant="menu-item" />
                         </div>
 
-                        <div onClick={() => setIsOpen(false)}>
+                        <div>
                             <TripCommitButton
                                 tripId={tripId}
                                 initialIsCommitted={isCommitted}
@@ -130,7 +130,7 @@ export function TripActionsMenu({
 
                         <div className="h-px bg-stone-gray/10 my-1" />
 
-                        <div onClick={() => setIsOpen(false)}>
+                        <div>
                             <TripDeleteButton tripId={tripId} variant="menu-item" />
                         </div>
                     </div>

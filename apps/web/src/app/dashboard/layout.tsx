@@ -30,6 +30,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const navItems = [
         { name: "My Trips", href: "/dashboard", icon: Home },
         { name: "Curated Trips", href: "/dashboard/curated-trips", icon: Compass },
+        { name: "Accommodation", href: "/dashboard/accommodation", icon: Home },
         { name: "Explore", href: "/dashboard/explore", icon: Map },
         { name: "Saved", href: "/dashboard/saved", icon: Heart },
         { name: "Community", href: "/dashboard/community", icon: Users },

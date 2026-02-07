@@ -228,7 +228,10 @@ export async function useTemplate(templateId: string, startDateStr: string) {
     }
 
     // 5. Increment use_count
-    await supabase.rpc('increment_template_use_count', { template_id: templateId });
+    const { error: rpcError } = await supabase.rpc('increment_template_use_count', { template_id: templateId });
+    if (rpcError) {
+        console.error('Failed to increment template use count:', rpcError);
+    }
     // If RPC doesn't exist, just update manually (ignoring race condition for MVP)
     // await supabase.from('trip_templates').update({ use_count: template.use_count + 1 }).eq('id', templateId);
 

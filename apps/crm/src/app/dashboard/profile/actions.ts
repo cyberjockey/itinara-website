@@ -23,6 +23,7 @@ export async function getProfile() {
     return data;
 }
 
+
 export async function updateProfile(prevState: unknown, formData: FormData) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
