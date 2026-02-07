@@ -11,7 +11,6 @@ const initialState = {
 };
 
 export function NewTripForm() {
-    // @ts-ignore
     const [state, formAction, isPending] = useActionState(createTrip, initialState);
 
     return (

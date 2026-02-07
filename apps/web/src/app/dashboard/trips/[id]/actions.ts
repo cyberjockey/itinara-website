@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export async function createActivity(prevState: any, formData: FormData) {
+export async function createActivity(prevState: { message: string; error?: string } | null, formData: FormData) {
     const supabase = await createClient();
 
     const tripId = formData.get("tripId") as string;

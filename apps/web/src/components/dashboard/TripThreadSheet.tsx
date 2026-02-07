@@ -9,8 +9,39 @@ import { CommentItem } from "@/components/dashboard/CommentItem";
 import { cn, getImageUrl } from "@/lib/utils";
 import Link from "next/link";
 
+interface Comment {
+    id: string;
+    parent_id?: string | null;
+    user_id: string;
+    content: string;
+    attachment_url?: string | null;
+    created_at: string;
+    updated_at?: string | null;
+    profiles: {
+        full_name: string | null;
+        avatar_url: string | null;
+    } | null;
+    replies?: Comment[];
+    likedByCurrentUser?: boolean;
+    likeCount?: number;
+}
+
+interface Trip {
+    id: string;
+    title: string;
+    destination: string;
+    image_url?: string;
+    start_date?: string;
+    end_date?: string;
+    description?: string;
+    profiles?: {
+        full_name: string | null;
+        avatar_url: string | null;
+    } | null;
+}
+
 interface TripThreadSheetProps {
-    trip: any;
+    trip: Trip | null;
     currentUserId?: string;
     isOpen: boolean;
     onClose: () => void;
@@ -18,7 +49,7 @@ interface TripThreadSheetProps {
 }
 
 export function TripThreadSheet({ trip, currentUserId, isOpen, onClose, initialIsLiked = false }: TripThreadSheetProps) {
-    const [comments, setComments] = useState<any[]>([]);
+    const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(false);
     const [offset, setOffset] = useState(0);
     const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
@@ -193,8 +224,8 @@ export function TripThreadSheet({ trip, currentUserId, isOpen, onClose, initialI
                                         comment={c}
                                         currentUserId={currentUserId || ""}
                                         tripId={trip.id}
-                                        likedByCurrentUser={c.likedByCurrentUser}
-                                        likeCount={c.likeCount}
+                                        likedByCurrentUser={c.likedByCurrentUser ?? false}
+                                        likeCount={c.likeCount ?? 0}
                                     />
                                 ))
                             )}

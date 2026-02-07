@@ -8,9 +8,10 @@ import { useRouter } from "next/navigation";
 interface TripCommitButtonProps {
     tripId: string;
     initialIsCommitted: boolean;
+    variant?: 'default' | 'menu-item';
 }
 
-export function TripCommitButton({ tripId, initialIsCommitted }: TripCommitButtonProps) {
+export function TripCommitButton({ tripId, initialIsCommitted, variant = 'default' }: TripCommitButtonProps) {
     const [isPending, startTransition] = useTransition();
     const [isCommitted, setIsCommitted] = useState(initialIsCommitted);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -30,11 +31,39 @@ export function TripCommitButton({ tripId, initialIsCommitted }: TripCommitButto
     };
 
     if (isCommitted) {
+        if (variant === 'menu-item') {
+            return (
+                <div className="w-full text-left flex items-center gap-3 px-3 py-2 text-sm font-medium text-rice-paddy-green bg-rice-paddy-green/5 rounded-lg">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Trip Committed</span>
+                </div>
+            );
+        }
         return (
             <div className="flex items-center gap-2 px-4 py-2 bg-rice-paddy-green/10 text-rice-paddy-green rounded-xl text-sm font-medium">
                 <CheckCircle2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Committed</span>
             </div>
+        );
+    }
+
+    if (variant === 'menu-item') {
+        return (
+            <>
+                <button
+                    onClick={() => setShowConfirm(true)}
+                    disabled={isPending}
+                    className="w-full text-left flex items-center gap-3 px-3 py-2 text-sm font-medium text-stone-gray hover:text-deep-teak hover:bg-stone-gray/5 rounded-lg transition-colors disabled:opacity-50"
+                >
+                    {isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                        <Lock className="w-4 h-4" />
+                    )}
+                    <span>Commit Trip</span>
+                </button>
+                {/* Modal rendering code remains below */}
+            </>
         );
     }
 

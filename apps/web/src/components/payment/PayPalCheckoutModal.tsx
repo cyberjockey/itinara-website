@@ -48,8 +48,8 @@ export function PayPalCheckoutModal({
             const result = await capturePayment(data.orderID);
             if (result.success) {
                 // Track purchase
-                if (typeof window !== 'undefined' && (window as any).gtag) {
-                    (window as any).gtag('event', 'purchase', {
+                if (typeof window !== 'undefined' && 'gtag' in window) {
+                    (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'purchase', {
                         transaction_id: data.orderID,
                         value: amount / 100,
                         currency: 'USD',
@@ -72,7 +72,7 @@ export function PayPalCheckoutModal({
         }
     };
 
-    const handleError = (err: any) => {
+    const handleError = (err: unknown) => {
         console.error("PayPal error:", err);
         toast.error("Payment error. Please try again.");
     };

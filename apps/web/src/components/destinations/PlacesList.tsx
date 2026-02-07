@@ -16,7 +16,7 @@ interface Place {
     rating?: number;
     coordinates?: { lat: number, lng: number };
     photos?: string[];
-    reviews?: any[];
+    reviews?: unknown[];
 }
 
 interface Trip {

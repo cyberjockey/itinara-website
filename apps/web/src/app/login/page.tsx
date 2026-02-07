@@ -1,9 +1,10 @@
 "use client";
 
 import { login } from "./actions";
-import { useActionState } from "react";
+import { useActionState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar"; // Assuming you want to reuse the Navbar or a simplified version
 
 const initialState = {
@@ -11,7 +12,17 @@ const initialState = {
 };
 
 export default function LoginPage() {
-    // @ts-ignore
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-warm-white" />}>
+            <LoginForm />
+        </Suspense>
+    );
+}
+
+function LoginForm() {
+    const searchParams = useSearchParams();
+    const next = searchParams.get("next");
+
     const [state, formAction, isPending] = useActionState(login, initialState);
 
     return (
@@ -41,6 +52,7 @@ export default function LoginPage() {
                     </div>
 
                     <form action={formAction} className="space-y-6">
+                        {next && <input type="hidden" name="next" value={next} />}
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-stone-gray mb-1">
                                 Email Address
@@ -90,8 +102,8 @@ export default function LoginPage() {
                     </form>
 
                     <div className="mt-6 text-center text-sm text-stone-gray">
-                        Don't have an account?{" "}
-                        <Link href="/signup" className="text-terracotta font-bold hover:underline">
+                        Don&apos;t have an account?{" "}
+                        <Link href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"} className="text-terracotta font-bold hover:underline">
                             Sign up
                         </Link>
                     </div>

@@ -62,7 +62,7 @@ export function HowItWorks() {
                         transition={{ delay: 0.2 }}
                         className="text-stone-gray/80 text-lg"
                     >
-                        Planning a trip to Indonesia doesn't have to be overwhelming. We make it effortless.
+                        Planning a trip to Indonesia doesn&apos;t have to be overwhelming. We make it effortless.
                     </motion.p>
                 </div>
 

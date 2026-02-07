@@ -5,15 +5,26 @@ import { MessageCircle, Heart, X, Send, Loader2, Filter, Image as ImageIcon, Tra
 import { fetchComments, addComment } from "@/app/dashboard/trips/actions";
 import { CommentItem } from "@/components/dashboard/CommentItem";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface CommentPopoverProps {
     tripId: string;
     currentUserId: string;
 }
 
+interface Comment {
+    id: string;
+    user_id: string;
+    content: string;
+    created_at: string;
+    likedByCurrentUser: boolean;
+    likeCount: number;
+    profiles: { full_name: string | null; avatar_url: string | null } | null;
+}
+
 export function CommentPopover({ tripId, currentUserId }: CommentPopoverProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [comments, setComments] = useState<any[]>([]);
+    const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(false);
     const [offset, setOffset] = useState(0);
     const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
@@ -199,7 +210,13 @@ export function CommentPopover({ tripId, currentUserId }: CommentPopoverProps) {
                         {/* Image Preview */}
                         {previewUrl && (
                             <div className="relative mb-3 inline-block">
-                                <img src={previewUrl} alt="Preview" className="h-20 w-auto rounded-lg border border-stone-gray/20 object-cover" />
+                                <Image
+                                    src={previewUrl}
+                                    alt="Preview"
+                                    width={100}
+                                    height={80}
+                                    className="h-20 w-auto rounded-lg border border-stone-gray/20 object-cover"
+                                />
                                 <button
                                     onClick={clearFile}
                                     className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md border border-stone-gray/10 text-red-500 hover:bg-red-50"

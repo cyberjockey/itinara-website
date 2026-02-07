@@ -1,5 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
+interface OverpassElement {
+    type: string;
+    id: number;
+    lat?: number;
+    lon?: number;
+    center?: { lat: number; lon: number };
+    tags?: {
+        name?: string;
+        amenity?: string;
+        "addr:full"?: string;
+        "addr:street"?: string;
+        phone?: string;
+        "contact:phone"?: string;
+    } & Record<string, string>;
+}
+
 interface EmergencyPlace {
     id: number;
     name: string;
@@ -83,8 +99,8 @@ export async function GET(request: NextRequest) {
 
         // Process and categorize results
         const places: EmergencyPlace[] = data.elements
-            .filter((el: any) => el.tags?.name || el.tags?.amenity)
-            .map((el: any) => {
+            .filter((el: OverpassElement) => el.tags?.name || el.tags?.amenity)
+            .map((el: OverpassElement) => {
                 // For ways, use the center coordinates
                 const elLat = el.lat || el.center?.lat;
                 const elLon = el.lon || el.center?.lon;

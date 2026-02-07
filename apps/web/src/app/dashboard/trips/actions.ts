@@ -59,13 +59,21 @@ export async function toggleLike(tripId: string) {
     revalidatePath('/dashboard/community');
 }
 
+interface CommentPayload {
+    user_id: string;
+    trip_id: string;
+    content: string;
+    attachment_url?: string;
+    parent_id?: string;
+}
+
 export async function addComment(tripId: string, content: string, parentId?: string, attachmentUrl?: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) throw new Error("Unauthorized");
 
-    const payload: any = {
+    const payload: CommentPayload = {
         user_id: user.id,
         trip_id: tripId,
         content: content,
@@ -145,6 +153,16 @@ export async function fetchComments(
     limit: number = 3,
     sortBy: 'recent' | 'popular' = 'recent'
 ) {
+    interface CommentWithMetadata {
+        id: string;
+        user_id: string;
+        trip_id: string;
+        content: string;
+        parent_id: string | null;
+        created_at: string;
+        comment_likes: { user_id: string }[];
+        profiles: { full_name: string | null; avatar_url: string | null } | null;
+    }
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -188,10 +206,10 @@ export async function fetchComments(
 
     const allFetched = [...rootComments, ...(replies || [])];
 
-    const processed = allFetched.map((c: any) => ({
+    const processed = (allFetched as unknown as CommentWithMetadata[]).map((c: CommentWithMetadata) => ({
         ...c,
         likeCount: c.comment_likes?.length || 0,
-        likedByCurrentUser: !!user && c.comment_likes?.some((l: any) => l.user_id === user.id),
+        likedByCurrentUser: !!user && c.comment_likes?.some((l: { user_id: string }) => l.user_id === user.id),
         profiles: c.profiles
     }));
 

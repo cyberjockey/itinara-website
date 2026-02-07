@@ -7,6 +7,19 @@ import { RankBadge } from "@/components/ui/RankBadge";
 import { TripCardActions } from "@/components/dashboard/TripCardActions";
 import { ClientAnalytics } from "@/components/analytics/ClientAnalytics";
 
+interface Trip {
+    id: string;
+    title: string;
+    status: 'active' | 'planning' | 'completed' | 'cancelled';
+    destination: string;
+    start_date: string;
+    end_date: string;
+    activity_count?: number;
+    max_activities?: number;
+    trip_type?: 'standard' | 'vip';
+    source_template_id?: string | null;
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage({
@@ -68,17 +81,17 @@ export default async function DashboardPage({
     // Sort and Group Trips
     const now = new Date();
 
-    const activeTripsRaw = trips?.filter((t: any) => t.status === 'active') || [];
-    const planningTrips = trips?.filter((t: any) => t.status === 'planning') || [];
-    const closedTrips = trips?.filter((t: any) => t.status === 'completed' || t.status === 'cancelled') || [];
+    const activeTripsRaw = (trips as Trip[] | null)?.filter((t: Trip) => t.status === 'active') || [];
+    const planningTrips = (trips as Trip[] | null)?.filter((t: Trip) => t.status === 'planning') || [];
+    const closedTrips = (trips as Trip[] | null)?.filter((t: Trip) => t.status === 'completed' || t.status === 'cancelled') || [];
 
-    const activeTrips = activeTripsRaw.filter((t: any) => new Date(t.end_date) >= now);
-    const expiredActiveTrips = activeTripsRaw.filter((t: any) => new Date(t.end_date) < now);
+    const activeTrips = activeTripsRaw.filter((t: Trip) => new Date(t.end_date) >= now);
+    const expiredActiveTrips = activeTripsRaw.filter((t: Trip) => new Date(t.end_date) < now);
 
     const mainTrips = [...activeTrips, ...planningTrips];
     const inactiveTrips = [...closedTrips, ...expiredActiveTrips];
 
-    const renderTripCard = (trip: any) => {
+    const renderTripCard = (trip: Trip) => {
         const activityCount = trip.activity_count || 0;
         const maxActivities = trip.max_activities;
         const isVIP = trip.trip_type === 'vip';

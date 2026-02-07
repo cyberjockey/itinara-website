@@ -6,17 +6,16 @@ import { ArrowDown, MapPin, Calendar, Compass } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useEffect } from "react";
 
+const words = ["Heritage", "Culture", "Culinary", "Indonesia"];
+
 export function Hero() {
     const { scrollY } = useScroll();
     const y = useTransform(scrollY, [0, 1000], [0, 400]);
-
 
     const [text, setText] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
     const [loopNum, setLoopNum] = useState(0);
     const [typingSpeed, setTypingSpeed] = useState(150);
-
-    const words = ["Heritage", "Culture", "Culinary", "Indonesia"];
 
     useEffect(() => {
         const handleTyping = () => {
@@ -43,7 +42,7 @@ export function Hero() {
 
         const timer = setTimeout(handleTyping, typingSpeed);
         return () => clearTimeout(timer);
-    }, [text, isDeleting, loopNum, typingSpeed, words]);
+    }, [text, isDeleting, loopNum, typingSpeed]);
 
     return (
         <section className="relative h-screen w-full overflow-hidden flex items-center justify-center text-warm-white bg-deep-teak">

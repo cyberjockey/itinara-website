@@ -7,9 +7,10 @@ import { deleteTrip } from "@/app/dashboard/trips/actions";
 
 interface TripDeleteButtonProps {
     tripId: string;
+    variant?: 'default' | 'menu-item';
 }
 
-export function TripDeleteButton({ tripId }: TripDeleteButtonProps) {
+export function TripDeleteButton({ tripId, variant = 'default' }: TripDeleteButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [confirmText, setConfirmText] = useState("");
     const [isPending, startTransition] = useTransition();
@@ -26,6 +27,21 @@ export function TripDeleteButton({ tripId }: TripDeleteButtonProps) {
             }
         });
     };
+
+    if (variant === 'menu-item') {
+        return (
+            <>
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="w-full text-left flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Trip
+                </button>
+                {/* Modal rendering code remains below */}
+            </> // Wrapper to ensure modal works, logic continues
+        );
+    }
 
     return (
         <>
@@ -57,7 +73,7 @@ export function TripDeleteButton({ tripId }: TripDeleteButtonProps) {
                             </div>
 
                             <div className="w-full">
-                                <label className="block text-xs font-bold text-stone-gray uppercase mb-2">Type "DELETE" to confirm</label>
+                                <label className="block text-xs font-bold text-stone-gray uppercase mb-2">Type &quot;DELETE&quot; to confirm</label>
                                 <input
                                     type="text"
                                     className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-stone-800 font-bold placeholder:font-normal transition-all"

@@ -6,6 +6,20 @@ import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
 import { SaveButton } from "@/components/dashboard/SaveButton";
 
+interface Destination {
+    id: string;
+    name: string;
+    location: string;
+    description: string;
+    image_url: string;
+    rating: number;
+    tags?: string[];
+}
+
+interface SavedDestination {
+    destination: Destination;
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function SavedPage() {
@@ -22,8 +36,12 @@ export default async function SavedPage() {
         .order('created_at', { ascending: false });
 
     // Flatten the structure a bit for easier mapping
-    // Note: Type assertion or detailed types would be better, but we trust the query shape here for MVP.
-    const destinations = savedItems?.map((item: any) => item.destination) || [];
+    const destinations = (savedItems as unknown as { destination: Destination | Destination[] }[])?.map((item) => {
+        const dest = item.destination;
+        return Array.isArray(dest) ? dest[0] : dest;
+    }).filter(Boolean) as Destination[] || [];
+
+    // Note: The above handles Supabase returning joins as arrays in some TS configurations.
 
     return (
         <div className="max-w-7xl mx-auto">
@@ -34,7 +52,7 @@ export default async function SavedPage() {
 
             {destinations.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {destinations.map((destination: any) => (
+                    {destinations.map((destination: Destination) => (
                         <div key={destination.id} className="group bg-white rounded-2xl overflow-hidden border border-stone-gray/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                             <div className="relative h-64 overflow-hidden">
                                 <Image

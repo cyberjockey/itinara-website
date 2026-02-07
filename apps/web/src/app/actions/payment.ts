@@ -2,6 +2,31 @@
 
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { createPayPalOrder, capturePayPalOrder } from "@/services/paypal";
+
+interface PayPalCaptureResult {
+    status: string;
+    purchase_units?: {
+        payments?: {
+            captures?: {
+                amount?: {
+                    value: string;
+                    currency_code: string;
+                };
+            }[];
+        };
+    }[];
+    metadata?: {
+        userEmail?: string;
+    };
+}
+
+interface QuotaUpdates {
+    premium_trips_remaining?: number;
+    vip_trips_remaining?: number;
+    lifetime_trips_purchased: number;
+    paid_trips_remaining: number;
+    updated_at: string;
+}
 import { revalidatePath } from "next/cache";
 
 // Send Telegram notification for new payment
@@ -149,7 +174,7 @@ export async function capturePayment(orderId: string) {
     }
 
     // Get package info from the capture result
-    const purchaseUnits = (captureResult as any).purchase_units?.[0];
+    const purchaseUnits = (captureResult as unknown as PayPalCaptureResult).purchase_units?.[0];
     const capturedAmount = purchaseUnits?.payments?.captures?.[0]?.amount;
 
     let packageType = "starter"; // Default
@@ -260,7 +285,7 @@ export async function capturePayment(orderId: string) {
         const currentLifetime = quota.lifetime_trips_purchased || 0;
         const currentPaid = quota.paid_trips_remaining || 0;
 
-        const updates: any = {
+        const updates: QuotaUpdates = {
             lifetime_trips_purchased: currentLifetime + creditsToAdd,
             paid_trips_remaining: currentPaid + creditsToAdd,
             updated_at: new Date().toISOString()

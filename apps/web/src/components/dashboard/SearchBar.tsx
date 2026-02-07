@@ -5,10 +5,10 @@ import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 
 // Simple custom debounce since we might not have use-debounce installed and don't want to install more deps if not needed
-function useDebounce(callback: (...args: any[]) => void, delay: number) {
+function useDebounce<A extends unknown[]>(callback: (...args: A) => void, delay: number) {
     // Basic implementation for binding
     let timeoutId: NodeJS.Timeout;
-    return (...args: any[]) => {
+    return (...args: A) => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
             callback(...args);

@@ -128,7 +128,7 @@ export async function createPayPalOrder(
     }
 
     const order: PayPalOrderResponse = await response.json();
-    const approvalLink = order.links?.find((link: any) => link.rel === 'approve');
+    const approvalLink = order.links?.find((link: { rel: string; href: string }) => link.rel === 'approve');
 
     return {
         orderId: order.id,
@@ -187,7 +187,7 @@ export async function capturePayPalOrder(orderId: string): Promise<{
 /**
  * Get PayPal Order Details
  */
-export async function getPayPalOrderDetails(orderId: string): Promise<any> {
+export async function getPayPalOrderDetails(orderId: string): Promise<unknown> {
     const accessToken = await getPayPalAccessToken();
 
     const response = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders/${orderId}`, {

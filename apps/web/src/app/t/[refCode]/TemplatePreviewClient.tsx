@@ -30,8 +30,8 @@ export function TemplatePreviewClient({
 }: {
     templateId: string;
     refCode: string;
-    itinerary: any;
-    guideMaterials?: any[];
+    itinerary: { days: { day: number; title?: string; activities?: Activity[] }[] };
+    guideMaterials?: unknown[];
     tripType?: string;
 }) {
     const router = useRouter();
@@ -41,23 +41,27 @@ export function TemplatePreviewClient({
 
     useEffect(() => {
         // Track view event on page load (once)
-        if (!hasTrackedView) {
+        if (!hasTrackedView && refCode) {
             trackReferralEvent(refCode, 'view');
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setHasTrackedView(true);
         }
+    }, [refCode, hasTrackedView]);
 
+    useEffect(() => {
         if (itinerary && itinerary.days) {
             // Map itinerary JSON to Day structure
-            const mappedDays = itinerary.days.map((d: any) => ({
+            const mappedDays = itinerary.days.map((d: { day: number; title?: string; activities?: Activity[] }) => ({
                 day_number: d.day,
                 title: d.title || `Day ${d.day}`,
                 activities: d.activities || []
             }));
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setDays(mappedDays);
         }
 
         setLoading(false);
-    }, [templateId, refCode, hasTrackedView, itinerary]);
+    }, [itinerary]);
 
     const handleUseTemplate = async () => {
         // Track click event
@@ -235,7 +239,7 @@ export function TemplatePreviewClient({
                         <div className="border-2 border-dashed border-red-200 rounded-lg p-4 mb-6 text-center bg-red-50 relative group">
                             <div className="flex flex-col items-center gap-2 text-red-400">
                                 <FileText className="w-8 h-8" />
-                                <div className="font-semibold">Download Guide's PDF</div>
+                                <div className="font-semibold">Download Guide&apos;s PDF</div>
                                 <div className="text-xs text-red-400/80">Available after purchase</div>
                             </div>
 

@@ -12,7 +12,7 @@ export default function AccessDeniedPage() {
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-3">Access Denied</h1>
                     <p className="text-gray-600 mb-8">
-                        You don't have permission to access the CRM. This area is restricted to administrators and local guides.
+                        You don&apos;t have permission to access the CRM. This area is restricted to administrators and local guides.
                     </p>
                 </div>
 

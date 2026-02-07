@@ -1,8 +1,25 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
-import { CreditCard, Check, Clock, X, Search, Filter, Download, DollarSign } from "lucide-react";
+import { CreditCard, Check, Clock, X, DollarSign } from "lucide-react";
 import Link from "next/link";
+
+interface Transaction {
+    id: string;
+    status: string;
+    amount: number;
+    currency: string;
+    credits_purchased: number;
+    paypal_order_id: string;
+    created_at: string;
+    payer_email?: string;
+    profiles?: {
+        full_name: string;
+        email: string;
+        avatar_url?: string;
+    };
+    package_type?: string;
+}
 
 export default async function TransactionsPage() {
     const supabase = await createClient();
@@ -141,7 +158,7 @@ export default async function TransactionsPage() {
                             </thead>
                             <tbody className="divide-y divide-stone-gray/10">
                                 {transactions && transactions.length > 0 ? (
-                                    transactions.map((tx: any) => (
+                                    transactions.map((tx: Transaction) => (
                                         <tr key={tx.id} className="hover:bg-stone-50 transition-colors">
                                             <td className="p-4">
                                                 <div className="flex items-center gap-3">

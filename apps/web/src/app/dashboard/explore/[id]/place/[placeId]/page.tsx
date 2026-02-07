@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Star, Calendar, Clock, Tag, ExternalLink } from "lucide-react";
+import { ArrowLeft, MapPin, Star, Clock, Tag, ExternalLink } from "lucide-react";
 import { PlaceGallery } from "@/components/places/PlaceGallery";
 import { PlaceReviews } from "@/components/places/PlaceReviews";
 import { PlaceMap } from "@/components/places/PlaceMap";
@@ -32,7 +32,7 @@ export default async function PlaceDetailPage(props: { params: Promise<{ id: str
 
     // 2. Fetch User's Trips for Add to Trip
     const { data: { user } } = await supabase.auth.getUser();
-    let userTrips: any[] = [];
+    let userTrips: { id: string; title: string; start_date: string; end_date: string }[] = [];
     if (user) {
         const now = new Date().toISOString();
         const { data: trips } = await supabase

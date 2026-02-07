@@ -5,8 +5,15 @@ import { Plus } from "lucide-react";
 import AddToTripModal from "@/components/dashboard/AddToTripModal";
 // Removed AddActivityModal import as it is replaced by dynamic import or usage below
 
+interface Trip {
+    id: string;
+    title: string;
+    start_date: string;
+    end_date: string;
+}
+
 interface AddToTripWrapperProps {
-    userTrips: any[];
+    userTrips: Trip[];
     placeId: string;
     placeName: string;
     placeLocation: string;

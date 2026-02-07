@@ -10,7 +10,7 @@ interface Transaction {
     currency: string;
     payment_status: string;
     created_at: string;
-    metadata: any;
+    metadata: Record<string, unknown>;
     package_type?: string;
     payer_email?: string;
 }
@@ -79,8 +79,9 @@ export function PurchaseHistory() {
                 </thead>
                 <tbody className="divide-y divide-stone-gray/10">
                     {transactions.map((tx) => {
-                        const planType = tx.metadata?.plan_type || tx.metadata?.creditType || (tx.package_type?.includes('vip') ? 'vip' : 'premium');
-                        const credits = tx.metadata?.trip_count || tx.metadata?.credits || 1;
+                        const metadata = tx.metadata as Record<string, unknown>;
+                        const planType = (metadata?.plan_type as string) || (metadata?.creditType as string) || (tx.package_type?.includes('vip') ? 'vip' : 'premium');
+                        const credits = Number(metadata?.trip_count || metadata?.credits || 1);
 
                         return (
                             <tr key={tx.id} className="hover:bg-stone-gray/5 transition-colors">

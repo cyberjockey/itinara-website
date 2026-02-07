@@ -33,7 +33,7 @@ interface Activity {
     coordinates?: { lat: number; lng: number } | null;
     place?: {
         coordinates?: { lat: number; lng: number } | null;
-        [key: string]: any;
+        [key: string]: unknown;
     } | null;
 }
 

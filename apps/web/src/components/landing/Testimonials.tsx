@@ -119,7 +119,7 @@ export function Testimonials() {
                             </div>
 
                             <blockquote className="text-xl md:text-2xl font-accent italic text-stone-gray mb-6 leading-relaxed">
-                                "{testimonials[currentIndex].text}"
+                                &quot;{testimonials[currentIndex].text}&quot;
                             </blockquote>
 
                             <div className="mt-auto">

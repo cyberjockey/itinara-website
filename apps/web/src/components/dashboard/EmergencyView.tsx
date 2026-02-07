@@ -15,9 +15,11 @@ interface EmergencyPlace {
     phone?: string;
 }
 
+import { Activity } from "@/types/trip";
+
 interface EmergencyViewProps {
-    trip: any;
-    activities: any[];
+    trip: { id: string; destination: string };
+    activities: Activity[];
     tripStatus: string;
 }
 
@@ -174,7 +176,7 @@ export function EmergencyView({ trip, activities, tripStatus }: EmergencyViewPro
                     </div>
                     <h3 className="text-xl font-bold text-deep-teak mb-2">Emergency Services Locked</h3>
                     <p className="text-stone-gray mb-6">
-                        Commit your trip to unlock emergency services information. Once committed, you'll see nearby hospitals, police stations, pharmacies, and local emergency numbers.
+                        Commit your trip to unlock emergency services information. Once committed, you&apos;ll see nearby hospitals, police stations, pharmacies, and local emergency numbers.
                     </p>
                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-left">
                         <div className="flex items-start gap-3">
@@ -228,7 +230,7 @@ export function EmergencyView({ trip, activities, tripStatus }: EmergencyViewPro
                         </div>
                         <div>
                             <p className="text-sm font-medium text-deep-teak">
-                                {useGPS ? 'Using your current location' : `Using trip location: ${trip.destination}`}
+                                {useGPS ? "Using your current location" : `Using trip location: ${trip.destination}`}
                             </p>
                             <p className="text-xs text-stone-gray">
                                 {refLat?.toFixed(4)}, {refLon?.toFixed(4)}

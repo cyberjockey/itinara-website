@@ -6,6 +6,23 @@ import { getPublishedTemplates } from "../explore/actions";
 import { Pagination } from "@/components/ui/Pagination";
 import { getImageUrl } from "@/lib/utils";
 
+interface Template {
+    id: string;
+    title: string;
+    description: string;
+    featured_image?: string;
+    duration_days: number;
+    difficulty_level: string;
+    destinations?: {
+        name: string;
+        image_url?: string;
+    };
+    profiles?: {
+        full_name: string;
+        avatar_url?: string;
+    };
+}
+
 export const metadata = {
     title: "Curated Trips | Itinara",
     description: "Explore curated trips by local guides.",
@@ -53,7 +70,7 @@ export default async function CuratedTripsPage(props: { searchParams: Promise<{ 
             {templates && templates.length > 0 ? (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                        {templates.map((template: any) => (
+                        {templates.map((template: Template) => (
                             <Link href={`/dashboard/explore/trips/${template.id}`} key={template.id} className="group flex flex-col h-full">
                                 <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
                                     <div className="relative h-60 shrink-0 overflow-hidden">
@@ -121,7 +138,7 @@ export default async function CuratedTripsPage(props: { searchParams: Promise<{ 
                 </>
             ) : (
                 <div className="py-20 text-center bg-stone-50 rounded-3xl border border-dashed border-stone-gray/20">
-                    <p className="text-lg text-stone-gray mb-2">No trips found for <span className="font-bold text-deep-teak">"{preference}"</span>.</p>
+                    <p className="text-lg text-stone-gray mb-2">No trips found for <span className="font-bold text-deep-teak">&quot;{preference}&quot;</span>.</p>
                     <p className="text-stone-gray/60">Try selecting a different category.</p>
                 </div>
             )

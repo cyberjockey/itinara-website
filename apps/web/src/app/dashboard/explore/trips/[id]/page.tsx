@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Calendar, Clock, User, ChevronLeft, Map, Star, FileText, Sparkles } from "lucide-react";
+import { MapPin, User, ChevronLeft, Map, Star, FileText } from "lucide-react";
 import { getPublishedTemplate } from "../../actions";
 import UseTemplateButton from "@/components/explore/UseTemplateButton";
 import { TripGallery } from "@/components/dashboard/TripGallery";
@@ -9,6 +9,22 @@ import { createClient } from "@/lib/supabase/server";
 import { getImageUrl } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
+
+interface ItineraryDay {
+    day: number;
+    title: string;
+    activities: {
+        id: string;
+        title: string;
+        start_time?: string;
+        location?: string;
+        description?: string;
+    }[];
+}
+
+interface Itinerary {
+    days: ItineraryDay[];
+}
 
 export default async function TripDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -21,7 +37,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
     }
 
     const { destinations, profiles: guide } = template;
-    const itinerary = template.itinerary as any; // Cast JSONB
+    const itinerary = template.itinerary as unknown as Itinerary; // Cast JSONB
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -115,9 +131,9 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                             {/* Connector Line */}
                             <div className="absolute left-[27px] top-4 bottom-4 w-0.5 bg-dashed border-l-2 border-stone-gray/20"></div>
 
-                            {itinerary?.days?.map((day: any, i: number) => {
+                            {itinerary?.days?.map((day: ItineraryDay, i: number) => {
                                 const stops = day.activities
-                                    ?.map((a: any) => a.location || a.title)
+                                    ?.map((a) => a.location || a.title)
                                     .filter(Boolean) || [];
 
                                 const mapsUrl = stops.length > 0
@@ -151,7 +167,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
 
                                             {day.activities && day.activities.length > 0 ? (
                                                 <div className="space-y-6">
-                                                    {day.activities.map((activity: any) => (
+                                                    {day.activities.map((activity) => (
                                                         <div key={activity.id} className="flex gap-4 group">
                                                             <div className="w-16 pt-1 text-right text-sm font-mono font-medium text-stone-gray shrink-0">
                                                                 {activity.start_time}
@@ -229,7 +245,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                                 className="flex items-center justify-center gap-2 w-full mb-3 px-6 py-3 bg-white border-2 border-dashed border-terracotta/30 hover:border-terracotta text-terracotta font-bold rounded-xl transition-all hover:bg-terracotta/5 group"
                             >
                                 <FileText className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                <span>Download Guide's PDF</span>
+                                <span>Download Guide&apos;s PDF</span>
                             </a>
                         )}
 
@@ -237,6 +253,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
                             templateId={template.id}
                             durationDays={template.duration_days}
                             vipQuota={vipCredits}
+                            isAuthenticated={!!user}
                         />
 
                         <p className="text-center text-xs text-stone-gray/60 mb-6 font-medium bg-stone-50 py-2 rounded-lg mt-2">
@@ -260,7 +277,7 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
 
                             {guide?.bio && (
                                 <p className="text-sm text-stone-gray/80 italic">
-                                    "{guide.bio}"
+                                    &quot;{guide.bio}&quot;
                                 </p>
                             )}
                         </div>

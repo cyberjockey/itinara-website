@@ -1,6 +1,3 @@
-import { User, Save, Asterisk } from "lucide-react";
-import { updateProfile } from "@/app/dashboard/settings/actions";
-import { createClient } from "@/lib/supabase/client";
 import { PurchaseHistory } from "@/components/dashboard/PurchaseHistory";
 import { SettingsForm } from "@/components/dashboard/SettingsForm";
 

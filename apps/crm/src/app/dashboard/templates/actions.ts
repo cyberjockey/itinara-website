@@ -134,7 +134,7 @@ export async function updateTemplate(id: string, formData: FormData) {
 
     const supabase = await createClient();
 
-    const updates: any = {};
+    const updates: Record<string, unknown> = {};
     if (formData.has('title')) updates.title = formData.get('title') as string;
     if (formData.has('description')) updates.description = formData.get('description') as string;
     if (formData.has('status')) updates.status = formData.get('status') as string;

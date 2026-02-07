@@ -9,7 +9,7 @@ import { createCheckoutOrder, capturePayment } from "@/app/actions/payment";
 interface PayPalCheckoutModalProps {
     isOpen: boolean;
     onClose: () => void;
-    packageType: string;
+    packageType: "starter" | "explorer" | "adventurer";
     packageDetails: {
         name: string;
         credits: number;
@@ -26,14 +26,16 @@ export function PayPalCheckoutModal({
     packageDetails,
     onSuccess,
 }: PayPalCheckoutModalProps) {
-    const [{ isPending, isResolved }] = usePayPalScriptReducer();
+    const [{ isPending }] = usePayPalScriptReducer();
     const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = "hidden";
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setStatus("idle");
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setErrorMessage("");
         } else {
             document.body.style.overflow = "unset";
@@ -45,7 +47,7 @@ export function PayPalCheckoutModal({
 
     const handleCreateOrder = async () => {
         try {
-            const result = await createCheckoutOrder(packageType as any);
+            const result = await createCheckoutOrder(packageType);
             return result.orderId;
         } catch (error) {
             console.error("Create order error:", error);
@@ -73,7 +75,7 @@ export function PayPalCheckoutModal({
         }
     };
 
-    const handleError = (err: any) => {
+    const handleError = (err: unknown) => {
         console.error("PayPal error:", err);
         setStatus("error");
         setErrorMessage("Something went wrong. Please try again.");

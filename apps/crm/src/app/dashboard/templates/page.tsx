@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Plus, MapPin, Calendar, Star } from "lucide-react";
 import { getTemplates } from "./actions";
+import { getImageUrl } from "@/lib/utils";
 
 export default async function TemplatesPage() {
     const templates = await getTemplates();
@@ -49,12 +50,13 @@ export default async function TemplatesPage() {
                                 <tr key={template.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                            <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
                                                 {template.featured_image ? (
-                                                    <img
-                                                        src={template.featured_image}
+                                                    <Image
+                                                        src={getImageUrl(template.featured_image)}
                                                         alt={template.title}
-                                                        className="w-full h-full object-cover"
+                                                        fill
+                                                        className="object-cover"
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-gray-400">

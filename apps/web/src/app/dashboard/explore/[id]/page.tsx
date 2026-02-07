@@ -9,6 +9,27 @@ import { getImageUrl } from "@/lib/utils";
 export const revalidate = 3600; // Revalidate every hour
 export const dynamic = 'force-dynamic';
 
+interface Trip {
+    id: string;
+    title: string;
+    start_date: string;
+    end_date: string;
+}
+
+interface TemplateProfile {
+    full_name: string | null;
+    avatar_url: string | null;
+}
+
+interface Template {
+    id: string;
+    title: string;
+    description: string | null;
+    duration_days: number;
+    featured_image: string | null;
+    profiles: TemplateProfile | null;
+}
+
 export default async function DestinationDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const supabase = await createClient();
@@ -40,7 +61,7 @@ export default async function DestinationDetailPage(props: { params: Promise<{ i
 
     // 3. Fetch User's Trips (for Add to Trip functionality)
     const { data: { user } } = await supabase.auth.getUser();
-    let userTrips: any[] = [];
+    let userTrips: Trip[] = [];
 
     if (user) {
         // Only fetch future trips for adding activities
@@ -146,7 +167,7 @@ export default async function DestinationDetailPage(props: { params: Promise<{ i
                         <section>
                             <h2 className="text-2xl font-bold text-deep-teak mb-6">Curated Trips in {destination.name}</h2>
                             <div className="grid md:grid-cols-2 gap-6">
-                                {templates.map((template: any) => (
+                                {templates?.map((template: Template) => (
                                     <Link href={`/dashboard/explore/trips/${template.id}`} key={template.id} className="group flex flex-col h-full">
                                         <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
                                             <div className="relative h-48 shrink-0 overflow-hidden">

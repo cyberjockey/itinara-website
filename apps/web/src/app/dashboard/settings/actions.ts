@@ -6,6 +6,17 @@ import { revalidatePath } from "next/cache";
 import path from "path";
 import fs from "fs/promises";
 
+interface ProfileUpdates {
+    id: string;
+    full_name?: string;
+    first_name?: string;
+    last_name?: string;
+    phone_number?: string;
+    website?: string;
+    updated_at: string;
+    avatar_url?: string;
+}
+
 export async function updateProfile(formData: FormData) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -54,7 +65,7 @@ export async function updateProfile(formData: FormData) {
         }
     }
 
-    const updates: any = {
+    const updates: ProfileUpdates = {
         id: user.id,
         full_name: fullName,
         first_name: firstName,

@@ -10,16 +10,16 @@ interface Activity {
     day_number: number;
     notes: string | null;
     location: string | null;
-    trip_start_date: string; // Passed from parent or calculated
 }
 
 interface CalendarExportButtonProps {
     tripTitle: string;
     tripStartDate: string;
-    activities: any[]; // Using any for simplicity here, but should be typed match DB
+    activities: Activity[]; // Using typed match DB
+    variant?: 'default' | 'menu-item';
 }
 
-export function CalendarExportButton({ tripTitle, tripStartDate, activities }: CalendarExportButtonProps) {
+export function CalendarExportButton({ tripTitle, tripStartDate, activities, variant = 'default' }: CalendarExportButtonProps) {
 
     const handleDownload = () => {
         const tripStart = new Date(tripStartDate);
@@ -41,7 +41,7 @@ export function CalendarExportButton({ tripTitle, tripStartDate, activities }: C
             return {
                 title: act.title,
                 description: act.notes || `Activity for ${tripTitle}`,
-                location: act.location,
+                location: act.location || undefined,
                 start: actDate,
                 durationMinutes: 60 // Default duration
             };
@@ -59,6 +59,18 @@ export function CalendarExportButton({ tripTitle, tripStartDate, activities }: C
         link.click();
         document.body.removeChild(link);
     };
+
+    if (variant === 'menu-item') {
+        return (
+            <button
+                onClick={handleDownload}
+                className="w-full text-left flex items-center gap-3 px-3 py-2 text-sm font-medium text-stone-gray hover:text-deep-teak hover:bg-stone-gray/5 rounded-lg transition-colors"
+            >
+                <Calendar className="w-4 h-4" />
+                Add to Calendar
+            </button>
+        );
+    }
 
     return (
         <button

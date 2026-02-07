@@ -2,19 +2,14 @@
 
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import Link from "next/link";
 import { format } from "date-fns";
 import { Plus } from "lucide-react";
 import { SortableActivityCard } from "./SortableActivityCard";
+import { cn } from "@/lib/utils";
+import { generateDayRouteUrl } from "@/lib/maps";
 
-interface Activity {
-    id: string;
-    day_number: number;
-    start_time: string | null;
-    title: string;
-    location: string | null;
-    category: string | null;
-    notes: string | null;
-}
+import { Activity } from "@/types/trip";
 
 interface DayColumnProps {
     dayNumber: number;
@@ -22,35 +17,13 @@ interface DayColumnProps {
     activities: Activity[];
     onAddActivity: () => void;
     readOnly?: boolean;
+    className?: string; // Add className prop
 }
 
 // Helper function to generate Google Maps route URL with multiple waypoints
-function generateDayRouteUrl(activities: Activity[]): string {
-    const locationsWithActivities = activities.filter(a => a.location && a.location.trim());
+// Now imported from @/lib/maps
 
-    if (locationsWithActivities.length === 0) return '#';
-    if (locationsWithActivities.length === 1) {
-        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationsWithActivities[0].location!)}`;
-    }
-
-    // For multiple locations, create a route
-    const origin = encodeURIComponent(locationsWithActivities[0].location!);
-    const destination = encodeURIComponent(locationsWithActivities[locationsWithActivities.length - 1].location!);
-
-    // Middle locations as waypoints
-    const waypoints = locationsWithActivities
-        .slice(1, -1)
-        .map(a => encodeURIComponent(a.location!))
-        .join('|');
-
-    if (waypoints) {
-        return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}&travelmode=driving`;
-    } else {
-        return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
-    }
-}
-
-export function DayColumn({ dayNumber, date, activities, onAddActivity, readOnly = false }: DayColumnProps) {
+export function DayColumn({ dayNumber, date, activities, onAddActivity, readOnly = false, className }: DayColumnProps) {
     const { setNodeRef } = useDroppable({
         id: `day-${dayNumber}`,
         data: {
@@ -61,7 +34,7 @@ export function DayColumn({ dayNumber, date, activities, onAddActivity, readOnly
     });
 
     return (
-        <div className="flex-shrink-0 w-80 h-full flex flex-col bg-stone-gray/5 rounded-2xl border border-stone-gray/10">
+        <div className={cn("flex-shrink-0 flex flex-col bg-stone-gray/5 rounded-2xl border border-stone-gray/10", className)}>
             {/* Column Header */}
             <div className="p-4 border-b border-stone-gray/10 bg-white/50 rounded-t-2xl backdrop-blur-sm sticky top-0 z-10">
                 <div className="flex justify-between items-center mb-1">
@@ -78,7 +51,7 @@ export function DayColumn({ dayNumber, date, activities, onAddActivity, readOnly
 
                 {/* Navigate Day Button - only show if there are activities with locations */}
                 {activities.length > 0 && activities.some(a => a.location) && (
-                    <a
+                    <Link
                         href={generateDayRouteUrl(activities)}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -93,12 +66,12 @@ export function DayColumn({ dayNumber, date, activities, onAddActivity, readOnly
                             <polyline points="7 13 12 18 17 13" />
                             <polyline points="7 6 12 11 17 6" />
                         </svg>
-                    </a>
+                    </Link>
                 )}
             </div>
 
             {/* Droppable Area */}
-            <div ref={readOnly ? undefined : setNodeRef} className="flex-1 p-3 overflow-y-auto min-h-[100px]">
+            <div ref={readOnly ? undefined : setNodeRef} className="flex-1 p-3 overflow-visible md:overflow-y-auto min-h-[100px]">
                 {readOnly ? (
                     <div className="space-y-3">
                         {activities.map((activity) => (
@@ -125,13 +98,13 @@ export function DayColumn({ dayNumber, date, activities, onAddActivity, readOnly
                         <p className="text-xs text-stone-gray/80 mb-2">
                             Add activities from our curated list
                         </p>
-                        <a
+                        <Link
                             href="/dashboard/explore"
                             className="inline-flex items-center gap-2 text-sm font-bold text-terracotta hover:text-deep-teak transition-colors"
                         >
                             <Plus className="w-4 h-4" />
                             Browse Explore
-                        </a>
+                        </Link>
                     </div>
                 )}
             </div>

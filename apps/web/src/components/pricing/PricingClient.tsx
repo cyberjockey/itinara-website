@@ -23,8 +23,8 @@ function PricingContent() {
         setIsModalOpen(true);
 
         // Track begin_checkout
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-            (window as any).gtag('event', 'begin_checkout', {
+        if (typeof window !== 'undefined' && 'gtag' in window) {
+            (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'begin_checkout', {
                 currency: 'USD',
                 value: amount / 100, // amount is in cents
                 items: [{

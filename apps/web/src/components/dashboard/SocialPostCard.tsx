@@ -5,8 +5,21 @@ import Image from "next/image";
 import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow, parseISO } from "date-fns";
 
+interface Trip {
+    id: string;
+    user_id: string;
+    title: string;
+    destination: string;
+    image_url?: string;
+    created_at?: string;
+    profiles?: {
+        full_name: string | null;
+        avatar_url: string | null;
+    } | null;
+}
+
 interface SocialPostCardProps {
-    trip: any;
+    trip: Trip;
     currentUserId?: string;
     isLiked?: boolean;
     onCommentClick?: () => void;

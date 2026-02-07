@@ -4,19 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { MapPin, MoreVertical } from "lucide-react";
 
-interface Activity {
-    id: string;
-    day_number: number;
-    start_time: string | null;
-    title: string;
-    location: string | null;
-    category: string | null;
-    notes: string | null;
-    place_id?: string; // Optional place_id for linking
-    place?: {
-        destination_id: string;
-    };
-}
+import { Activity } from "@/types/trip";
 
 interface SortableActivityCardProps {
     activity: Activity;

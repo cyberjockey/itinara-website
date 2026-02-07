@@ -6,6 +6,15 @@ import { SearchBar } from "@/components/dashboard/SearchBar";
 import { SaveButton } from "@/components/dashboard/SaveButton";
 import { getImageUrl } from "@/lib/utils";
 
+interface Destination {
+    id: string;
+    name: string;
+    location: string;
+    description: string;
+    image_url: string;
+    rating: number;
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function ExplorePage(props: { searchParams: Promise<{ query?: string }> }) {
@@ -57,7 +66,7 @@ export default async function ExplorePage(props: { searchParams: Promise<{ query
                     <h2 className="text-2xl font-bold text-deep-teak">Popular Destinations</h2>
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {destinations?.map((destination: any) => (
+                    {destinations?.map((destination: Destination) => (
                         <Link href={`/dashboard/explore/${destination.id}`} key={destination.id} className="group flex flex-col h-full">
                             <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-gray/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
                                 <div className="relative h-64 shrink-0 overflow-hidden">

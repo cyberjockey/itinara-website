@@ -20,7 +20,7 @@ export function getSessionId(): string {
 export async function trackReferralEvent(
     refCode: string,
     eventType: 'view' | 'click' | 'purchase',
-    metadata: Record<string, any> = {}
+    metadata: Record<string, unknown> = {}
 ) {
     try {
         const sessionId = getSessionId();
@@ -44,8 +44,9 @@ export async function trackReferralEvent(
         });
 
         // Send to Google Analytics
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-            (window as any).gtag('event', `referral_${eventType}`, {
+        const win = window as unknown as { gtag?: (type: string, name: string, data: Record<string, unknown>) => void };
+        if (typeof window !== 'undefined' && win.gtag) {
+            win.gtag('event', `referral_${eventType}`, {
                 event_category: 'Referral',
                 event_label: refCode,
                 value: eventType === 'purchase' ? 1 : 0

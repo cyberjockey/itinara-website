@@ -1,9 +1,10 @@
 "use client";
 
 import { signup } from "./actions";
-import { useActionState } from "react";
+import { useActionState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 
 const initialState = {
@@ -11,7 +12,17 @@ const initialState = {
 };
 
 export default function SignupPage() {
-    // @ts-ignore
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-warm-white" />}>
+            <SignupForm />
+        </Suspense>
+    );
+}
+
+function SignupForm() {
+    const searchParams = useSearchParams();
+    const next = searchParams.get("next");
+
     const [state, formAction, isPending] = useActionState(signup, initialState);
 
     return (
@@ -41,6 +52,7 @@ export default function SignupPage() {
                     </div>
 
                     <form action={formAction} className="space-y-6">
+                        {next && <input type="hidden" name="next" value={next} />}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label htmlFor="firstName" className="block text-sm font-medium text-stone-gray mb-1">
@@ -135,7 +147,7 @@ export default function SignupPage() {
 
                     <div className="mt-6 text-center text-sm text-stone-gray">
                         Already have an account?{" "}
-                        <Link href="/login" className="text-terracotta font-bold hover:underline">
+                        <Link href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"} className="text-terracotta font-bold hover:underline">
                             Log in
                         </Link>
                     </div>

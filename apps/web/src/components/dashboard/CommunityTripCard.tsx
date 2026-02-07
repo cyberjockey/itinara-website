@@ -4,8 +4,22 @@ import { MapPin, Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
 import { formatDistanceToNow, differenceInDays, parseISO } from "date-fns";
 import { getImageUrl } from "@/lib/utils";
 
+interface Trip {
+    id: string;
+    title: string;
+    destination: string;
+    image_url?: string;
+    created_at?: string;
+    start_date?: string;
+    end_date?: string;
+    profiles?: {
+        full_name: string | null;
+        avatar_url: string | null;
+    } | null;
+}
+
 interface CommunityTripCardProps {
-    trip: any;
+    trip: Trip;
     currentUserId?: string;
     isLiked?: boolean;
     onCommentClick?: () => void;

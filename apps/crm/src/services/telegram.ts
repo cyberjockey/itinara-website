@@ -1,5 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
-
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
@@ -15,7 +13,7 @@ export async function sendTelegramNotification(message: string, buttons?: { text
 
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
-    const payload: any = {
+    const payload: Record<string, unknown> = {
         chat_id: CHAT_ID,
         text: message,
         parse_mode: 'Markdown',
@@ -129,15 +127,16 @@ export async function uploadToTelegram(file: Blob, fileName: string, type: 'phot
     }
 }
 
-function parseTelegramResponse(data: any, type: 'photo' | 'document'): { file_id: string } | null {
+function parseTelegramResponse(data: unknown, type: 'photo' | 'document'): { file_id: string } | null {
+    const responseData = data as { result: { photo?: { file_id: string }[]; document?: { file_id: string } } };
     let fileId = '';
     if (type === 'photo') {
-        const photos = data.result.photo;
+        const photos = responseData.result.photo;
         if (photos && photos.length > 0) {
             fileId = photos[photos.length - 1].file_id;
         }
     } else {
-        fileId = data.result.document?.file_id;
+        fileId = responseData.result.document?.file_id || '';
     }
 
     if (!fileId) {

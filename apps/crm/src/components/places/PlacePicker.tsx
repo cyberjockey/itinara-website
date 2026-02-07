@@ -22,7 +22,9 @@ export function PlacePicker({ destinationId, value, onChange }: PlacePickerProps
     // Fetch places with server-side search - debounced
     useEffect(() => {
         if (!destinationId) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setPlaces([]);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLoading(false);
             return;
         }

@@ -5,6 +5,39 @@ import { createClient as createServiceRoleClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+interface ActivityData {
+    id?: string;
+    title?: string;
+    time?: string | null;
+    description?: string;
+    place_id?: string;
+    place_data?: {
+        id?: string;
+        location?: string;
+        name?: string;
+        type?: string;
+    };
+}
+
+interface ItineraryDay {
+    activities: ActivityData[];
+}
+
+interface Itinerary {
+    days: ItineraryDay[];
+}
+
+interface ActivityToInsert {
+    trip_id: string;
+    day_number: number;
+    title: string;
+    start_time: string | null;
+    location: string | null;
+    category: string;
+    notes: string;
+    place_id: string | null;
+}
+
 export async function purchaseTemplate(templateId: string, startDateStr: string, refCode?: string, sessionId?: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -79,14 +112,14 @@ export async function purchaseTemplate(templateId: string, startDateStr: string,
     }
 
     // 5. Create Activities
-    const activitiesToInsert: any[] = [];
-    const itinerary = template.itinerary as any;
+    const activitiesToInsert: ActivityToInsert[] = [];
+    const itinerary = template.itinerary as unknown as Itinerary;
 
     if (itinerary && itinerary.days) {
-        itinerary.days.forEach((day: any, index: number) => {
+        itinerary.days.forEach((day: ItineraryDay, index: number) => {
             const dayNumber = index + 1;
             if (day.activities) {
-                day.activities.forEach((activity: any) => {
+                day.activities.forEach((activity: ActivityData) => {
                     // Look up Place ID if available? 
                     // Template activities usually store `place_id` in `place_data` or `place_id` prop?
                     // The `useTemplate` logic used `place_data?.location` text.

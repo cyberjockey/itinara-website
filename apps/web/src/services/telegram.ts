@@ -7,6 +7,28 @@ const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const FILES_BOT_TOKEN = process.env.TELEGRAM_FILES_BOT_TOKEN || BOT_TOKEN;
 const FILES_CHAT_ID = process.env.TELEGRAM_FILES_CHAT_ID || CHAT_ID;
 
+interface TelegramMessagePayload {
+    chat_id: string;
+    text: string;
+    parse_mode?: string;
+    reply_markup?: {
+        inline_keyboard: Array<Array<{ text: string; url: string }>>;
+    };
+}
+
+interface TelegramResponse {
+    ok: boolean;
+    result: {
+        photo?: Array<{ file_id: string }>;
+        document?: { file_id: string };
+    };
+    error_code?: number;
+    description?: string;
+    parameters?: {
+        migrate_to_chat_id?: string;
+    };
+}
+
 export async function sendTelegramNotification(message: string, buttons?: { text: string; url: string }[]) {
     if (!BOT_TOKEN || !CHAT_ID) {
         console.warn("Telegram credentials not found in environment variables.");
@@ -15,8 +37,8 @@ export async function sendTelegramNotification(message: string, buttons?: { text
 
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
-    const payload: any = {
-        chat_id: CHAT_ID,
+    const payload: TelegramMessagePayload = {
+        chat_id: CHAT_ID!,
         text: message,
         parse_mode: 'Markdown',
     };
@@ -76,7 +98,7 @@ export async function uploadToTelegram(file: Blob, fileName: string, type: 'phot
     }
 
     const formData = new FormData();
-    formData.append("chat_id", FILES_CHAT_ID);
+    formData.append("chat_id", FILES_CHAT_ID!);
 
     // Append file with filename
     if (type === 'photo') {
@@ -129,7 +151,7 @@ export async function uploadToTelegram(file: Blob, fileName: string, type: 'phot
     }
 }
 
-function parseTelegramResponse(data: any, type: 'photo' | 'document'): { file_id: string } | null {
+function parseTelegramResponse(data: TelegramResponse, type: 'photo' | 'document'): { file_id: string } | null {
     let fileId = '';
     if (type === 'photo') {
         const photos = data.result.photo;
@@ -137,7 +159,7 @@ function parseTelegramResponse(data: any, type: 'photo' | 'document'): { file_id
             fileId = photos[photos.length - 1].file_id;
         }
     } else {
-        fileId = data.result.document?.file_id;
+        fileId = data.result.document?.file_id || '';
     }
 
     if (!fileId) {

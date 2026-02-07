@@ -170,7 +170,7 @@ function AcceptInviteContent() {
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                     <div className="mb-6 p-4 bg-blue-50 rounded-xl">
                         <p className="text-sm text-blue-800">
-                            You're joining as a <strong className="capitalize">{inviteData?.role?.replace("_", " ")}</strong>
+                            You&apos;re joining as a <strong className="capitalize">{inviteData?.role?.replace("_", " ")}</strong>
                         </p>
                         <p className="text-sm text-blue-600 mt-1">{inviteData?.email}</p>
                     </div>

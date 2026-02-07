@@ -6,9 +6,10 @@ import { toast } from "sonner"; // Assuming sonner is set up as per previous con
 
 interface ShareButtonProps {
     tripId: string;
+    variant?: 'default' | 'menu-item';
 }
 
-export function ShareButton({ tripId }: ShareButtonProps) {
+export function ShareButton({ tripId, variant = 'default' }: ShareButtonProps) {
     const [copied, setCopied] = useState(false);
 
     const handleShare = async () => {
@@ -25,6 +26,18 @@ export function ShareButton({ tripId }: ShareButtonProps) {
             toast.error("Failed to copy link");
         }
     };
+
+    if (variant === 'menu-item') {
+        return (
+            <button
+                onClick={handleShare}
+                className="w-full text-left flex items-center gap-3 px-3 py-2 text-sm font-medium text-stone-gray hover:text-deep-teak hover:bg-stone-gray/5 rounded-lg transition-colors"
+            >
+                {copied ? <Check className="w-4 h-4 text-green-600" /> : <Share2 className="w-4 h-4" />}
+                {copied ? "Copied!" : "Share Trip"}
+            </button>
+        );
+    }
 
     return (
         <button

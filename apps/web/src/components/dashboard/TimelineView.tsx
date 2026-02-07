@@ -29,26 +29,7 @@ import { DayColumn } from "./DayColumn";
 import { SortableActivityCard } from "./SortableActivityCard";
 import { createPortal } from "react-dom";
 
-interface Activity {
-    id: string;
-    day_number: number;
-    start_time: string | null;
-    title: string;
-    location: string | null;
-    category: string | null;
-    notes: string | null;
-    place_id?: string;
-    order_index?: number;
-}
-
-interface Trip {
-    id: string;
-    title: string;
-    destination: string;
-    start_date: string;
-    end_date: string;
-    status: string;
-}
+import { Trip, Activity } from "@/types/trip";
 
 interface TimelineViewProps {
     trip: Trip;
@@ -225,6 +206,7 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
     // Prevent hydration mismatch
     const [isMounted, setIsMounted] = useState(false);
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsMounted(true);
     }, []);
 
@@ -281,11 +263,11 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
                 </div>
             )}
 
-            <div className="flex-1 w-full flex justify-center overflow-hidden">
-                <div className="flex-1 max-w-7xl w-full overflow-x-auto overflow-y-hidden p-6">
+            <div className="flex-1 w-full overflow-hidden">
+                <div className="w-full h-full overflow-y-auto md:overflow-y-hidden md:overflow-x-auto p-4 md:p-6 no-scrollbar">
                     {readOnly ? (
                         // Read Only View - Simplified
-                        <div className="flex h-full gap-6 w-max">
+                        <div className="flex flex-col md:flex-row h-auto md:h-full gap-6 w-full md:w-max pb-10 md:pb-0 mx-auto md:mx-0">
                             {Array.from(columns.entries()).map(([dayNum, dayActivities]) => (
                                 <DayColumn
                                     key={dayNum}
@@ -294,6 +276,7 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
                                     activities={dayActivities}
                                     onAddActivity={() => handleAddActivity(dayNum)}
                                     readOnly={true}
+                                    className="w-full md:w-80 h-auto md:h-full flex-shrink-0"
                                 />
                             ))}
                         </div>
@@ -306,7 +289,7 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
                             onDragOver={handleDragOver}
                             onDragEnd={handleDragEnd}
                         >
-                            <div className="flex h-full gap-6 w-max">
+                            <div className="flex flex-col md:flex-row h-auto md:h-full gap-6 w-full md:w-max pb-10 md:pb-0 mx-auto md:mx-0">
                                 {Array.from(columns.entries()).map(([dayNum, dayActivities]) => (
                                     <DayColumn
                                         key={dayNum}
@@ -315,6 +298,7 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
                                         activities={dayActivities}
                                         onAddActivity={() => handleAddActivity(dayNum)}
                                         readOnly={false}
+                                        className="w-full md:w-80 h-auto md:h-full flex-shrink-0"
                                     />
                                 ))}
                             </div>

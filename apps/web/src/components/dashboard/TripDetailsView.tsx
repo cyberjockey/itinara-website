@@ -8,34 +8,10 @@ import Link from 'next/link';
 import { deleteTrip } from "@/app/dashboard/trips/actions";
 import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
 
-interface Place {
-    id: string;
-    name: string;
-    description?: string;
-    phone?: string;
-    website?: string;
-    location?: string;
-    rating?: number;
-    social_media?: Record<string, string>;
-    price_level?: string;
-    amenities?: string[];
-    what_to_expect?: string;
-}
-
-interface Activity {
-    id: string;
-    day_number: number;
-    start_time: string | null;
-    title: string;
-    location: string | null;
-    category: string | null;
-    notes: string | null;
-    place_id?: string;
-    place?: Place;
-}
+import { Activity, Place, Trip } from "@/types/trip";
 
 interface TripDetailsViewProps {
-    trip: any;
+    trip: Trip;
     activities: Activity[];
 }
 
@@ -180,7 +156,7 @@ export function TripDetailsView({ trip, activities }: TripDetailsViewProps) {
                                     </div>
                                     <div className="flex items-center gap-2 mt-0.5">
                                         <button
-                                            onClick={() => setViewingPdf({ url: trip.guide_material_url, title: 'Trip Guide' })}
+                                            onClick={() => trip.guide_material_url && setViewingPdf({ url: trip.guide_material_url, title: 'Trip Guide' })}
                                             className="text-xs text-terracotta hover:underline font-medium flex items-center gap-1"
                                         >
                                             <Eye className="w-3 h-3" /> Preview

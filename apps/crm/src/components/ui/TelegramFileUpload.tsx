@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Upload, X, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Upload, X, FileText, Loader2 } from "lucide-react";
 import Image from "next/image";
 
 interface TelegramFileUploadProps {
@@ -73,13 +73,13 @@ export default function TelegramFileUpload({
             // Our proxy route is `/api/proxy/images/telegram/[file_id]`.
             // So if the value looks like a URL, use it. If it's a raw ID, construct proxy URL.
 
-            const newIds = data.files.map((f: any) => f.file_id);
+            const newIds = data.files.map((f: { file_id: string }) => f.file_id);
             const updated = [...uploadedFiles, ...newIds];
             setUploadedFiles(updated);
             onUpload(updated);
 
-        } catch (err: any) {
-            setError(err.message || "Something went wrong uploading files.");
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Something went wrong uploading files.");
         } finally {
             setIsUploading(false);
             // Reset input

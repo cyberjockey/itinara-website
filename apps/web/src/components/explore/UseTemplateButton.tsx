@@ -9,9 +9,10 @@ interface UseTemplateButtonProps {
     templateId: string;
     durationDays: number;
     vipQuota: number;
+    isAuthenticated?: boolean;
 }
 
-export default function UseTemplateButton({ templateId, durationDays, vipQuota }: UseTemplateButtonProps) {
+export default function UseTemplateButton({ templateId, durationDays, vipQuota, isAuthenticated }: UseTemplateButtonProps) {
     const [isPending, startTransition] = useTransition();
     const [showDate, setShowDate] = useState(false);
     const router = useRouter();
@@ -34,14 +35,14 @@ export default function UseTemplateButton({ templateId, durationDays, vipQuota }
 
                 if (res.success) {
                     // Analytics: Spend Virtual Currency & Create Trip
-                    if (typeof window !== 'undefined' && (window as any).gtag) {
-                        (window as any).gtag('event', 'spend_virtual_currency', {
+                    if (typeof window !== 'undefined' && 'gtag' in window) {
+                        (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'spend_virtual_currency', {
                             value: 1,
                             virtual_currency_name: 'VIP_Credit',
                             item_name: `Template_${templateId}`
                         });
 
-                        (window as any).gtag('event', 'create_trip', {
+                        (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'create_trip', {
                             trip_id: res.tripId,
                             destination: 'template'
                         });
@@ -53,14 +54,19 @@ export default function UseTemplateButton({ templateId, durationDays, vipQuota }
                     }
                     router.push(`/dashboard/trips/${res.tripId}`);
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error(error);
-                alert(error.message || "Failed to purchase trip.");
+                alert(error instanceof Error ? error.message : "Failed to purchase trip.");
             }
         });
     };
 
     const handleClick = () => {
+        if (!isAuthenticated) {
+            router.push(`/signup?next=${encodeURIComponent(`/dashboard/explore/trips/${templateId}`)}`);
+            return;
+        }
+
         if (vipQuota < 1) {
             router.push("/dashboard/purchase"); // Redirect to top-up
             return;
@@ -116,7 +122,7 @@ export default function UseTemplateButton({ templateId, durationDays, vipQuota }
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                         min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-4 py-2 border border-stoe-gray/30 rounded-lg focus:ring-2 focus:ring-terracotta outline-none"
+                        className="w-full px-4 py-2 border border-stone-gray/30 rounded-lg focus:ring-2 focus:ring-terracotta outline-none"
                     />
                     <p className="text-xs text-stone-gray/60 mt-2">
                         This is a {durationDays} day trip.
@@ -143,17 +149,21 @@ export default function UseTemplateButton({ templateId, durationDays, vipQuota }
         );
     }
 
+    const buttonText = !isAuthenticated
+        ? "Register to Buy"
+        : (vipQuota < 1 ? "Insufficient VIP Quota - Top Up" : "Buy with VIP Trip Quota");
+
     return (
         <div className="mb-4">
             <button
                 onClick={handleClick}
                 className={`w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 
-                ${vipQuota < 1
+                ${(isAuthenticated && vipQuota < 1)
                         ? "bg-gray-100 text-stone-gray hover:bg-gray-200 shadow-gray-200/50"
                         : "bg-terracotta hover:bg-[#B54B35] text-white shadow-terracotta/20"
                     }`}
             >
-                {vipQuota < 1 ? "Insufficient VIP Quota - Top Up" : "Buy with VIP Trip Quota"}
+                {buttonText}
             </button>
             <p className="text-center text-xs text-stone-gray/60 mt-2">
                 Your Balance: <span className="font-bold text-deep-teak">{vipQuota} VIP Credits</span>

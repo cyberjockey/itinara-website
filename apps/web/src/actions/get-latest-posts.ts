@@ -40,8 +40,25 @@ export async function getLatestPosts(limit: number = 3) {
         return [];
     }
 
+    interface PostWithAuthor {
+        id: string;
+        title: string;
+        slug: string;
+        excerpt: string | null;
+        featured_image: string | null;
+        published_at: string;
+        created_at: string;
+        author: {
+            full_name: string | null;
+            avatar_url: string | null;
+        } | {
+            full_name: string | null;
+            avatar_url: string | null;
+        }[] | null;
+    }
+
     // Map author array to single object if needed
-    const formattedPosts = posts?.map((post: any) => ({
+    const formattedPosts = (posts as unknown as PostWithAuthor[])?.map((post: PostWithAuthor) => ({
         ...post,
         author: Array.isArray(post.author) ? post.author[0] : post.author
     })) || [];

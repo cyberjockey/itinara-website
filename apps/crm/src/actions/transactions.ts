@@ -21,13 +21,13 @@ export async function getTransactions() {
         return [];
     }
 
-    return transactions as any[];
+    return (transactions || []) as unknown[];
 }
 
 export async function updateTransactionStatus(id: string, status: string, invoiceId?: string) {
     const supabase = await createClient();
 
-    const updateData: any = { payment_status: status };
+    const updateData: Record<string, string> = { payment_status: status };
     if (invoiceId) {
         updateData.invoice_id = invoiceId;
     }

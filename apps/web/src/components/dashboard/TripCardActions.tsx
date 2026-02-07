@@ -84,7 +84,7 @@ export function TripCardActions({ tripId, tripName }: TripCardActionsProps) {
                             </div>
                             <h3 className="font-bold text-lg text-deep-teak mb-2">Delete Trip?</h3>
                             <div className="w-full text-left mb-6">
-                                <label className="block text-[10px] font-bold text-stone-gray uppercase mb-1.5 opacity-60">Type "DELETE" to confirm</label>
+                                <label className="block text-[10px] font-bold text-stone-gray uppercase mb-1.5 opacity-60">Type &quot;DELETE&quot; to confirm</label>
                                 <input
                                     type="text"
                                     className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-stone-800 font-bold placeholder:font-normal transition-all text-sm"

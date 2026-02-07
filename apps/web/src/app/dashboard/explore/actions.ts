@@ -4,6 +4,39 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+interface ActivityData {
+    id?: string;
+    title?: string;
+    time?: string | null;
+    description?: string;
+    place_id?: string;
+    place_data?: {
+        id?: string;
+        location?: string;
+        name?: string;
+        type?: string;
+    };
+}
+
+interface ItineraryDay {
+    activities: ActivityData[];
+}
+
+interface Itinerary {
+    days: ItineraryDay[];
+}
+
+interface ActivityToInsert {
+    trip_id: string;
+    day_number: number;
+    title: string;
+    start_time: string | null;
+    location: string | null;
+    category: string;
+    notes: string;
+    place_id: string | null;
+}
+
 export async function getPublishedTemplates(query?: string, page = 1, limit = 6, preference?: string) {
     const supabase = await createClient();
 
@@ -141,14 +174,14 @@ export async function useTemplate(templateId: string, startDateStr: string) {
     }
 
     // 4. Create Activities from Itinerary
-    const activitiesToInsert: any[] = [];
-    const itinerary = template.itinerary as any; // Assuming JSON structure
+    const activitiesToInsert: ActivityToInsert[] = [];
+    const itinerary = template.itinerary as unknown as Itinerary; // Assuming JSON structure
 
     if (itinerary && itinerary.days) {
         // Collect all activity titles to search for places
         const allTitles = new Set<string>();
-        itinerary.days.forEach((day: any) => {
-            day.activities?.forEach((activity: any) => {
+        itinerary.days.forEach((day: ItineraryDay) => {
+            day.activities?.forEach((activity: ActivityData) => {
                 if (activity.title) allTitles.add(activity.title);
             });
         });
@@ -161,12 +194,12 @@ export async function useTemplate(templateId: string, startDateStr: string) {
 
         const placesMap = new Map(matchedPlaces?.map(p => [p.name || "", p.id]) || []);
 
-        itinerary.days.forEach((day: any, index: number) => {
+        itinerary.days.forEach((day: ItineraryDay, index: number) => {
             const dayNumber = index + 1; // 1-based day number
 
             if (day.activities) {
-                day.activities.forEach((activity: any) => {
-                    const placeId = activity.place_id || activity.place_data?.id || placesMap.get(activity.title);
+                day.activities.forEach((activity: ActivityData) => {
+                    const placeId = activity.place_id || activity.place_data?.id || (activity.title ? placesMap.get(activity.title) : null);
 
                     activitiesToInsert.push({
                         trip_id: trip.id,

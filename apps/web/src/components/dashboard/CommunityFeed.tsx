@@ -4,14 +4,29 @@ import { useState } from "react";
 import { SocialPostCard } from "@/components/dashboard/SocialPostCard";
 import { TripThreadSheet } from "@/components/dashboard/TripThreadSheet";
 
+interface Trip {
+    id: string;
+    user_id: string;
+    title: string;
+    destination: string;
+    image_url?: string;
+    created_at?: string;
+    start_date?: string;
+    end_date?: string;
+    profiles?: {
+        full_name: string | null;
+        avatar_url: string | null;
+    } | null;
+}
+
 interface CommunityFeedProps {
-    trips: any[];
+    trips: Trip[];
     currentUserId?: string;
     likedTripIds: Set<string>;
 }
 
 export function CommunityFeed({ trips, currentUserId, likedTripIds }: CommunityFeedProps) {
-    const [selectedTrip, setSelectedTrip] = useState<any | null>(null);
+    const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
     return (
         <>

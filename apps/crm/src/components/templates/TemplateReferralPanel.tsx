@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Copy, ExternalLink, TrendingUp, Eye, MousePointer, ShoppingCart, Users } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Copy, TrendingUp, Eye, MousePointer, ShoppingCart } from "lucide-react";
 import { generateReferralLink, getReferralAnalytics, getRecentReferralEvents } from "@/app/dashboard/templates/referral-actions";
 
 interface ReferralAnalytics {
@@ -18,7 +18,7 @@ interface ReferralEvent {
     id: string;
     event_type: 'view' | 'click' | 'purchase';
     created_at: string;
-    metadata: any;
+    metadata: Record<string, unknown>;
 }
 
 export function TemplateReferralPanel({ templateId }: { templateId: string }) {
@@ -28,11 +28,7 @@ export function TemplateReferralPanel({ templateId }: { templateId: string }) {
     const [recentEvents, setRecentEvents] = useState<ReferralEvent[]>([]);
     const [copied, setCopied] = useState(false);
 
-    useEffect(() => {
-        loadData();
-    }, [templateId]);
-
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         setLoading(true);
 
         // Load referral link
@@ -54,7 +50,12 @@ export function TemplateReferralPanel({ templateId }: { templateId: string }) {
         }
 
         setLoading(false);
-    };
+    }, [templateId]);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadData();
+    }, [loadData]);
 
     const copyToClipboard = () => {
         if (refUrl) {

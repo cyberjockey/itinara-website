@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import {
     Send,
@@ -54,7 +55,7 @@ interface Conversation {
 }
 
 interface GuideChatProps {
-    trip: any;
+    trip: { id: string; trip_type?: string };
     tripStatus: string;
 }
 
@@ -130,9 +131,9 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
                         } catch (e) { console.error(e); }
                     }
 
-                    setMessages(prev => {
+                    setMessages((prev: Message[]) => {
                         // Avoid duplicates
-                        if (prev.some(m => m.id === newMsg.id)) return prev;
+                        if (prev.some((m: Message) => m.id === newMsg.id)) return prev;
                         return [...prev, newMsg];
                     });
                 }
@@ -216,8 +217,8 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
 
             // Add message optimistically (real-time will also deliver it)
             if (data.message) {
-                setMessages(prev => {
-                    if (prev.some(m => m.id === data.message.id)) return prev;
+                setMessages((prev: Message[]) => {
+                    if (prev.some((m: Message) => m.id === data.message.id)) return prev;
                     return [...prev, data.message];
                 });
             }
@@ -251,8 +252,8 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
                         </div>
                         <h3 className="text-xl font-bold text-deep-teak mb-2">No Guide Available</h3>
                         <p className="text-stone-gray">
-                            This trip isn't from a curated template. Guide chat is only available for trips that were
-                            created from our local guides' curated itineraries.
+                            This trip isn&apos;t from a curated template. Guide chat is only available for trips that were
+                            created from our local guides&apos; curated itineraries.
                         </p>
                     </div>
                 </div>
@@ -279,7 +280,7 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
                         </div>
                         <h3 className="text-xl font-bold text-deep-teak mb-2">Finding Your Guide</h3>
                         <p className="text-stone-gray">
-                            This is a curated trip, but we're still connecting you with the local guide.
+                            This is a curated trip, but we&apos;re still connecting you with the local guide.
                             Please check back shortly or contact support if this persists.
                         </p>
                     </div>
@@ -326,8 +327,8 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
                         </div>
                         <h3 className="text-xl font-bold text-deep-teak mb-2">No Guide Available</h3>
                         <p className="text-stone-gray">
-                            This trip isn't from a curated template. Guide chat is only available for trips that were
-                            created from our local guides' curated itineraries.
+                            This trip isn&apos;t from a curated template. Guide chat is only available for trips that were
+                            created from our local guides&apos; curated itineraries.
                         </p>
                     </div>
                 </div>
@@ -343,7 +344,7 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
                     </div>
                     <h3 className="text-xl font-bold text-deep-teak mb-2">Finding Your Guide</h3>
                     <p className="text-stone-gray">
-                        This is a curated trip, but we're still connecting you with the local guide.
+                        This is a curated trip, but we&apos;re still connecting you with the local guide.
                         Please check back shortly or contact support if this persists.
                     </p>
                 </div>
@@ -365,18 +366,16 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
             <div className="bg-white border-b border-stone-gray/10 p-4">
                 <div className="max-w-3xl mx-auto flex items-center gap-4">
                     {guide?.avatar_url ? (
-                        <img
+                        <Image
                             src={guide.avatar_url}
-                            onError={(e) => {
-                                e.currentTarget.src = '/logo.png';
-                                e.currentTarget.onerror = null;
-                            }}
                             alt={guide.full_name}
+                            width={56}
+                            height={56}
                             className="w-14 h-14 rounded-full object-cover border-2 border-ocean-turquoise"
                         />
                     ) : (
                         <div className="w-14 h-14 rounded-full bg-ocean-turquoise/10 flex items-center justify-center overflow-hidden">
-                            <img src="/logo.png" alt="Logo" className="w-full h-full object-cover opacity-50" />
+                            <Image src="/logo.png" alt="Logo" width={56} height={56} className="w-full h-full object-cover opacity-50" />
                         </div>
                     )}
                     <Link href={`/guides/${guide?.id}`} className="flex-1 hover:opacity-80 transition-opacity">
@@ -404,7 +403,7 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
                         </div>
                         {guide?.guide_expertise && guide.guide_expertise.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-1">
-                                {guide.guide_expertise.slice(0, 3).map((exp, i) => (
+                                {guide?.guide_expertise.slice(0, 3).map((exp: string, i: number) => (
                                     <span key={i} className="text-xs text-stone-gray bg-stone-gray/10 px-2 py-0.5 rounded-full">
                                         {exp}
                                     </span>
@@ -432,7 +431,7 @@ export function GuideChat({ trip, tripStatus }: GuideChatProps) {
                             </p>
                         </div>
                     ) : (
-                        messages.map((msg) => (
+                        messages.map((msg: Message) => (
                             <MessageBubble
                                 key={msg.id}
                                 message={msg}
@@ -535,9 +534,11 @@ function MessageBubble({ message, isOwnMessage, guide }: {
                     {message.attachment_url && (
                         <div className="mt-2">
                             {message.attachment_type === 'image' ? (
-                                <img
+                                <Image
                                     src={message.attachment_url}
                                     alt="Attachment"
+                                    width={300}
+                                    height={200}
                                     className="max-w-full rounded-lg border border-black/10 mt-1 cursor-pointer hover:opacity-95"
                                     onClick={() => window.open(message.attachment_url, '_blank')}
                                     style={{ maxHeight: '200px' }}

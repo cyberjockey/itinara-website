@@ -25,8 +25,7 @@ const initialState = {
 };
 
 export function AddActivityModal({ isOpen, onClose, tripId, dayNumber, initialData }: AddActivityModalProps) {
-    // @ts-ignore
-    const [state, formAction, isPending] = useActionState(async (prev: any, formData: FormData) => {
+    const [state, formAction, isPending] = useActionState(async (prev: { message: string, error?: string } | null, formData: FormData) => {
         const result = await createActivity(prev, formData);
         if (result.message === "success") {
             onClose();

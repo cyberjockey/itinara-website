@@ -5,8 +5,17 @@ import { Calendar, DollarSign, Sparkles, ArrowRight, BookOpen, Anchor, ChefHat }
 import Link from "next/link";
 import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
 
+interface Destination {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    image_url: string | null;
+    sample_itinerary?: { day: number; title: string; description: string }[] | null;
+}
+
 interface DestinationContentProps {
-    destination: any; // Using any for agility, ideally strictly typed
+    destination: Destination;
 }
 
 interface DestinationDetail {
@@ -156,7 +165,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
                     <p>{destination.description}</p>
                     <p>
                         Beyond the postcards, {destination.name} offers a deep connection to nature and culture.
-                        Whether you are seeking spiritual grounding or adrenaline-pumping adventures, this destination captures the essence of Indonesia's diversity.
+                        Whether you are seeking spiritual grounding or adrenaline-pumping adventures, this destination captures the essence of Indonesia&apos;s diversity.
                     </p>
                 </div>
             </section>
@@ -236,7 +245,7 @@ export function DestinationContent({ destination }: DestinationContentProps) {
 
                     {destination.sample_itinerary && Array.isArray(destination.sample_itinerary) ? (
                         <div className="space-y-8 max-w-2xl border-l border-white/20 pl-8 ml-2">
-                            {destination.sample_itinerary.map((day: any, index: number) => (
+                            {destination.sample_itinerary.map((day: { day: number; title: string; description: string }, index: number) => (
                                 <div key={index} className="relative">
                                     <span className={`absolute -left-[39px] top-1 w-5 h-5 rounded-full border-4 border-[#2C2121] ${index === 0 ? 'bg-[#E35435]' : 'bg-white'}`}></span>
                                     <h4 className="font-bold text-lg text-[#E35435] mb-1">Day {day.day}: {day.title}</h4>

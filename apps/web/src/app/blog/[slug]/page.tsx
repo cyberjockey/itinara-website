@@ -9,7 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import remarkBreaks from 'remark-breaks';
-import { ArrowLeft, User, Calendar, Clock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { ClientAnalytics } from "@/components/analytics/ClientAnalytics";
@@ -65,8 +65,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <div className="max-w-2xl mx-auto">
                     <h1 className="text-3xl font-bold text-red-600 mb-4">Debug: Post Not Found</h1>
                     <div className="bg-gray-100 p-6 rounded-lg text-left font-mono text-sm overflow-auto">
-                        <p className="mb-2"><strong>Slug searched:</strong> "{slug}"</p>
-                        <p className="mb-2"><strong>Status Check:</strong> 'published'</p>
+                        <p className="mb-2"><strong>Slug searched:</strong> &quot;{slug}&quot;</p>
+                        <p className="mb-2"><strong>Status Check:</strong> &apos;published&apos;</p>
                         {error ? (
                             <div>
                                 <p className="text-red-600 font-bold">Supabase Error:</p>

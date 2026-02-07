@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 // Custom modal pattern used instead of headlessui to avoid deps issues.
+import Link from "next/link";
 
 import { X, Calendar, MapPin } from "lucide-react";
 import { format, parseISO, differenceInDays, addDays } from "date-fns";
@@ -41,6 +42,7 @@ export default function AddToTripModal({ destination, trips, place, trigger }: A
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsMounted(true);
     }, []);
 
@@ -167,7 +169,7 @@ export default function AddToTripModal({ destination, trips, place, trigger }: A
                                 ) : (
                                     <div className="text-center py-4 text-stone-gray text-sm bg-warm-white/50 rounded-xl">
                                         No upcoming trips found.
-                                        <a href="/dashboard/trips/new" className="text-terracotta font-bold hover:underline ml-1">Create one first?</a>
+                                        <Link href="/dashboard/trips/new" className="text-terracotta font-bold hover:underline ml-1">Create one first?</Link>
                                     </div>
                                 )}
                             </div>

@@ -46,6 +46,7 @@ export function TemplateDetailsForm({ template }: TemplateDetailsFormProps) {
 
     // Watch for upload state changes too
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         handleFormChange();
     }, [featuredImage, galleryImages, guideMaterials]);
 

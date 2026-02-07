@@ -5,10 +5,27 @@ import { Send } from "lucide-react";
 import { addComment } from "@/app/dashboard/trips/actions";
 import { CommentItem } from "@/components/dashboard/CommentItem";
 
+interface Comment {
+    id: string;
+    parent_id?: string | null;
+    user_id: string;
+    content: string;
+    attachment_url?: string | null;
+    created_at: string;
+    updated_at?: string | null;
+    profiles: {
+        full_name: string | null;
+        avatar_url: string | null;
+    } | null;
+    replies?: Comment[];
+    likedByCurrentUser?: boolean;
+    likeCount?: number;
+}
+
 interface CommentSectionProps {
     tripId: string;
     currentUserId: string;
-    initialComments: any[]; // Flat list from DB, we will organize it
+    initialComments: Comment[]; // Flat list from DB, we will organize it
 }
 
 export function CommentSection({ tripId, currentUserId, initialComments }: CommentSectionProps) {
@@ -34,7 +51,7 @@ export function CommentSection({ tripId, currentUserId, initialComments }: Comme
     // Organize flat comments into trees
     const rootComments = initialComments.filter(c => !c.parent_id);
 
-    const getReplies = (parentId: string): any[] => {
+    const getReplies = (parentId: string): Comment[] => {
         return initialComments
             .filter(c => c.parent_id === parentId)
             .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) // Oldest first for replies usually
@@ -83,8 +100,8 @@ export function CommentSection({ tripId, currentUserId, initialComments }: Comme
                         comment={comment}
                         currentUserId={currentUserId}
                         tripId={tripId}
-                        likedByCurrentUser={comment.likedByCurrentUser}
-                        likeCount={comment.likeCount}
+                        likedByCurrentUser={comment.likedByCurrentUser ?? false}
+                        likeCount={comment.likeCount ?? 0}
                     />
                 ))}
 

@@ -5,7 +5,7 @@ import { TimelineView } from "@/components/dashboard/TimelineView";
 import { TripDetailsView } from "./TripDetailsView";
 import { EmergencyView } from "./EmergencyView";
 import { GuideChat } from "./GuideChat";
-import { Map, List, ListFilter, FileText, Shield, Lock, CheckCircle2, MessageCircle } from "lucide-react";
+import { Map, ListFilter, FileText, Shield, Lock, MessageCircle } from "lucide-react";
 
 // Dynamically import map to avoid SSR issues with Leaflet
 import dynamic from 'next/dynamic';
@@ -15,11 +15,13 @@ const TripMapSafe = dynamic(() => import('@/components/dashboard/TripMap').then(
     loading: () => <div className="w-full h-full bg-stone-gray/5 animate-pulse rounded-2xl" />
 });
 
+import { Trip, Activity } from "@/types/trip";
+
 interface TripViewToggleProps {
-    trip: any;
-    activities: any[];
+    trip: Trip;
+    activities: Activity[];
     readOnly?: boolean;
-    isCommitted?: boolean; // NEW prop
+    isCommitted?: boolean;
     initialView?: "timeline" | "map" | "details" | "emergency" | "guide";
 }
 
@@ -37,7 +39,7 @@ export function TripViewToggle({ trip, activities, readOnly = false, isCommitted
         <div className="flex flex-col flex-1 min-h-0">
             {/* View Toggle Tabs */}
             <div className="border-b border-stone-gray/10 bg-white">
-                <div className="px-6 pt-4 pb-2 flex gap-10 overflow-x-auto max-w-7xl mx-auto w-full">
+                <div className="px-4 md:px-6 pt-4 pb-2 flex gap-5 md:gap-10 overflow-x-auto max-w-7xl mx-auto w-full no-scrollbar">
                     <button
                         onClick={() => setView("timeline")}
                         className={`pb-3 text-sm font-bold flex items-center gap-2 transition-colors relative whitespace-nowrap ${view === "timeline" ? "text-deep-teak" : "text-stone-gray hover:text-deep-teak"

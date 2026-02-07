@@ -16,8 +16,8 @@ export function AuthTracker() {
 
         if (event === "login" || event === "sign_up") {
             // Track event
-            if (typeof window !== 'undefined' && (window as any).gtag) {
-                (window as any).gtag('event', event, {
+            if (typeof window !== 'undefined' && 'gtag' in window) {
+                (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', event, {
                     method: event === 'sign_up' ? 'email' : 'email' // Defaulting to email for now
                 });
             }
@@ -32,7 +32,7 @@ export function AuthTracker() {
             // Replace URL without refresh
             const query = params.toString();
             const url = query ? `${pathname}?${query}` : pathname;
-            router.replace(url as any, { scroll: false });
+            router.replace(url, { scroll: false });
         }
     }, [searchParams, pathname, router]);
 

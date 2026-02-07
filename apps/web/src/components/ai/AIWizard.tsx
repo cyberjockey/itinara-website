@@ -86,7 +86,7 @@ export function AIWizard({ onComplete }: AIWizardProps) {
                 <div className="space-y-6 animate-in slide-in-from-right-8 duration-500">
                     <div className="text-center mb-8">
                         <h2 className="text-2xl font-bold text-deep-teak mb-2">Where are you headed?</h2>
-                        <p className="text-stone-gray">Let's start with the basics of your journey.</p>
+                        <p className="text-stone-gray">Let&apos;s start with the basics of your journey.</p>
                     </div>
 
                     <div className="space-y-4">

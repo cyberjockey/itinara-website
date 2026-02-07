@@ -4,13 +4,10 @@ import { Calendar, MapPin, Share2, Map as MapIcon, List as ListIcon, Sparkles } 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { TripVisibilityToggle } from "@/components/dashboard/TripVisibilityToggle";
-import { CalendarExportButton } from "@/components/dashboard/CalendarExportButton";
 import { LikeButton } from "@/components/dashboard/LikeButton";
 import { CommentPopover } from "@/components/dashboard/CommentPopover";
-import { ShareButton } from "@/components/dashboard/ShareButton";
 import { TripViewToggle } from "@/components/dashboard/TripViewToggle";
-import { TripDeleteButton } from "@/components/dashboard/TripDeleteButton";
-import { TripCommitButton } from "@/components/dashboard/TripCommitButton";
+import { TripActionsMenu } from "@/components/dashboard/TripActionsMenu";
 
 export const dynamic = "force-dynamic";
 
@@ -69,84 +66,76 @@ export default async function TripDetailPage(props: {
 
     return (
         <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden bg-white/50">
-            <div className="mb-0 px-6 pt-6 bg-white border-b border-stone-gray/10 pb-4 shadow-sm z-10">
+            <div className="mb-0 px-4 md:px-6 pt-6 bg-white border-b border-stone-gray/10 pb-4 shadow-sm z-10 w-full">
                 <div className="max-w-7xl mx-auto w-full">
-                    <Link href={isOwner ? "/dashboard" : "/dashboard/community"} className="inline-flex items-center text-sm font-medium text-stone-gray hover:text-deep-teak mb-4 transition-colors group">
-                        <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-                        Back to {isOwner ? 'Dashboard' : 'Community'}
-                    </Link>
+                    {/* Top Row: Back Button & Visibility Badge (Desktop) */}
+                    <div className="flex items-center justify-between mb-2">
+                        <Link href={isOwner ? "/dashboard" : "/dashboard/community"} className="inline-flex items-center text-sm font-medium text-stone-gray hover:text-deep-teak transition-colors group">
+                            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                            Back to {isOwner ? 'Dashboard' : 'Community'}
+                        </Link>
+
+                        {/* Visibility on Desktop only, otherwise in menu */}
+                        {isOwner && (
+                            <div className="hidden md:block">
+                                <TripVisibilityToggle tripId={trip.id} initialIsPublic={trip.is_public || false} />
+                            </div>
+                        )}
+                    </div>
 
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                        <div>
-                            <h1 className="text-3xl font-heading font-bold text-deep-teak mb-2">{trip.title}</h1>
-                            <div className="flex items-center gap-4 text-stone-gray text-sm">
+                        <div className="flex-1 min-w-0">
+                            {/* Title */}
+                            <h1 className="text-2xl md:text-3xl font-heading font-bold text-deep-teak mb-3 leading-tight break-words">
+                                {trip.title}
+                            </h1>
+
+                            {/* Metadata Row */}
+                            <div className="flex flex-wrap items-center gap-2 md:gap-4 text-stone-gray text-xs md:text-sm">
                                 <div className="flex items-center gap-1.5 bg-stone-gray/5 px-2.5 py-1 rounded-md">
                                     <MapPin className="w-3.5 h-3.5 text-terracotta" />
-                                    <span className="font-medium">{trip.destination}</span>
+                                    <span className="font-medium truncate max-w-[150px]">{trip.destination}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 bg-stone-gray/5 px-2.5 py-1 rounded-md">
                                     <Calendar className="w-3.5 h-3.5 text-terracotta" />
                                     <span className="font-medium">
-                                        {/* Privacy for visitors: Show only days count or general start date? 
-                                            User asked for privacy. Let's just show year or generic duration?
-                                            But 'TimelineView' needs dates. 
-                                            Let's keep dates for now as standard travel sites do, but remove editing.
-                                        */}
                                         {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
                                     </span>
                                 </div>
-                                <div className="w-px h-4 bg-stone-gray/20 mx-1 hidden md:block"></div>
-
-                                {isOwner && (
-                                    <TripVisibilityToggle tripId={trip.id} initialIsPublic={trip.is_public || false} />
-                                )}
 
                                 {/* Trip Type Label */}
                                 {trip.trip_type === 'vip' ? (
-                                    <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1">
+                                    <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-2.5 py-1 rounded-md font-bold shadow-sm flex items-center gap-1">
                                         <span>👑</span> VIP
                                     </div>
                                 ) : trip.source_template_id ? (
-                                    <div className="bg-white border border-stone-gray/20 text-stone-gray px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm">
-                                        <Sparkles className="w-3 h-3 text-terracotta" /> Curated Trip
+                                    <div className="bg-white border border-stone-gray/20 text-stone-gray px-2.5 py-1 rounded-md font-bold flex items-center gap-1 shadow-sm">
+                                        <Sparkles className="w-3 h-3 text-terracotta" /> Curated
                                     </div>
                                 ) : null}
                             </div>
                         </div>
-                        <div className="flex gap-2 items-center relative self-end md:self-auto">
+
+                        {/* Actions Row */}
+                        <div className="flex items-center gap-2 self-start md:self-auto mt-2 md:mt-0">
                             <LikeButton
                                 tripId={trip.id}
                                 initialLikeCount={likeCount || 0}
                                 initialIsLiked={!!isLikedData}
                             />
                             <CommentPopover tripId={trip.id} currentUserId={user?.id || ""} />
-                            <div className="w-px h-6 bg-stone-gray/20 mx-2"></div>
-                            <Link
-                                href={`/dashboard/trips/${trip.id}/print`}
-                                className="flex items-center gap-2 px-4 py-2 border border-stone-gray/20 rounded-xl text-stone-gray hover:text-deep-teak hover:border-stone-gray/40 hover:bg-stone-50 transition-all font-medium text-sm"
-                            >
-                                <Share2 className="w-4 h-4" />
-                                <span className="hidden sm:inline">Print</span>
-                            </Link>
 
-                            {/* Actions only for owner or specific allowed actions for visitors */}
-                            {isOwner && (
-                                <>
-                                    <TripCommitButton
-                                        tripId={trip.id}
-                                        initialIsCommitted={trip.status === 'active' || trip.status === 'completed'}
-                                    />
-                                    <CalendarExportButton
-                                        tripTitle={trip.title}
-                                        tripStartDate={trip.start_date}
-                                        activities={activities || []}
-                                    />
-                                    <ShareButton tripId={trip.id} />
-                                    <div className="w-px h-6 bg-stone-gray/20 mx-2"></div>
-                                    <TripDeleteButton tripId={trip.id} />
-                                </>
-                            )}
+                            <div className="w-px h-6 bg-stone-gray/20 mx-1 md:mx-2"></div>
 
+                            <TripActionsMenu
+                                tripId={trip.id}
+                                tripTitle={trip.title}
+                                tripStartDate={trip.start_date}
+                                activities={activities || []}
+                                isCommitted={trip.status === 'active' || trip.status === 'completed'}
+                                isOwner={isOwner}
+                                isPublic={trip.is_public}
+                            />
                         </div>
                     </div>
                 </div>

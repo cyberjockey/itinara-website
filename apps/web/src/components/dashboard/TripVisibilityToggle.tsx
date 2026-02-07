@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 interface TripVisibilityToggleProps {
     tripId: string;
     initialIsPublic: boolean;
+    variant?: 'default' | 'menu-item';
 }
 
-export function TripVisibilityToggle({ tripId, initialIsPublic }: TripVisibilityToggleProps) {
+export function TripVisibilityToggle({ tripId, initialIsPublic, variant = 'default' }: TripVisibilityToggleProps) {
     const [isPublic, setIsPublic] = useState(initialIsPublic);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -27,6 +28,25 @@ export function TripVisibilityToggle({ tripId, initialIsPublic }: TripVisibility
             setIsLoading(false);
         }
     };
+
+    if (variant === 'menu-item') {
+        return (
+            <button
+                onClick={handleToggle}
+                disabled={isLoading}
+                className="w-full text-left flex items-center gap-3 px-3 py-2 text-sm font-medium text-stone-gray hover:text-deep-teak hover:bg-stone-gray/5 rounded-lg transition-colors disabled:opacity-50"
+            >
+                {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                ) : isPublic ? (
+                    <Globe className="w-4 h-4 text-rice-paddy-green" />
+                ) : (
+                    <Lock className="w-4 h-4" />
+                )}
+                <span>Make {isPublic ? "Private" : "Public"}</span>
+            </button>
+        );
+    }
 
     return (
         <button

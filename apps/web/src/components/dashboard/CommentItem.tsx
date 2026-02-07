@@ -7,8 +7,25 @@ import { formatDistanceToNow } from "date-fns";
 import { cn, getImageUrl } from "@/lib/utils";
 import { addComment, deleteComment, editComment, toggleCommentLike } from "@/app/dashboard/trips/actions";
 
+interface Comment {
+    id: string;
+    parent_id?: string | null;
+    user_id: string;
+    content: string;
+    attachment_url?: string | null;
+    created_at: string;
+    updated_at?: string | null;
+    profiles: {
+        full_name: string | null;
+        avatar_url: string | null;
+    } | null;
+    replies?: Comment[];
+    likedByCurrentUser?: boolean;
+    likeCount?: number;
+}
+
 interface CommentItemProps {
-    comment: any;
+    comment: Comment;
     currentUserId: string;
     tripId: string;
     likedByCurrentUser: boolean;
@@ -122,7 +139,7 @@ export function CommentItem({
                                         src={comment.attachment_url}
                                         alt="Attachment"
                                         className="max-h-60 rounded-lg border border-stone-gray/10 object-cover hover:opacity-95 transition-opacity cursor-pointer"
-                                        onClick={() => window.open(comment.attachment_url, '_blank')}
+                                        onClick={() => comment.attachment_url && window.open(comment.attachment_url, '_blank')}
                                     />
                                 </div>
                             )}
@@ -187,14 +204,14 @@ export function CommentItem({
             {/* Nested Replies */}
             {comment.replies && comment.replies.length > 0 && (
                 <div className="mt-1">
-                    {comment.replies.map((reply: any) => (
+                    {comment.replies.map((reply: Comment) => (
                         <CommentItem
                             key={reply.id}
                             comment={reply}
                             currentUserId={currentUserId}
                             tripId={tripId}
-                            likedByCurrentUser={reply.likedByCurrentUser}
-                            likeCount={reply.likeCount}
+                            likedByCurrentUser={reply.likedByCurrentUser ?? false}
+                            likeCount={reply.likeCount ?? 0}
                             depth={depth + 1}
                         />
                     ))}
