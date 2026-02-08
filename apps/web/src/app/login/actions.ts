@@ -34,10 +34,9 @@ export async function login(
 export async function loginWithGoogle(next?: string) {
   const supabase = await createClient();
 
-  const redirectTo =
-    next && next.startsWith("/")
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}${next}`
-      : `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`;
+  const redirectTo = next
+    ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`
+    : `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
@@ -47,10 +46,9 @@ export async function loginWithGoogle(next?: string) {
   });
 
   if (error) {
-    console.error("Google OAuth error:", error.message);
-    redirect("/login?error=oauth_failed");
+    console.error(error);
+    redirect("/login?error=google_login_failed");
   }
 
-  // Supabase akan handle redirect
   redirect(data.url);
 }
