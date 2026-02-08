@@ -5,7 +5,6 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
 
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login`);
@@ -20,8 +19,6 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/login?error=oauth_failed`);
   }
 
-  // ✅ sukses login → redirect ke tujuan
-  return NextResponse.redirect(
-    next.startsWith("/") ? `${origin}${next}` : `${origin}/dashboard`
-  );
+  // ✅ FIX: selalu ke dashboard
+  return NextResponse.redirect(`${origin}/dashboard`);
 }
