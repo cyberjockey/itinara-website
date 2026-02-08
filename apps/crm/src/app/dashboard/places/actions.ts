@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import Groq from "groq-sdk";
 import { deleteImages } from "@/lib/cloudinary";
-import { requirePermission, requireResourceAccess, Permission, isAdmin } from "@/lib/rbac";
+import { requirePermission, Permission } from "@/lib/rbac";
 
 export type Place = {
     id: string;
@@ -42,8 +42,8 @@ export async function generateCoordinates(placeName: string, location: string) {
                 lng: parseFloat(data[0].lon)
             };
         }
-    } catch (e) {
-        console.error("Geocoding failed:", e);
+    } catch (_e) {
+        console.error("Geocoding failed:", _e);
     }
 
     return null;
@@ -180,7 +180,7 @@ export async function createPlace(prevState: unknown, formData: FormData) {
         try {
             cloudinary_images = JSON.parse(formData.get('cloudinary_images_json') as string);
         } catch (e) {
-            console.error("Invalid JSON images");
+            console.error("Invalid JSON images", e);
         }
     }
 
@@ -353,7 +353,7 @@ export async function updatePlace(placeId: string, prevState: unknown, formData:
                 }
             }
         } catch (e) {
-            console.error("Invalid JSON images");
+            console.error("Invalid JSON images", e);
         }
     }
 
@@ -406,7 +406,7 @@ export async function bulkGenerateCoordinates(placeIds: string[]) {
                     coords = await generateCoordinates(place.name, place.location);
                     if (coords) break;
                 } catch (e) {
-                    console.warn(`Attempt ${attempts + 1} failed for ${place.name}`);
+                    console.warn(`Attempt ${attempts + 1} failed for ${place.name}`, e);
                 }
                 attempts++;
                 if (!coords) await delay(1000 * attempts); // Exponential backoff

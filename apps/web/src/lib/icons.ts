@@ -1,7 +1,7 @@
 
-import { Award, Zap, Heart, Map, Users, Star, ShieldCheck, Trophy, BadgeCheck, Medal } from "lucide-react";
+import { Award, Zap, Heart, Map, Users, Star, ShieldCheck, Trophy, BadgeCheck, Medal, type LucideIcon } from "lucide-react";
 
-export const IconMap: Record<string, any> = {
+export const IconMap: Record<string, LucideIcon> = {
     "Award": Award,
     "Zap": Zap,
     "Heart": Heart,

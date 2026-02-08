@@ -22,7 +22,7 @@ export async function getTransactions(
     page = 1,
     limit = 20,
     status?: string,
-    search?: string
+    _search?: string
 ) {
     const supabase = await createClient();
 

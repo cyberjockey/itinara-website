@@ -54,6 +54,7 @@ export default function TelegramMultiUploader({
 
                 const formData = new FormData();
                 formData.append("file", file);
+                formData.append("type", type === 'image' ? 'photo' : 'document');
 
                 const res = await fetch("/api/upload/telegram", {
                     method: "POST",

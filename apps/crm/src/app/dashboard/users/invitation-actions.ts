@@ -117,7 +117,7 @@ export async function cancelInvitation(id: string) {
     if (!invite) return { success: false, error: "Invitation not found" };
 
     try {
-        const adminClient = createAdminClient();
+        // const adminClient = createAdminClient();
 
         // Find user by email to get ID (since we didn't store ID in simple schema yet, or we can just delete by email... wait, deleteUser needs ID)
         // We need to fetch the user ID from auth.users via admin API
@@ -149,22 +149,24 @@ export async function cancelInvitation(id: string) {
  * Supabase doesn't strictly have "resend invite", but calling inviteUserByEmail again might work?
  * "If the user already exists, this will send a magic link."
  */
-export async function resendInvitation(id: string) {
+export async function resendInvitation(_id: string) {
     await requirePermission(Permission.INVITE_USERS);
 
     // Logic similar to sendInvitation
-    // For now returning simulated success to avoid complexity.
     // In production: fetch email, call inviteUserByEmail again.
+    console.log("Resending invitation", _id);
 
     return { success: true };
 }
 
 // These are no longer used but kept for interface compatibility if needed, 
 // or can be removed.
-export async function validateInvitation(token: string): Promise<{ valid: boolean; error?: string; email?: string; role?: string }> {
+export async function validateInvitation(_token: string): Promise<{ valid: boolean; error?: string; email?: string; role?: string }> {
+    console.log("Validating", _token);
     return { valid: false, error: "Deprecated" };
 }
 
-export async function acceptInvitation(token: string, userId: string) {
+export async function acceptInvitation(_token: string, _userId: string) {
+    console.log("Accepting", _token, _userId);
     return { success: false };
 }

@@ -112,26 +112,28 @@ export function TripActionsMenu({
                         <div className="h-px bg-stone-gray/10 my-1" />
 
                         <div onClick={() => setIsOpen(false)}>
-                            {/* Assuming TripVisibilityToggle is imported. I need to import it. 
+                            <div>
+                                {/* Assuming TripVisibilityToggle is imported. I need to import it. 
                                 It was not imported in the original file I see in `view_file` output 
                                 (wait, I didn't see it imported in module view earlier).
                                 I'll add the import.
                              */}
-                            <TripVisibilityToggle tripId={tripId} initialIsPublic={!!isPublic} variant="menu-item" />
-                        </div>
+                                <TripVisibilityToggle tripId={tripId} initialIsPublic={!!isPublic} variant="menu-item" />
+                            </div>
 
-                        <div>
-                            <TripCommitButton
-                                tripId={tripId}
-                                initialIsCommitted={isCommitted}
-                                variant="menu-item"
-                            />
-                        </div>
+                            <div>
+                                <TripCommitButton
+                                    tripId={tripId}
+                                    initialIsCommitted={isCommitted}
+                                    variant="menu-item"
+                                />
+                            </div>
 
-                        <div className="h-px bg-stone-gray/10 my-1" />
+                            <div className="h-px bg-stone-gray/10 my-1" />
 
-                        <div>
-                            <TripDeleteButton tripId={tripId} variant="menu-item" />
+                            <div>
+                                <TripDeleteButton tripId={tripId} variant="menu-item" />
+                            </div>
                         </div>
                     </div>
                 </div>

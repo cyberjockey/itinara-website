@@ -137,6 +137,7 @@ export default async function AccommodationDetailPage(props: { params: Promise<{
                             userTrips={userTrips}
                             destinationName={destination.name}
                             destinationId={destination.id}
+                            readOnly={true}
                         />
                     </section>
                 </div>

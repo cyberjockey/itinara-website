@@ -1,5 +1,5 @@
 
-import { Award, Zap, Heart, Map, Users, Star } from "lucide-react";
+import { Award, Zap, Map, Users, Star, LucideIcon } from "lucide-react";
 
 export type BadgeType = 'first_trip' | 'veteran' | 'top_rated' | 'fast_responder' | 'community_pillar';
 
@@ -7,7 +7,7 @@ export interface BadgeDef {
     id: BadgeType;
     label: string;
     description: string;
-    icon: any;
+    icon: LucideIcon;
     color: string;
 }
 

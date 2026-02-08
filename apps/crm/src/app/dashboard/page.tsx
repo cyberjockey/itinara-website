@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 
 export default async function DashboardPage() {
-    const supabase = await createClient();
+    // const supabase = await createClient();
 
     // We can fetch stats here later
 
