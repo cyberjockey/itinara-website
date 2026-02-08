@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
+import { AddToTripWrapper } from "@/components/places/AddToTripWrapper";
 
 interface Place {
     id: string;
@@ -31,9 +32,10 @@ interface PlacesListProps {
     userTrips: Trip[];
     destinationName: string;
     destinationId: string;
+    readOnly?: boolean;
 }
 
-export function PlacesList({ places, userTrips, destinationName, destinationId }: PlacesListProps) {
+export function PlacesList({ places, userTrips, destinationName, destinationId, readOnly = false }: PlacesListProps) {
     if (!places || places.length === 0) {
         return (
             <div className="text-center py-12 bg-stone-gray/5 rounded-3xl">
@@ -102,10 +104,20 @@ export function PlacesList({ places, userTrips, destinationName, destinationId }
                             >
                                 View Details
                             </Link>
-                        </div>
+
+                            {!readOnly && (
+                                <AddToTripWrapper
+                                    placeId={place.id}
+                                    placeName={place.name}
+                                    placeLocation={place.location || destinationName}
+                                    placeType={place.type || 'Activity'}
+                                    userTrips={userTrips}
+                                    placeCoordinates={place.coordinates}
+                                />
+                            )}                        </div>
                     </div>
                 ))}
             </div>
-        </section>
+        </section >
     );
 }
