@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 "use client";
 
 import { useEffect } from "react";
@@ -14,7 +16,9 @@ export default function AuthCallback() {
         supabase.auth.getSession().then(({ data }) => {
             if (data.session) {
                 const next = searchParams.get("next");
-                router.replace(next && next.startsWith("/") ? next : "/dashboard");
+                router.replace(
+                    next && next.startsWith("/") ? next : "/dashboard"
+                );
             } else {
                 router.replace("/login");
             }
