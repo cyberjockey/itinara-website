@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar"; // Assuming you want to reuse the Navbar or a simplified version
+import { loginWithGoogle } from "./actions";
 
 const initialState = {
     message: "",
@@ -107,6 +108,22 @@ function LoginForm() {
                             Sign up
                         </Link>
                     </div>
+                    <div className="flex items-center gap-4 my-6">
+                        <div className="flex-1 h-px bg-stone-gray/20" />
+                        <span className="text-xs text-stone-gray/60">OR</span>
+                        <div className="flex-1 h-px bg-stone-gray/20" />
+                    </div>
+                    <button
+                        onClick={() => loginWithGoogle(next ?? undefined)}
+                        type="button"
+                        className="w-full py-3 rounded-full border border-stone-gray/30 bg-white flex items-center justify-center gap-3 hover:bg-stone-50 transition"
+                    >
+                        <Image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN1HgAOQZBf48TI55AvzbnfV0IFrCCrX6ldg&s" alt="Google" width={20} height={20} />
+                        <span className="font-semibold text-stone-gray">
+                            Continue with Google
+                        </span>
+                    </button>
+
                 </div>
             </div>
         </div>
