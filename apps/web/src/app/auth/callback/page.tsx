@@ -1,40 +1,26 @@
-"use client";
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url);
 
-export const dynamic = "force-dynamic"; // ⬅️ WAJIB
+  const code = searchParams.get("code");
 
-export default function AuthCallbackPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  if (!code) {
+    return NextResponse.redirect(`${origin}/login`);
+  }
 
-  useEffect(() => {
-    const code = searchParams.get("code");
+  // ⬇️ response HARUS dibuat dulu
+  const response = NextResponse.redirect(`${origin}/dashboard`);
 
-    if (!code) {
-      router.replace("/login");
-      return;
-    }
+  const supabase = await createClient();
 
-    const supabase = createClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-      if (error) {
-        console.error("OAuth error:", error.message);
-        router.replace("/login?error=oauth_failed");
-        return;
-      }
+  if (error) {
+    console.error("OAuth error:", error.message);
+    return NextResponse.redirect(`${origin}/login?error=oauth_failed`);
+  }
 
-      // ✅ selalu ke dashboard
-      router.replace("/dashboard");
-    });
-  }, [router, searchParams]);
-
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="text-stone-gray">Signing you in…</p>
-    </div>
-  );
+  return response;
 }
