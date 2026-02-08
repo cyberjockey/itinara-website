@@ -5,8 +5,8 @@ import { useActionState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { Navbar } from "@/components/layout/Navbar"; // Assuming you want to reuse the Navbar or a simplified version
-import { loginWithGoogle } from "./actions";
+import { Navbar } from "@/components/layout/Navbar";
+import { createClient } from "@/lib/supabase/client";
 
 const initialState = {
     message: "",
@@ -26,6 +26,19 @@ function LoginForm() {
 
     const [state, formAction, isPending] = useActionState(login, initialState);
 
+    const handleGoogleLogin = async () => {
+        const supabase = createClient();
+
+        const redirectTo = next
+            ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+            : `${window.location.origin}/auth/callback`;
+
+        await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: { redirectTo },
+        });
+    };
+
     return (
         <div className="min-h-screen relative flex flex-col">
             {/* Background Image */}
@@ -37,53 +50,50 @@ function LoginForm() {
                     className="object-cover"
                     priority
                 />
-                {/* Overlay to ensure text readability */}
                 <div className="absolute inset-0 bg-deep-teak/40" />
             </div>
 
             <Navbar />
+
             <div className="flex-1 flex items-center justify-center px-4 relative z-10">
                 <div className="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-white/20 w-full max-w-md">
                     <div className="text-center mb-8">
                         <div className="relative w-24 h-24 mx-auto mb-6 rounded-full overflow-hidden border-4 border-terracotta/10">
                             <Image src="/logo.png" alt="ITINARA Logo" fill className="object-cover" />
                         </div>
-                        <h1 className="text-3xl font-heading font-bold text-deep-teak">Welcome Back</h1>
-                        <p className="text-stone-gray/80">Sign in to continue your journey</p>
+                        <h1 className="text-3xl font-heading font-bold text-deep-teak">
+                            Welcome Back
+                        </h1>
+                        <p className="text-stone-gray/80">
+                            Sign in to continue your journey
+                        </p>
                     </div>
 
+                    {/* EMAIL / PASSWORD */}
                     <form action={formAction} className="space-y-6">
                         {next && <input type="hidden" name="next" value={next} />}
+
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-stone-gray mb-1">
+                            <label className="block text-sm font-medium text-stone-gray mb-1">
                                 Email Address
                             </label>
                             <input
-                                id="email"
                                 name="email"
                                 type="email"
                                 required
-                                className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50"
-                                placeholder="you@example.com"
+                                className="w-full px-4 py-3 rounded-xl border border-stone-gray/20"
                             />
                         </div>
 
                         <div>
-                            <div className="flex justify-between items-center mb-1">
-                                <label htmlFor="password" className="block text-sm font-medium text-stone-gray">
-                                    Password
-                                </label>
-                                <Link href="#" className="text-xs text-terracotta hover:underline">
-                                    Forgot password?
-                                </Link>
-                            </div>
+                            <label className="block text-sm font-medium text-stone-gray mb-1">
+                                Password
+                            </label>
                             <input
-                                id="password"
                                 name="password"
                                 type="password"
                                 required
-                                className="w-full px-4 py-3 rounded-xl border border-stone-gray/20 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all bg-warm-white/50"
-                                placeholder="••••••••"
+                                className="w-full px-4 py-3 rounded-xl border border-stone-gray/20"
                             />
                         </div>
 
@@ -96,7 +106,7 @@ function LoginForm() {
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="w-full py-3.5 rounded-full bg-terracotta text-white font-bold hover:bg-deep-teak transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full py-3.5 rounded-full bg-terracotta text-white font-bold"
                         >
                             {isPending ? "Signing in..." : "Sign In"}
                         </button>
@@ -104,26 +114,37 @@ function LoginForm() {
 
                     <div className="mt-6 text-center text-sm text-stone-gray">
                         Don&apos;t have an account?{" "}
-                        <Link href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"} className="text-terracotta font-bold hover:underline">
+                        <Link
+                            href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}
+                            className="text-terracotta font-bold hover:underline"
+                        >
                             Sign up
                         </Link>
                     </div>
+
+                    {/* DIVIDER */}
                     <div className="flex items-center gap-4 my-6">
                         <div className="flex-1 h-px bg-stone-gray/20" />
                         <span className="text-xs text-stone-gray/60">OR</span>
                         <div className="flex-1 h-px bg-stone-gray/20" />
                     </div>
+
+                    {/* GOOGLE LOGIN */}
                     <button
-                        onClick={() => loginWithGoogle(next ?? undefined)}
+                        onClick={handleGoogleLogin}
                         type="button"
                         className="w-full py-3 rounded-full border border-stone-gray/30 bg-white flex items-center justify-center gap-3 hover:bg-stone-50 transition"
                     >
-                        <Image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN1HgAOQZBf48TI55AvzbnfV0IFrCCrX6ldg&s" alt="Google" width={20} height={20} />
+                        <Image
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN1HgAOQZBf48TI55AvzbnfV0IFrCCrX6ldg&s"
+                            alt="Google"
+                            width={20}
+                            height={20}
+                        />
                         <span className="font-semibold text-stone-gray">
                             Continue with Google
                         </span>
                     </button>
-
                 </div>
             </div>
         </div>
