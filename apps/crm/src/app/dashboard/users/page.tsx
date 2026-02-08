@@ -1,8 +1,8 @@
-import { getUsers, verifyGuide, setUserRole } from "./actions";
+import { getUsers, verifyGuide } from "./actions";
 import { getInvitations } from "./invitation-actions";
-import { Check, Shield, Search, Filter, UserCog } from "lucide-react";
+import { Check, UserCog } from "lucide-react";
 import Image from "next/image";
-import { UserRoleBadge } from "../../../components/users/UserRoleBadge";
+// import { UserRoleBadge } from "../../../components/users/UserRoleBadge";
 import { UsersClient } from "./UsersClient";
 
 interface User {
@@ -26,6 +26,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         invitations = await getInvitations();
     } catch (e) {
         // Non-admins won't have permission - that's fine
+        console.error("Failed to fetch invitations", e);
     }
 
     return (

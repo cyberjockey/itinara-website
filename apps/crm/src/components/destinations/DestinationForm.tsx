@@ -46,6 +46,7 @@ export default function DestinationForm({ destination, isEditing = false }: Dest
                 router.refresh();
             }
         } catch (err) {
+            console.error(err);
             setError('An unexpected error occurred');
             setIsSubmitting(false);
         }
@@ -64,6 +65,7 @@ export default function DestinationForm({ destination, isEditing = false }: Dest
                     router.refresh();
                 }
             } catch (err) {
+                console.error(err);
                 setError('Failed to delete destination');
             }
         });

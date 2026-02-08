@@ -2,7 +2,7 @@
 
 import { updateTemplate, deleteTemplate } from "@/app/dashboard/templates/actions";
 import { useActionState, useState, useRef, useEffect, useTransition } from "react";
-import { Save, Loader2, Check, Trash2 } from "lucide-react";
+import { Loader2, Check, Trash2 } from "lucide-react";
 import TelegramMultiUploader from "@/components/ui/TelegramMultiUploader";
 import { DeleteModal } from "@/components/ui/DeleteModal";
 import { useRouter } from "next/navigation";

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from 'next/link';
+import Image from 'next/image';
 import { signOut } from "@/app/auth/actions";
 import { LogOut } from "lucide-react";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -40,7 +41,8 @@ export default async function DashboardLayout({
             <aside className="w-64 bg-white border-r fixed h-full hidden md:flex md:flex-col z-20 overflow-y-auto">
                 <div className="p-6 border-b flex-shrink-0">
                     <Link href="/dashboard" className="flex items-center gap-3">
-                        <img src="/logo.svg" alt="Itinara Logo" className="w-8 h-8" />
+                        <Image src="/logo.svg" alt="Itinara Logo" width={32} height={32} className="w-8 h-8" />
+
                         <div>
                             <h1 className="text-xl font-bold text-gray-800 tracking-tight">ITINARA <span className="text-batik-indigo">CRM</span></h1>
                             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">{profile?.role || 'Guest'}</p>

@@ -2,9 +2,9 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { getProfile, updateProfile } from "./actions";
-import { Loader2, User, Save } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import CloudinaryImageUpload from "@/components/ui/CloudinaryImageUpload";
-import Image from "next/image";
+
 import { UserAvatar } from "@/components/ui/UserAvatar";
 
 export default function ProfilePage() {

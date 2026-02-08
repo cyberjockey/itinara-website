@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, MapPin, Calendar, Star } from "lucide-react";
+import { Plus, MapPin } from "lucide-react";
 import { getTemplates } from "./actions";
 import { getImageUrl } from "@/lib/utils";
 

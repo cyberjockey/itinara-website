@@ -22,7 +22,7 @@ export default async function GuideInboxPage() {
     }
 
     // Fetch conversations assigned to this guide
-    const { data: conversations, error } = await supabase
+    const { data: conversations } = await supabase
         .from("guide_conversations")
         .select(`
             *,

@@ -165,7 +165,7 @@ export async function updateTemplate(id: string, formData: FormData) {
         try {
             updates.itinerary = JSON.parse(formData.get('itinerary_json') as string);
         } catch (e) {
-            console.error("Invalid JSON itinerary");
+            console.error("Invalid JSON itinerary", e);
         }
     }
 
