@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
-import { CreditCard, Check, Clock, X, ArrowLeft, Receipt, Coins } from "lucide-react";
+import { CreditCard, Check, Clock, X, ArrowLeft, Receipt, Crown, Sparkles, Plus } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -74,27 +74,38 @@ export default async function BillingPage() {
                     </div>
                 </div>
 
-                {/* Credit Balance Card */}
-                <div className="bg-gradient-to-br from-deep-teak to-deep-teak/90 text-white rounded-2xl p-6 mb-8 shadow-lg">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-white/70 text-sm mb-1">Available Credits</p>
+                {/* Credit Balance Card - Updated Design */}
+                <div className="bg-white rounded-2xl p-6 mb-8 border border-stone-gray/10 shadow-sm flex items-center justify-between">
+                    <div className="flex items-center gap-8">
+                        {/* VIP Credits */}
+                        <div className="flex items-center gap-4">
+                            <Crown className="w-8 h-8 text-amber-500" />
                             <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-bold">{profile?.trip_credits || 0}</span>
-                                <span className="text-white/70">trip credits</span>
+                                <span className="text-3xl font-bold text-deep-teak">{profile?.trip_credits || 0}</span>
+                                <span className="text-sm font-bold text-amber-500 uppercase">VIP</span>
                             </div>
                         </div>
-                        <div className="p-4 bg-white/10 rounded-2xl">
-                            <Coins className="w-8 h-8 text-sunrise-gold" />
+
+                        {/* Divider */}
+                        <div className="w-px h-10 bg-stone-gray/20"></div>
+
+                        {/* Premium Credits (Placeholder) */}
+                        <div className="flex items-center gap-4">
+                            <Sparkles className="w-8 h-8 text-rose-500" />
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-3xl font-bold text-deep-teak">101</span>
+                                <span className="text-sm font-bold text-rose-500 uppercase">PREM</span>
+                            </div>
                         </div>
                     </div>
-                    <div className="mt-4 pt-4 border-t border-white/10">
+
+                    <div className="flex items-center gap-4">
                         <Link
                             href="/dashboard/purchase"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-white text-deep-teak font-bold rounded-xl hover:bg-white/90 transition-colors"
+                            className="p-2 hover:bg-stone-50 rounded-full transition-colors"
+                            title="Buy More Credits"
                         >
-                            <CreditCard className="w-4 h-4" />
-                            Buy More Credits
+                            <Plus className="w-8 h-8 text-terracotta" />
                         </Link>
                     </div>
                 </div>

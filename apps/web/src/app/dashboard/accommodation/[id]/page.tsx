@@ -94,53 +94,19 @@ export default async function AccommodationDetailPage(props: { params: Promise<{
                 </div>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-12">
-                {/* 2. Sidebar: Key Info */}
-                <div className="lg:col-span-1 space-y-8">
-                    <div className="bg-white rounded-3xl p-8 border border-stone-gray/10 shadow-sm sticky top-8">
-                        <h2 className="font-bold text-xl text-deep-teak mb-4">About the Area</h2>
-                        <p className="text-stone-gray leading-relaxed mb-8">
-                            {destination.description}
-                        </p>
-
-                        <div className="space-y-6">
-                            <div className="flex items-start gap-4">
-                                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-                                    <Calendar className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <span className="block font-bold text-deep-teak text-sm mb-1">Best Booking Period</span>
-                                    <span className="text-stone-gray text-sm">3-6 Months in Advance</span>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 shrink-0">
-                                    <DollarSign className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <span className="block font-bold text-deep-teak text-sm mb-1">Price Range</span>
-                                    <span className="text-stone-gray text-sm">{destination.name === 'Bali' ? '$40 - $300' : '$20 - $150'} / night</span>
-                                </div>
-                            </div>
-                        </div>
+            <div className="space-y-16">
+                <section>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-bold text-deep-teak">Recommended Accommodations</h2>
                     </div>
-                </div>
-
-                {/* 3. Main Content: Accommodations */}
-                <div className="lg:col-span-2 space-y-16">
-                    <section>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-2xl font-bold text-deep-teak">Recommended Accommodations</h2>
-                        </div>
-                        <PlacesList
-                            places={places || []}
-                            userTrips={userTrips}
-                            destinationName={destination.name}
-                            destinationId={destination.id}
-                            readOnly={true}
-                        />
-                    </section>
-                </div>
+                    <PlacesList
+                        places={places || []}
+                        userTrips={userTrips}
+                        destinationName={destination.name}
+                        destinationId={destination.id}
+                        readOnly={true}
+                    />
+                </section>
             </div>
         </div>
     );

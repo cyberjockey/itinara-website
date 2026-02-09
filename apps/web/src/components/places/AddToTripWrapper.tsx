@@ -22,6 +22,11 @@ interface AddToTripWrapperProps {
 }
 
 export function AddToTripWrapper({ userTrips, placeId, placeName, placeLocation, placeType, placeCoordinates }: AddToTripWrapperProps) {
+    // Prevent adding Accommodations to trip
+    if (placeType?.toLowerCase().includes("accommodation") || placeType?.toLowerCase().includes("accomodation")) {
+        return null;
+    }
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     // For MVP with AddActivityModal, we usually pick a trip first.
     // Since AddActivityModal implies a specific trip and day, we might need the "AddToTripModal" logic here instead

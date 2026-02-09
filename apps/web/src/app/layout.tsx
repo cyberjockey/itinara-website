@@ -22,32 +22,32 @@ const crimson = Crimson_Pro({
 export const metadata: Metadata = {
   metadataBase: new URL('https://itinaravacation.com'),
   title: {
-    default: "ITINARA - Curated Indonesia Travel Itineraries",
+    default: "Indonesia Itinerary & Travel Guide | ITINARA",
     template: "%s | ITINARA"
   },
-  description: "Discover Indonesia with intention. Curated itineraries for independent travelers visiting Bali, Java, Lombok, and beyond. Plan your perfect Indonesian vacation today.",
-  keywords: ["Indonesia Travel", "Bali Itinerary", "Java Travel Guide", "Indonesia Vacation", "Itinara", "Travel Planner", "Indonesia Tourism"],
+  description: "Plan your perfect Indonesia itinerary with ITINARA. Curated travel guides for independent travelers visiting Bali, Java, Lombok, and beyond.",
+  keywords: ["Indonesia Itinerary", "Indonesia Travel", "Bali Itinerary", "Java Travel Guide", "Indonesia Vacation", "Itinara", "Travel Planner", "Indonesia Tourism"],
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://itinaravacation.com',
-    title: "ITINARA - Curated Indonesia Travel Itineraries",
-    description: "Discover Indonesia with intention. Curated itineraries for independent travelers.",
+    title: "Indonesia Itinerary & Travel Guide | ITINARA",
+    description: "Plan your perfect Indonesia itinerary with ITINARA. Curated travel guides for independent travelers.",
     siteName: 'ITINARA',
     images: [
       {
-        url: '/images/hero-mosaic.jpg', // Using existing hero image
+        url: '/images/hero-mosaic.jpg',
         width: 1200,
         height: 630,
-        alt: 'ITINARA - Discover Indonesia',
+        alt: 'ITINARA - Indonesia Itinerary Planner',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "ITINARA - Curated Indonesia Travel Itineraries",
-    description: "Discover Indonesia with intention. Curated itineraries for independent travelers.",
-    images: ['/images/hero-mosaic.jpg'], // Using existing hero image
+    title: "Indonesia Itinerary & Travel Guide | ITINARA",
+    description: "Plan your perfect Indonesia itinerary with ITINARA. Curated travel guides for independent travelers.",
+    images: ['/images/hero-mosaic.jpg'],
   },
   robots: {
     index: true,
@@ -91,6 +91,31 @@ export default async function RootLayout({
       </Script>
       <body className="font-sans antialiased bg-warm-white text-deep-teak" suppressHydrationWarning>
         {children}
+        <Script id="json-ld" type="application/ld+json" strategy="beforeInteractive">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "TravelAgency",
+              "name": "ITINARA",
+              "url": "https://itinaravacation.com",
+              "logo": "https://itinaravacation.com/logo.png",
+              "description": "Curated Indonesia travel itineraries and guides for independent travelers.",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "ID"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": "-8.409518",
+                "longitude": "115.188919"
+              },
+              "sameAs": [
+                "https://www.instagram.com/itinara",
+                "https://twitter.com/itinara"
+              ]
+            }
+          `}
+        </Script>
         <Analytics />
       </body>
     </html>

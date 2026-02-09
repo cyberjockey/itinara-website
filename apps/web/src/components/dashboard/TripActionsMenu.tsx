@@ -84,7 +84,7 @@ export function TripActionsMenu({
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 top-12 w-56 bg-white rounded-xl shadow-xl border border-stone-gray/10 z-50 overflow-hidden animate-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 top-12 w-56 bg-white rounded-xl shadow-xl border border-stone-gray/10 z-[100] overflow-hidden animate-in slide-in-from-top-2 duration-200">
                     <div className="p-1 flex flex-col gap-1">
 
                         <div onClick={() => setIsOpen(false)}>

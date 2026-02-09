@@ -53,7 +53,7 @@ export function Hero() {
             >
                 <Image
                     src="/images/hero-mosaic.jpg"
-                    alt="Indonesia Mosaic: Culture, Food, Heritage"
+                    alt="Indonesia Itinerary Planner - Heritage, Culture, Visuals"
                     fill
                     className="object-cover object-center"
                     quality={80}
@@ -115,8 +115,8 @@ export function Hero() {
                     transition={{ duration: 0.8, delay: 0.4 }}
                     className="text-lg md:text-2xl max-w-3xl font-light text-warm-white/90 drop-shadow-md"
                 >
-                    ITINARA helps you discover the beauty of Indonesia authentically.
-                    Curated itineraries that guide without dictating, for travelers who value freedom and depth.
+                    Plan your perfect <strong>Indonesia Itinerary</strong> with ITINARA.
+                    Curated travel guides that help you discover the authentic beauty of the archipelago without the hassle.
                 </motion.p>
 
                 <motion.div
