@@ -45,7 +45,7 @@ export function Hero() {
     }, [text, isDeleting, loopNum, typingSpeed]);
 
     return (
-        <section className="relative h-screen w-full overflow-hidden flex items-center justify-center text-warm-white bg-deep-teak">
+        <section className="relative min-h-[100dvh] w-full overflow-hidden flex items-center justify-center text-warm-white bg-deep-teak pt-32 pb-20">
             {/* Parallax Background */}
             <motion.div
                 style={{ y }}
@@ -63,13 +63,13 @@ export function Hero() {
             </motion.div>
 
             {/* Content */}
-            <div className="relative z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center gap-8">
+            <div className="relative z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center gap-6 md:gap-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
                 >
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4 md:mb-6">
                         <Compass className="w-4 h-4 text-sunrise-gold" />
                         <span className="text-sm font-medium tracking-wide uppercase">Every Journey Begins With a Feeling</span>
                     </div>
@@ -136,12 +136,12 @@ export function Hero() {
                 </motion.div>
             </div>
 
-            {/* Scroll Indicator */}
+            {/* Scroll Indicator - Hidden on small vertical screens to avoid overlap */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.5, duration: 1 }}
-                className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/80"
+                className="hidden lg:flex absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex-col items-center gap-2 text-white/80"
             >
                 <span className="text-sm uppercase tracking-widest font-medium text-[10px]">Scroll to Explore</span>
                 <motion.div
