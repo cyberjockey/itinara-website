@@ -1,4 +1,5 @@
 import { Hero } from "@/components/landing/Hero";
+import { AboutSection } from "@/components/landing/AboutSection";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
 import { Testimonials } from "@/components/landing/Testimonials";
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-warm-white">
       <Hero />
+      <AboutSection />
       <section id="about">
         <ScrollReveal>
           <HowItWorks />

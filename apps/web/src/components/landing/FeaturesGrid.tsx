@@ -44,7 +44,7 @@ export function FeaturesGrid() {
                         transition={{ delay: 0.1 }}
                         className="text-stone-gray/80 text-lg max-w-2xl mx-auto leading-relaxed"
                     >
-                        We fuse insights from Top Local Guides & Google Local Guides to give you a travel experience like no other.
+                        We fuse real-time insights from Top Local Guides & Google Local Guides to give you a travel experience like no other. Our data-driven approach ensures your **Indonesia vacation** is authentic, efficient, and tailored specifically to your travel style.
                     </motion.p>
                 </div>
 

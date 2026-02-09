@@ -62,7 +62,7 @@ export function HowItWorks() {
                         transition={{ delay: 0.2 }}
                         className="text-stone-gray/80 text-lg"
                     >
-                        Planning a trip to Indonesia doesn&apos;t have to be overwhelming. We make it effortless.
+                        Planning a multi-island **Indonesia itinerary** doesn't have to be overwhelming. At ITINARA, we simplify the chaos of travel planning. Whether you're seeking the spiritual calm of Bali's rice terraces or the raw adventure of Java's volcanoes, our platform streamlines every step of your journey.
                     </motion.p>
                 </div>
 
