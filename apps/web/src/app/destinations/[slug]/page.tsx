@@ -7,6 +7,7 @@ import { MapPin, Calendar, DollarSign, ArrowRight, Sparkles, CheckCircle2, Alert
 import { Metadata } from "next";
 import { DestinationHero } from "@/components/destinations/DestinationHero";
 import { DestinationContent } from "@/components/destinations/DestinationContent";
+import { RelatedPosts } from "@/components/blog/RelatedPosts";
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -77,6 +78,9 @@ export default async function DestinationPage(props: PageProps) {
             />
 
             <DestinationContent destination={destination} />
+
+            {/* Related Blog Posts */}
+            <RelatedPosts destinationName={destination.name} slug={destination.slug} />
         </div>
     );
 }

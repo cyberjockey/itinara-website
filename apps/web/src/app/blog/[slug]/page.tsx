@@ -13,6 +13,7 @@ import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { ClientAnalytics } from "@/components/analytics/ClientAnalytics";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
 // Dynamic Metadata Generation
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -99,6 +100,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                 {/* Article Header */}
                 <article className="max-w-4xl mx-auto px-6">
+                    <Breadcrumbs
+                        items={[
+                            { label: 'Blog', href: '/blog' },
+                            { label: post.title, href: `/blog/${post.slug}` }
+                        ]}
+                    />
                     <div className="mb-8">
                         <div className="flex items-center gap-4 text-xs font-bold text-terracotta uppercase tracking-wider mb-4">
                             <span>Travel Guide</span>
