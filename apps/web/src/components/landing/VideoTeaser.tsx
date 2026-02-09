@@ -16,7 +16,7 @@ const SCENES = [
     },
     {
         id: "jakarta",
-        image: "/images/promo_jakarta_night_market.png",
+        image: "/images/promo_jakarta_night_market_v2.png",
         text: "But have you felt the pulse?",
         subtext: "From the city energy...",
         duration: 5000
