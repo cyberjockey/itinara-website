@@ -115,8 +115,8 @@ export function Hero() {
                     transition={{ duration: 0.8, delay: 0.4 }}
                     className="text-lg md:text-2xl max-w-3xl font-light text-warm-white/90 drop-shadow-md"
                 >
-                    Plan your perfect <strong>Indonesia Itinerary</strong> with ITINARA.
-                    Curated travel guides that help you discover the authentic beauty of the archipelago without the hassle.
+                    Plan your perfect Indonesia itinerary with ITINARA.
+                    Curated travel guides that help you discover the authentic beauty of the archipelago without the hassle. From the spiritual temples of Bali to the volcanic sunrises of Java, we provide the tools you need to craft an unforgettable journey.
                 </motion.p>
 
                 <motion.div

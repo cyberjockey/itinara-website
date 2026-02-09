@@ -22,8 +22,8 @@ const crimson = Crimson_Pro({
 export const metadata: Metadata = {
   metadataBase: new URL('https://itinaravacation.com'),
   title: {
-    default: "Indonesia Itinerary & Travel Guide | ITINARA",
-    template: "%s | ITINARA"
+    default: "Indonesia Itinerary & Travel Guide - ITINARA",
+    template: "%s - ITINARA"
   },
   description: "Plan your perfect Indonesia itinerary with ITINARA. Curated travel guides for independent travelers visiting Bali, Java, Lombok, and beyond.",
   keywords: ["Indonesia Itinerary", "Indonesia Travel", "Bali Itinerary", "Java Travel Guide", "Indonesia Vacation", "Itinara", "Travel Planner", "Indonesia Tourism"],
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://itinaravacation.com',
-    title: "Indonesia Itinerary & Travel Guide | ITINARA",
+    title: "Indonesia Itinerary & Travel Guide - ITINARA",
     description: "Plan your perfect Indonesia itinerary with ITINARA. Curated travel guides for independent travelers.",
     siteName: 'ITINARA',
     images: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Indonesia Itinerary & Travel Guide | ITINARA",
+    title: "Indonesia Itinerary & Travel Guide - ITINARA",
     description: "Plan your perfect Indonesia itinerary with ITINARA. Curated travel guides for independent travelers.",
     images: ['/images/hero-mosaic.jpg'],
   },
