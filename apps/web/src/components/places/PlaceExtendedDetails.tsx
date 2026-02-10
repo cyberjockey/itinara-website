@@ -13,6 +13,7 @@ interface PlaceExtendedDetailsProps {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         amenities?: any; // Used for Highlights/Tips
         what_to_expect?: string;
+        type?: string;
     };
     isUnlocked: boolean;
 }
@@ -22,13 +23,16 @@ export function PlaceExtendedDetails({ place, isUnlocked }: PlaceExtendedDetails
 
     const hasExtendedInfo = place.phone || place.website || place.social_media || place.price_level || place.what_to_expect || (place.amenities && place.amenities.length > 0);
 
+    // Accommodation details are free for everyone
+    const isVisible = isUnlocked || place.type?.toLowerCase() === 'accommodation';
+
     if (!hasExtendedInfo) return null;
 
     return (
         <div className="mt-8 relative">
             <h3 className="font-bold text-lg text-deep-teak mb-4">Activity Details</h3>
 
-            <div className={`space-y-6 transition-all duration-300 ${!isUnlocked ? "blur-sm select-none opacity-60" : ""}`}>
+            <div className={`space-y-6 transition-all duration-300 ${!isVisible ? "blur-sm select-none opacity-60" : ""}`}>
 
                 {/* Contact & Web */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -37,7 +41,7 @@ export function PlaceExtendedDetails({ place, isUnlocked }: PlaceExtendedDetails
                             <Phone className="w-5 h-5 text-terracotta" />
                             <div>
                                 <div className="text-xs text-stone-gray font-bold uppercase">Phone / Whatsapp</div>
-                                <div className="text-sm font-medium text-deep-teak">{isUnlocked ? place.phone : "+62 812 XXXX XXXX"}</div>
+                                <div className="text-sm font-medium text-deep-teak">{isVisible ? place.phone : "+62 812 XXXX XXXX"}</div>
                             </div>
                         </div>
                     )}
@@ -47,11 +51,11 @@ export function PlaceExtendedDetails({ place, isUnlocked }: PlaceExtendedDetails
                             <div>
                                 <div className="text-xs text-stone-gray font-bold uppercase">Website</div>
                                 <Link
-                                    href={isUnlocked ? place.website : "#"}
-                                    target={isUnlocked ? "_blank" : undefined}
+                                    href={isVisible ? place.website : "#"}
+                                    target={isVisible ? "_blank" : undefined}
                                     className="text-sm font-medium text-deep-teak hover:underline truncate block max-w-[200px]"
                                 >
-                                    {isUnlocked ? place.website : "www.example.com"}
+                                    {isVisible ? place.website : "www.example.com"}
                                 </Link>
                             </div>
                         </div>
@@ -77,7 +81,7 @@ export function PlaceExtendedDetails({ place, isUnlocked }: PlaceExtendedDetails
                         <div>
                             <div className="text-xs text-stone-gray font-bold uppercase">Social Media</div>
                             <div className="text-sm font-medium text-deep-teak">
-                                {isUnlocked ? "Available" : "Hidden"}
+                                {isVisible ? "Available" : "Hidden"}
                             </div>
                         </div>
                     </div>
@@ -114,7 +118,7 @@ export function PlaceExtendedDetails({ place, isUnlocked }: PlaceExtendedDetails
             </div>
 
             {/* Overlay */}
-            {!isUnlocked && (
+            {!isVisible && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
                     <div className="bg-white/90 backdrop-blur-sm p-6 rounded-2xl shadow-xl text-center border border-stone-200 max-w-sm mx-auto">
                         <div className="w-12 h-12 bg-terracotta/10 rounded-full flex items-center justify-center mx-auto mb-3">

@@ -297,7 +297,7 @@ export function TimelineView({ trip, activities: initialActivities, readOnly = f
                                         date={addDays(startDate, dayNum - 1)}
                                         activities={dayActivities}
                                         onAddActivity={() => handleAddActivity(dayNum)}
-                                        readOnly={false}
+                                        readOnly={readOnly || isCommitted}
                                         className="w-full md:w-80 h-auto md:h-full flex-shrink-0"
                                     />
                                 ))}

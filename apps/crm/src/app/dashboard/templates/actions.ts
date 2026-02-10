@@ -11,13 +11,29 @@ export async function getTemplates() {
 
     if (!user) return [];
 
-    const { data, error } = await supabase
+    // RBAC: Check if user is admin
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    const isAdmin = profile?.role === 'admin';
+
+    let query = supabase
         .from('trip_templates')
         .select(`
             *,
             destinations (name)
         `)
         .order('created_at', { ascending: false });
+
+    // If not admin, restrict to own templates
+    if (!isAdmin) {
+        query = query.eq('guide_id', user.id);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
         console.error("Error fetching templates:", error);

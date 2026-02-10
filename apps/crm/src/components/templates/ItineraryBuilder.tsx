@@ -243,78 +243,78 @@ export function ItineraryBuilder({ template }: { template: any }) {
                                             {/* Timeline line */}
                                             <div className="absolute left-[85px] top-2 bottom-2 w-0.5 bg-gray-100"></div>
 
-                                            {day.activities.map((activity) => (
-                                                <div key={activity.id} className="relative flex group">
-                                                    {/* Time */}
-                                                    <div className="w-[70px] pt-1 text-right pr-4 text-xs font-medium text-gray-500 font-mono">
-                                                        {activity.start_time}
-                                                    </div>
+                                            {day.activities.map((activity, index) => (
+                                                <div key={activity.id}>
+                                                    <div className="relative flex group">
+                                                        {/* Time */}
+                                                        <div className="w-[70px] pt-1 text-right pr-4 text-xs font-medium text-gray-500 font-mono">
+                                                            {activity.start_time}
+                                                        </div>
 
-                                                    {/* Dot */}
-                                                    <div className="absolute left-[81px] top-1.5 w-2.5 h-2.5 rounded-full bg-blue-400 border-2 border-white shadow-sm z-10"></div>
+                                                        {/* Dot */}
+                                                        <div className="absolute left-[81px] top-1.5 w-2.5 h-2.5 rounded-full bg-blue-400 border-2 border-white shadow-sm z-10"></div>
 
-                                                    {/* Content */}
-                                                    <div className="flex-1 bg-gray-50/50 hover:bg-white p-4 rounded-lg border border-transparent hover:border-gray-200 transition-all ml-4 mb-2 shadow-sm">
-                                                        <div className="flex justify-between items-start">
-                                                            <div>
-                                                                <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                                                                    {activity.is_transition && (
-                                                                        <span className="text-lg">
-                                                                            {activity.transition_type === 'driving' && '🚗'}
-                                                                            {activity.transition_type === 'walking' && '🚶'}
-                                                                            {activity.transition_type === 'ferry' && '⛴️'}
-                                                                            {activity.transition_type === 'train' && '🚆'}
-                                                                            {activity.transition_type === 'other' && '🚌'}
-                                                                        </span>
-                                                                    )}
-                                                                    {activity.title}
-                                                                </h4>
-                                                                <div className="flex items-center gap-3 mt-1">
-                                                                    {activity.location && (
-                                                                        <div className="flex items-center gap-1 text-xs text-gray-500">
-                                                                            <MapPin className="w-3 h-3" />
-                                                                            {activity.location}
-                                                                        </div>
-                                                                    )}
-                                                                    {activity.duration_hours && (
-                                                                        <div className="flex items-center gap-1 text-xs text-gray-500">
-                                                                            <Clock className="w-3 h-3" />
-                                                                            {activity.duration_hours}h
-                                                                            {activity.end_time && (
-                                                                                <span className="text-gray-400">→ {activity.end_time}</span>
-                                                                            )}
-                                                                        </div>
+                                                        {/* Content */}
+                                                        <div className="flex-1 bg-gray-50/50 hover:bg-white p-4 rounded-lg border border-transparent hover:border-gray-200 transition-all ml-4 mb-2 shadow-sm">
+                                                            <div className="flex justify-between items-start">
+                                                                <div>
+                                                                    <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                                                        {activity.is_transition && (
+                                                                            <span className="text-lg">
+                                                                                {activity.transition_type === 'driving' && '🚗'}
+                                                                                {activity.transition_type === 'walking' && '🚶'}
+                                                                                {activity.transition_type === 'ferry' && '⛴️'}
+                                                                                {activity.transition_type === 'train' && '🚆'}
+                                                                                {activity.transition_type === 'other' && '🚌'}
+                                                                            </span>
+                                                                        )}
+                                                                        {activity.title}
+                                                                    </h4>
+                                                                    <div className="flex items-center gap-3 mt-1">
+                                                                        {activity.location && (
+                                                                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                                                                                <MapPin className="w-3 h-3" />
+                                                                                {activity.location}
+                                                                            </div>
+                                                                        )}
+                                                                        {activity.duration_hours && (
+                                                                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                                                                                <Clock className="w-3 h-3" />
+                                                                                {activity.duration_hours}h
+                                                                                {activity.end_time && (
+                                                                                    <span className="text-gray-400">→ {activity.end_time}</span>
+                                                                                )}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                    {activity.description && (
+                                                                        <p className="text-sm text-gray-600 mt-2">{activity.description}</p>
                                                                     )}
                                                                 </div>
-                                                                {activity.description && (
-                                                                    <p className="text-sm text-gray-600 mt-2">{activity.description}</p>
-                                                                )}
+                                                                <button
+                                                                    onClick={() => handleDeleteActivity(dayIndex, activity.id)}
+                                                                    className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
                                                             </div>
-                                                            <button
-                                                                onClick={() => handleDeleteActivity(dayIndex, activity.id)}
-                                                                className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
 
-                                            {/* Add Transition Button between activities */}
-                                            {day.activities.map((activity, index) => (
-                                                index < day.activities.length - 1 && (
-                                                    <div key={`transition-${activity.id}`} className="relative flex items-center justify-center my-2">
-                                                        <div className="absolute left-[85px] w-0.5 h-4 bg-gray-100"></div>
-                                                        <button
-                                                            onClick={() => handleOpenAddModal(dayIndex, true)}
-                                                            className="ml-[85px] px-3 py-1.5 text-xs text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md border border-dashed border-gray-200 hover:border-blue-300 transition-all flex items-center gap-1.5"
-                                                        >
-                                                            <Plus className="w-3 h-3" />
-                                                            Add Transition
-                                                        </button>
-                                                    </div>
-                                                )
+                                                    {/* Add Transition Button between activities */}
+                                                    {index < day.activities.length - 1 && (
+                                                        <div key={`transition-${activity.id}`} className="relative flex items-center justify-center my-2">
+                                                            <div className="absolute left-[85px] w-0.5 h-4 bg-gray-100"></div>
+                                                            <button
+                                                                onClick={() => handleOpenAddModal(dayIndex, true)}
+                                                                className="ml-[85px] px-3 py-1.5 text-xs text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md border border-dashed border-gray-200 hover:border-blue-300 transition-all flex items-center gap-1.5"
+                                                            >
+                                                                <Plus className="w-3 h-3" />
+                                                                Add Transition
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             ))}
                                         </div>
                                     )}
@@ -404,32 +404,28 @@ export function ItineraryBuilder({ template }: { template: any }) {
                                         </p>
                                     )}
                                 </div>
-                                <div className="col-span-1">
-                                    <label className="block text-xs font-semibold text-gray-500 mb-1">Location / Place</label>
-                                    <div className="border border-gray-200 rounded-lg p-1">
-                                        <PlacePicker
-                                            destinationId={template.destination_id}
-                                            value={newActivity.place_id}
-                                            onChange={(place) => {
-                                                setNewActivity({
-                                                    ...newActivity,
-                                                    place_id: place.id,
-                                                    place_data: place,
-                                                    location: place.location || '',
-                                                    title: newActivity.title || place.name, // Auto-fill title if empty
-                                                    description: newActivity.description || place.description || '' // Auto-fill desc if empty
-                                                });
-                                            }}
-                                            onCancel={() => { }}
-                                        />
+                                {!isTransitionMode && (
+                                    <div className="col-span-1">
+                                        <label className="block text-xs font-semibold text-gray-500 mb-1">Location / Place</label>
+                                        <div className="border border-gray-200 rounded-lg p-1">
+                                            <PlacePicker
+                                                destinationId={template.destination_id}
+                                                value={newActivity.place_id}
+                                                onChange={(place) => {
+                                                    setNewActivity({
+                                                        ...newActivity,
+                                                        place_id: place.id,
+                                                        place_data: place,
+                                                        location: place.location || '',
+                                                        title: newActivity.title || place.name, // Auto-fill title if empty
+                                                        description: newActivity.description || place.description || '' // Auto-fill desc if empty
+                                                    });
+                                                }}
+                                                onCancel={() => { }}
+                                            />
+                                        </div>
                                     </div>
-                                    {/* Fallback manual location if needed, or keeping it hidden if place selected? 
-                                        For now, keeping the manual input hidden or readonly if place selected could be good.
-                                        But PlacePicker handles the selection. 
-                                        Let's just show the selected location in a readonly field IF we want to allow manual override?
-                                        Actually PlacePicker is the input.
-                                    */}
-                                </div>
+                                )}
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-gray-500 mb-1">Title</label>

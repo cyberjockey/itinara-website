@@ -10,6 +10,73 @@ import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
 import { useRef, useTransition } from "react";
 import { DeleteModal } from "@/components/ui/DeleteModal";
 
+function HighlightsInput({ initialHighlights, name }: { initialHighlights: string[], name: string }) {
+    const [highlights, setHighlights] = useState<string[]>(initialHighlights);
+    const [inputValue, setInputValue] = useState("");
+
+    const handleAdd = () => {
+        if (!inputValue.trim()) return;
+        setHighlights([...highlights, inputValue.trim()]);
+        setInputValue("");
+    };
+
+    const handleRemove = (index: number) => {
+        setHighlights(highlights.filter((_, i) => i !== index));
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAdd();
+        }
+    };
+
+    return (
+        <div className="space-y-3">
+            <input type="hidden" name={name} value={JSON.stringify(highlights)} />
+
+            <div className="flex gap-2">
+                <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Add a new highlight or tip..."
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black text-sm"
+                />
+                <button
+                    type="button"
+                    onClick={handleAdd}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors text-sm flex items-center gap-1"
+                >
+                    <Plus className="w-4 h-4" /> Add
+                </button>
+            </div>
+
+            {highlights.length > 0 && (
+                <div className="space-y-2">
+                    {highlights.map((item, index) => (
+                        <div key={index} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 group hover:border-blue-100 transition-all">
+                            <span className="text-sm text-gray-700 leading-relaxed">{item}</span>
+                            <button
+                                type="button"
+                                onClick={() => handleRemove(index)}
+                                className="text-gray-400 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-all"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {highlights.length === 0 && (
+                <p className="text-xs text-gray-400 italic">No highlights added yet.</p>
+            )}
+        </div>
+    );
+}
+
 function DescriptionGenerator() {
     const [loading, setLoading] = useState(false);
     const [completed, setCompleted] = useState(false);
@@ -449,17 +516,12 @@ export function PlaceForm({ destinations, initialData, mode }: PlaceFormProps) {
                             </div>
 
                             <div>
-                                <label htmlFor="amenities" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Highlight & Tips (JSON Array)
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Highlight & Tips
                                 </label>
-                                {/* Using Amenities field for Highlights/Tips as per migration plan */}
-                                <textarea
-                                    id="amenities"
+                                <HighlightsInput
+                                    initialHighlights={initialData?.amenities || []}
                                     name="amenities"
-                                    rows={10}
-                                    defaultValue={JSON.stringify(initialData?.amenities || [], null, 2)}
-                                    placeholder='["Wear comfortable shoes", "Best visited at sunset"]'
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-xs focus:ring-2 focus:ring-[#2C5F88] outline-none transition-all text-black"
                                 />
                             </div>
                         </div>

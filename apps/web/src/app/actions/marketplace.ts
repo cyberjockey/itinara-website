@@ -95,7 +95,8 @@ export async function purchaseTemplate(templateId: string, startDateStr: string,
             destination: template.destinations?.name || "Unknown Destination",
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
-            status: 'planning',
+            end_date: endDate.toISOString(),
+            status: 'active', // Auto-commit: Trip is ready for travel immediately
             trip_type: 'vip', // Explicitly VIP since purchased with VIP quota
             is_public: false,
             source_template_id: templateId // Fix: Link to template so guide chat works
