@@ -36,13 +36,14 @@ export function FeaturesGrid() {
                 >
                     <div className="relative w-full rounded-[2rem] overflow-hidden shadow-2xl">
                         <NextImage
-                            src="/images/features-collage.png"
+                            src="/images/features-collage-mobile.png"
                             alt="Itinara Key Features: Emergency, Map, Routing, Chat, Community"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
-                            className="w-full h-auto hover:scale-105 transition-transform duration-700"
+                            width={1080}
+                            height={1920}
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="w-full h-auto"
                             quality={100}
+                            priority
                         />
                     </div>
                 </motion.div>

@@ -39,6 +39,17 @@ export function Footer() {
                             Curated itineraries for the independent traveler.
                             Experience Indonesia with intention, freedom, and depth.
                         </p>
+                        <div className="mt-6 flex items-center gap-4">
+                            <span className="text-white/40 text-xs uppercase tracking-wider font-semibold">Supported by</span>
+                            <div className="relative w-24 h-12">
+                                <Image
+                                    src="/images/wonderful-indonesia-logo.png"
+                                    alt="Wonderful Indonesia"
+                                    fill
+                                    className="object-contain opacity-80 hover:opacity-100 transition-opacity"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Destinations Column */}
@@ -122,6 +133,6 @@ export function Footer() {
                     </div>
                 </div>
             </div>
-        </footer>
+        </footer >
     );
 }
