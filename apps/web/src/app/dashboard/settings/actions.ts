@@ -3,8 +3,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-import path from "path";
-import fs from "fs/promises";
 
 interface ProfileUpdates {
     id: string;
@@ -47,20 +45,34 @@ export async function updateProfile(formData: FormData) {
         }
 
         try {
-            const buffer = Buffer.from(await avatarFile.arrayBuffer());
             const ext = avatarFile.type.split('/')[1];
-            const filename = `${user.id}_${Date.now()}.${ext}`;
-            const uploadDir = path.join(process.cwd(), 'public', 'images', 'avatars');
-            const filePath = path.join(uploadDir, filename);
+            const timestamp = Date.now();
+            const filename = `${user.id}/${timestamp}.${ext}`;
 
-            // Ensure directory exists (though we created it in a previous step, good safety)
-            await fs.mkdir(uploadDir, { recursive: true });
+            // Upload to Supabase Storage
+            const { error: uploadError } = await supabase
+                .storage
+                .from('avatars')
+                .upload(filename, avatarFile, {
+                    cacheControl: '3600',
+                    upsert: true
+                });
 
-            await fs.writeFile(filePath, buffer);
+            if (uploadError) {
+                console.error("Supabase Storage Upload Error:", uploadError);
+                throw uploadError;
+            }
 
-            avatarUrl = `/images/avatars/${filename}`;
+            // Get Public URL
+            const { data: { publicUrl } } = supabase
+                .storage
+                .from('avatars')
+                .getPublicUrl(filename);
+
+            avatarUrl = publicUrl;
+
         } catch (error) {
-            console.error("File upload failed:", error);
+            console.error("Avatar upload failed:", error);
             return { message: "Failed to upload avatar image." };
         }
     }

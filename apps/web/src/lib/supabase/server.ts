@@ -22,7 +22,7 @@ export async function createClient() {
         },
       },
       cookieOptions: {
-        name: "itinara-web-auth",
+        name: "itinara-web-auth-v2",
       },
     },
   );
@@ -59,7 +59,7 @@ export async function createAdminClient() {
         },
       },
       cookieOptions: {
-        name: "itinara-web-auth",
+        name: "itinara-web-auth-v2",
       },
     },
   );

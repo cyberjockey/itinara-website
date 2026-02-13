@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     createLandingPage, updateLandingPage,
-    type LandingPage, type PageBlock, type HeroBlock, type FeaturesBlock, type CTABlock, type RichtextBlock
+    type LandingPage, type PageBlock, type HeroBlock, type FeaturesBlock, type CTABlock, type RichtextBlock, type RawHTMLBlock
 } from '@/app/dashboard/landing-pages/actions';
 import {
     Save, ArrowLeft, Loader2, Plus, Trash2, GripVertical,
     Image as ImageIcon, Type, LayoutGrid, MousePointerClick, FileText, Globe,
-    ChevronDown, ChevronUp
+    ChevronDown, ChevronUp, Code
 } from 'lucide-react';
 import Link from 'next/link';
 import CloudinaryImageUpload from '@/components/ui/CloudinaryImageUpload';
@@ -19,6 +19,7 @@ const BLOCK_TYPES = [
     { type: 'features', label: 'Features Grid', icon: LayoutGrid, description: 'Grid of feature cards' },
     { type: 'cta', label: 'Call to Action', icon: MousePointerClick, description: 'Conversion focused section' },
     { type: 'richtext', label: 'Rich Text', icon: FileText, description: 'Markdown content block' },
+    { type: 'raw_html', label: 'Raw HTML', icon: Code, description: 'Custom HTML & CSS' },
 ] as const;
 
 function createDefaultBlock(type: string): PageBlock {
@@ -31,6 +32,8 @@ function createDefaultBlock(type: string): PageBlock {
             return { type: 'cta', data: { title: 'Ready to Get Started?', description: '', buttonText: 'Sign Up Now', buttonUrl: '#', backgroundColor: '#4f46e5' } };
         case 'richtext':
             return { type: 'richtext', data: { content: '## Your Content Here\n\nStart writing...' } };
+        case 'raw_html':
+            return { type: 'raw_html', data: { html: '<div>Your HTML here</div>', css: '' } };
         default:
             return { type: 'richtext', data: { content: '' } };
     }
@@ -275,6 +278,31 @@ export function LandingPageEditor({ initialPage }: { initialPage?: LandingPage }
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
                                     placeholder="Write your content here..."
                                 />
+                            </div>
+                        )}
+
+                        {block.type === 'raw_html' && (
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">HTML Content</label>
+                                    <textarea
+                                        value={(block as RawHTMLBlock).data.html}
+                                        onChange={(e) => updateBlock(index, { ...(block as RawHTMLBlock).data, html: e.target.value })}
+                                        rows={8}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50"
+                                        placeholder="<div>...</div>"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">CSS (Scoped to this block)</label>
+                                    <textarea
+                                        value={(block as RawHTMLBlock).data.css || ''}
+                                        onChange={(e) => updateBlock(index, { ...(block as RawHTMLBlock).data, css: e.target.value })}
+                                        rows={4}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50"
+                                        placeholder=".my-class { ... }"
+                                    />
+                                </div>
                             </div>
                         )}
 

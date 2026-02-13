@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
-import { getLatestPosts } from "@/actions/get-latest-posts";
+import { getLatestPosts } from "@/app/actions/get-latest-posts";
 import { ArrowRight } from "lucide-react";
 
 export async function LatestBlog() {
@@ -57,10 +57,12 @@ export async function LatestBlog() {
                             <div className="flex flex-col flex-1">
                                 <div className="flex items-center gap-3 text-sm text-stone-gray/80 mb-3">
                                     <span>{format(new Date(post.published_at), 'MMMM d, yyyy')}</span>
-                                    {post.author?.full_name && (
+                                    {post.author && (
                                         <>
                                             <span className="w-1 h-1 rounded-full bg-stone-gray/40" />
-                                            <span>by {post.author.full_name}</span>
+                                            <span>
+                                                by {(post.author as any)[0]?.full_name || (post.author as any)?.full_name}
+                                            </span>
                                         </>
                                     )}
                                 </div>

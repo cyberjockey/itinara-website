@@ -47,3 +47,9 @@ next-env.d.ts
 lint_output.txt
 .wrangler/
 supabase/.temp/
+
+# Project planning documents (local only)
+ITINARA_Project_Plan.md
+branding-plan/*.md
+supabase/email_templates.md
+build_log.txt

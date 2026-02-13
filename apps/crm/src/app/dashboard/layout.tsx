@@ -80,6 +80,17 @@ export default async function DashboardLayout({
                             <Link href="/dashboard/landing-pages" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
                                 Landing Pages
                             </Link>
+
+                            <div className="pt-6 pb-2 px-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Campaigns</div>
+                            <Link href="/dashboard/campaigns" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
+                                Coupons & Promos
+                            </Link>
+                            <Link href="/dashboard/promotions" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
+                                Home Page Carousel
+                            </Link>
+                            <Link href="/dashboard/guide-applications" className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors">
+                                Guide Applications
+                            </Link>
                         </>
                     )}
                     {(isGuide || isAdmin) && (

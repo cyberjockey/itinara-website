@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, FileText } from "lucide-react";
-import { requestInvoice } from "@/actions/payment";
+import { requestInvoice } from "@/app/actions/payment";
 import { toast } from "sonner";
 
 interface RequestInvoiceModalProps {

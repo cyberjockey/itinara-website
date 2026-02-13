@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { requirePermission, Permission } from "@/lib/rbac";
 
 // Block types for landing pages
-export type BlockType = 'hero' | 'features' | 'cta' | 'gallery' | 'richtext';
+export type BlockType = 'hero' | 'features' | 'cta' | 'gallery' | 'richtext' | 'raw_html';
 
 export type HeroBlock = {
     type: 'hero';
@@ -56,7 +56,15 @@ export type RichtextBlock = {
     };
 };
 
-export type PageBlock = HeroBlock | FeaturesBlock | CTABlock | GalleryBlock | RichtextBlock;
+export type RawHTMLBlock = {
+    type: 'raw_html';
+    data: {
+        html: string;
+        css?: string;
+    };
+};
+
+export type PageBlock = HeroBlock | FeaturesBlock | CTABlock | GalleryBlock | RichtextBlock | RawHTMLBlock;
 
 export type LandingPage = {
     id: string;

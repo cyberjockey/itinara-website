@@ -5,6 +5,7 @@ import { MapPin, User, ChevronLeft, Map, Star, FileText } from "lucide-react";
 import { getPublishedTemplate } from "../../actions";
 import UseTemplateButton from "@/components/explore/UseTemplateButton";
 import { TripGallery } from "@/components/dashboard/TripGallery";
+import CuratedActivityCard from "@/components/dashboard/CuratedActivityCard";
 import { createClient } from "@/lib/supabase/server";
 import { getImageUrl } from "@/lib/utils";
 
@@ -167,30 +168,12 @@ export default async function TripDetailPage(props: { params: Promise<{ id: stri
 
                                             {day.activities && day.activities.length > 0 ? (
                                                 <div className="space-y-6">
-                                                    {day.activities.map((activity) => (
-                                                        <div key={activity.id} className="flex gap-4 group">
-                                                            <div className="w-16 pt-1 text-right text-sm font-mono font-medium text-stone-gray shrink-0">
-                                                                {activity.start_time}
-                                                            </div>
-                                                            <div className="flex-1 pb-4 border-b border-stone-gray/10 last:border-0 last:pb-0">
-                                                                <div className="flex items-start justify-between">
-                                                                    <h4 className="font-bold text-deep-teak group-hover:text-terracotta transition-colors">
-                                                                        {activity.title}
-                                                                    </h4>
-                                                                </div>
-                                                                {activity.location && (
-                                                                    <div className="flex items-center gap-1.5 text-xs text-stone-gray/70 mt-1 mb-2">
-                                                                        <MapPin className="w-3 h-3" />
-                                                                        {activity.location}
-                                                                    </div>
-                                                                )}
-                                                                {activity.description && (
-                                                                    <p className="text-sm text-stone-gray leading-relaxed">
-                                                                        {activity.description}
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
+                                                    {day.activities.map((activity, idx) => (
+                                                        <CuratedActivityCard
+                                                            key={activity.id}
+                                                            activity={activity}
+                                                            isLast={idx === day.activities.length - 1}
+                                                        />
                                                     ))}
                                                 </div>
                                             ) : (

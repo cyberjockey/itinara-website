@@ -51,8 +51,15 @@ type GalleryBlock = {
         images: string[];
     };
 };
+type RawHTMLBlock = {
+    type: 'raw_html';
+    data: {
+        html: string;
+        css?: string;
+    };
+};
 
-export type PageBlock = HeroBlock | FeaturesBlock | CTABlock | RichtextBlock | GalleryBlock;
+export type PageBlock = HeroBlock | FeaturesBlock | CTABlock | RichtextBlock | GalleryBlock | RawHTMLBlock;
 
 export type LandingPage = {
     id: string;
@@ -184,6 +191,15 @@ function GallerySection({ data }: { data: GalleryBlock['data'] }) {
     );
 }
 
+function RawHTMLSection({ data }: { data: RawHTMLBlock['data'] }) {
+    return (
+        <div>
+            {data.css && <style dangerouslySetInnerHTML={{ __html: data.css }} />}
+            <div dangerouslySetInnerHTML={{ __html: data.html }} />
+        </div>
+    );
+}
+
 function renderBlock(block: PageBlock, index: number) {
     switch (block.type) {
         case 'hero':
@@ -196,6 +212,8 @@ function renderBlock(block: PageBlock, index: number) {
             return <RichtextSection key={index} data={(block as RichtextBlock).data} />;
         case 'gallery':
             return <GallerySection key={index} data={(block as GalleryBlock).data} />;
+        case 'raw_html':
+            return <RawHTMLSection key={index} data={(block as RawHTMLBlock).data} />;
         default:
             return null;
     }

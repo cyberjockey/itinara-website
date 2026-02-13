@@ -154,7 +154,14 @@ export function DestinationsMap() {
                         <ZoomableGroup
                             zoom={position.zoom}
                             center={position.coordinates}
-                            onMoveEnd={(position) => setPosition(position)}
+                            onMoveEnd={(newPos) => {
+                                // Defer state update to avoid "Cannot update while rendering" error
+                                requestAnimationFrame(() => {
+                                    if (newPos && typeof newPos.zoom === 'number' && !isNaN(newPos.zoom)) {
+                                        setPosition(newPos);
+                                    }
+                                });
+                            }}
                             maxZoom={5}
                         // Adding simple motion damping if possible via wrapper, but for now relying on standard behavior
                         // react-simple-maps doesn't animate zoom natively, but we can make the path transitions smooth
@@ -194,7 +201,7 @@ export function DestinationsMap() {
                                     >
                                         {/* Animated Pulse Ring */}
                                         <motion.circle
-                                            r={4 / position.zoom}
+                                            r={4 / (position.zoom || 1)}
                                             fill="#E35435"
                                             initial={{ opacity: 0.6, scale: 1 }}
                                             animate={{ opacity: 0, scale: 4 }}

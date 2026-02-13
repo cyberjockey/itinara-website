@@ -8,10 +8,19 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { DestinationsMapLazy } from "@/components/landing/DestinationsMapLazy";
 import { LatestBlog } from "@/components/landing/LatestBlog";
 
+import { PromotionalCarousel } from "@/components/landing/PromotionalCarousel";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-warm-white">
       <Hero />
+
+      <section id="promo">
+        <ScrollReveal>
+          <PromotionalCarousel />
+        </ScrollReveal>
+      </section>
+
       <AboutSection />
 
       <section id="teaser">

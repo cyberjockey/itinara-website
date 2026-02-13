@@ -18,7 +18,7 @@ export async function login(
   const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
-    return { message: error.message };
+    return { message: error.message || "An unknown error occurred" };
   }
 
   revalidatePath("/", "layout");
@@ -28,27 +28,5 @@ export async function login(
     redirect(next);
   }
 
-  redirect("/dashboard?event=login");
-}
-
-export async function loginWithGoogle(next?: string) {
-  const supabase = await createClient();
-
-  const redirectTo = next
-    ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`
-    : `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`;
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo,
-    },
-  });
-
-  if (error) {
-    console.error(error);
-    redirect("/login?error=google_login_failed");
-  }
-
-  redirect(data.url);
+  return redirect("/dashboard?event=login");
 }

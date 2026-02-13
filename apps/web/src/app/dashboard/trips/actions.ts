@@ -119,10 +119,17 @@ export async function deleteComment(commentId: string, tripId: string) {
 
     if (!user) throw new Error("Unauthorized");
 
-    await supabase
+    // Verify ownership before deletion
+    const { error } = await supabase
         .from('trip_comments')
         .delete()
-        .eq('id', commentId);
+        .eq('id', commentId)
+        .eq('user_id', user.id);
+
+    if (error) {
+        console.error("Error deleting comment:", error);
+        throw new Error("Failed to delete comment");
+    }
 
     revalidatePath(`/dashboard/trips/${tripId}`);
 }

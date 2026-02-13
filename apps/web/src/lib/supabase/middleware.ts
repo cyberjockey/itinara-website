@@ -40,7 +40,7 @@ export async function updateSession(request: NextRequest) {
         },
       },
       cookieOptions: {
-        name: "itinara-web-auth",
+        name: "itinara-web-auth-v2",
       },
     },
   );

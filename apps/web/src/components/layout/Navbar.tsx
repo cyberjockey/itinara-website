@@ -136,6 +136,13 @@ export function Navbar() {
                             Blog
                         </Link>
 
+                        <Link
+                            href="/guides/apply"
+                            className={`text-sm font-medium transition-colors hover:text-terracotta ${isSolid ? "text-stone-gray" : "text-white/90"}`}
+                        >
+                            Register as Local Guide
+                        </Link>
+
                         <div className="w-px h-6 bg-current opacity-20 mx-2" />
 
                         <Link
@@ -233,6 +240,13 @@ export function Navbar() {
                             <div className="h-px bg-stone-200 w-full my-6" />
 
                             <div className="flex flex-col items-center gap-4 w-full">
+                                <Link
+                                    href="/guides/apply"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="text-lg font-bold text-stone-500 hover:text-deep-teak transition-colors"
+                                >
+                                    Register as Local Guide
+                                </Link>
                                 <Link
                                     href="/login"
                                     onClick={() => setIsMobileMenuOpen(false)}

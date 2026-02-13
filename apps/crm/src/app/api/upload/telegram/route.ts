@@ -39,7 +39,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Upload failed for all files" }, { status: 500 });
         }
 
-        return NextResponse.json({ files: uploadedFiles });
+        return NextResponse.json({
+            success: true,
+            files: uploadedFiles,
+            file_id: uploadedFiles[0]?.file_id,
+            url: uploadedFiles[0]?.url
+        });
 
     } catch (error) {
         console.error("Error in upload route:", error);

@@ -27,6 +27,7 @@ interface QuotaUpdates {
     paid_trips_remaining: number;
     updated_at: string;
 }
+import { validateCoupon } from "./campaign";
 import { revalidatePath } from "next/cache";
 
 // Send Telegram notification for new payment
@@ -88,7 +89,7 @@ const CREDIT_PACKAGES = {
 type PackageType = keyof typeof CREDIT_PACKAGES;
 
 // Create a checkout order and record transaction
-export async function createCheckoutOrder(packageType: PackageType) {
+export async function createCheckoutOrder(packageType: PackageType, couponCode?: string) {
     // Get user and verify auth
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -111,10 +112,106 @@ export async function createCheckoutOrder(packageType: PackageType) {
     }
 
     const { credits: creditsToAdd, name: packageTypeDisplay, creditType } = pkg;
+    let amountCents = Math.round(parseFloat(pkg.price) * 100);
+
+    // Apply Coupon
+    let discountAmount = 0;
+    let finalAmount = amountCents;
+    let couponId: string | undefined;
+
+    if (couponCode) {
+        const couponResult = await validateCoupon(couponCode);
+        if (couponResult.valid) {
+            couponId = couponResult.couponId;
+            if (couponResult.discountType === 'percentage') {
+                discountAmount = Math.round(amountCents * (couponResult.discountValue! / 100));
+            } else {
+                discountAmount = Math.round(couponResult.discountValue! * 100); // Fixed amount in cents
+            }
+            finalAmount = Math.max(0, amountCents - discountAmount);
+        } else {
+            throw new Error(couponResult.message || "Invalid coupon");
+        }
+    }
+
+    // Handle 100% Discount (Direct Grant)
+    if (finalAmount <= 0) {
+        // Create completed transaction
+        const { data: transaction, error } = await supabase
+            .from("payment_transactions")
+            .insert({
+                user_id: user.id,
+                amount_total: amountCents,
+                // @ts-ignore - Columns added in migration
+                final_amount: 0,
+                discount_amount: amountCents,
+                coupon_id: couponId,
+                currency: "USD",
+                payment_status: "completed",
+                payment_method: "coupon_100",
+                payer_email: user.email,
+                completed_at: new Date().toISOString(),
+                package_type: packageType,
+                metadata: {
+                    credits: pkg.credits,
+                    creditType: pkg.creditType,
+                    coupon_code: couponCode
+                }
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error("100% off transaction error:", error);
+            throw new Error("Failed to process free redemption");
+        }
+
+        // Add credits to user_quotas table using Admin Client
+        const adminSupabase = await createAdminClient();
+        const { data: quota } = await adminSupabase.from("user_quotas").select("*").eq("user_id", user.id).single();
+        const isVip = creditType === 'vip';
+
+        if (!quota) {
+            await adminSupabase.from("user_quotas").insert({
+                user_id: user.id,
+                premium_trips_remaining: isVip ? 0 : creditsToAdd,
+                vip_trips_remaining: isVip ? creditsToAdd : 0,
+                lifetime_trips_purchased: creditsToAdd,
+                paid_trips_remaining: creditsToAdd
+            });
+        } else {
+            const updates: QuotaUpdates = {
+                lifetime_trips_purchased: (quota.lifetime_trips_purchased || 0) + creditsToAdd,
+                paid_trips_remaining: (quota.paid_trips_remaining || 0) + creditsToAdd,
+                updated_at: new Date().toISOString()
+            };
+            if (isVip) {
+                updates.vip_trips_remaining = (quota.vip_trips_remaining || 0) + creditsToAdd;
+            } else {
+                updates.premium_trips_remaining = (quota.premium_trips_remaining || 0) + creditsToAdd;
+            }
+            await adminSupabase.from("user_quotas").update(updates).eq("user_id", user.id);
+        }
+
+        // Increment coupon usage
+        if (couponCode) {
+            await supabase.rpc('increment_coupon_usage', { coupon_code: couponCode });
+        }
+
+        // Notify
+        await sendPaymentNotification(0, creditsToAdd, packageTypeDisplay, creditType, user.email, "COUPON-100");
+
+        revalidatePath("/dashboard");
+
+        return {
+            orderId: "COUPON-GRANT",
+            transactionId: transaction.id,
+        };
+    }
 
     // Create PayPal order
     const paypalOrder = await createPayPalOrder(
-        Math.round(parseFloat(pkg.price) * 100),
+        finalAmount, // Use discounted amount
         "USD",
         {
             userId: user.id,
@@ -129,7 +226,11 @@ export async function createCheckoutOrder(packageType: PackageType) {
         .from("payment_transactions")
         .insert({
             user_id: user.id,
-            amount_total: Math.round(parseFloat(pkg.price) * 100),
+            amount_total: amountCents,
+            // @ts-ignore
+            final_amount: finalAmount,
+            discount_amount: discountAmount,
+            coupon_id: couponId,
             currency: "USD",
             payment_status: "pending",
             paypal_order_id: paypalOrder.orderId,
@@ -138,6 +239,7 @@ export async function createCheckoutOrder(packageType: PackageType) {
             metadata: {
                 credits: pkg.credits,
                 creditType: pkg.creditType,
+                coupon_code: couponCode
             }
         })
         .select()
@@ -249,6 +351,12 @@ export async function capturePayment(orderId: string) {
         orderId
     );
 
+    // Increment coupon usage if applicable
+    const couponCode = transaction?.metadata?.coupon_code;
+    if (couponCode) {
+        await supabase.rpc('increment_coupon_usage', { coupon_code: couponCode });
+    }
+
     // Add credits to user_quotas table
     // Use Admin Client to bypass RLS
     const adminSupabase = await createAdminClient();
@@ -344,4 +452,32 @@ export async function getCreditPackages() {
         id: key,
         ...value,
     }));
+}
+
+export async function requestInvoice(tripId: string, planType: 'premium' | 'vip', amount: number) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error("Unauthorized");
+
+    // Send Telegram notification
+    try {
+        const botToken = process.env.TELEGRAM_BOT_TOKEN;
+        const chatId = process.env.TELEGRAM_CHAT_ID;
+        if (botToken && chatId) {
+            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: `🧾 *New Invoice Request*\n\nUser: ${user.email}\nPlan: ${planType}\nAmount: $${(amount / 100).toFixed(2)}\nTrip ID: ${tripId}`,
+                    parse_mode: 'Markdown',
+                }),
+            });
+        }
+    } catch (e) {
+        console.error("Failed to send telegram notification for invoice request", e);
+    }
+
+    return { success: true };
 }

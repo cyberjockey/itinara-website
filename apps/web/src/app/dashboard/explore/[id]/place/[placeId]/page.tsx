@@ -117,7 +117,7 @@ export default async function PlaceDetailPage(props: { params: Promise<{ id: str
                         <h3 className="font-bold text-lg text-deep-teak mb-2">About</h3>
                         {place.description ? (
                             <ReactMarkdown remarkPlugins={[remarkBreaks]}>
-                                {place.description}
+                                {place.description.replace(/\\/g, '\n')}
                             </ReactMarkdown>
                         ) : (
                             <p>Experience the unique charm of {place.name}. A must-visit spot in {place.location}.</p>
