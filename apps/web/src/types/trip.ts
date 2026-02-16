@@ -5,6 +5,7 @@ export interface Place {
     destination_id?: string | null;
     latitude?: number | null;
     longitude?: number | null;
+    coordinates?: { lat: number; lng: number } | null;
     full_address?: string | null;
     description?: string | null;
     rating?: number | null;

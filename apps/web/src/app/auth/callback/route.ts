@@ -27,7 +27,7 @@ export async function GET(request: Request) {
         },
       },
       cookieOptions: {
-        name: "itinara-web-auth",
+        name: "itinara-web-auth-v2",
       },
     },
   );

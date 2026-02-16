@@ -11,6 +11,7 @@ import { AddToTripWrapper } from "@/components/places/AddToTripWrapper"; // New 
 import { PlaceExtendedDetails } from "@/components/places/PlaceExtendedDetails";
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
+// import { RideHailingOptions } from "@/components/places/RideHailingOptions";
 
 
 export const revalidate = 3600;
@@ -162,6 +163,15 @@ export default async function PlaceDetailPage(props: { params: Promise<{ id: str
                                 placeCoordinates={place.coordinates}
                             />
                         </div>
+
+                        {/* Ride Hailing Options (Moved to Trip Card) */}
+                        {/* <div className="mt-6 pt-6 border-t border-stone-gray/10">
+                            <RideHailingOptions
+                                coordinates={place.coordinates}
+                                destinationName={place.name}
+                                destinationAddress={place.location}
+                            />
+                        </div> */}
                     </div>
                 </div>
             </div>

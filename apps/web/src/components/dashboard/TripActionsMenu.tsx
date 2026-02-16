@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MoreHorizontal, Share2, Calendar, Trash2, CheckCircle2 } from "lucide-react";
+import { MoreHorizontal, Share2 } from "lucide-react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
+
 import { cn } from "@/lib/utils";
 import { TripDeleteButton } from "./TripDeleteButton";
 import { TripCommitButton } from "./TripCommitButton";
@@ -26,6 +28,7 @@ interface TripActionsMenuProps {
     activities: Activity[];
     isCommitted: boolean;
     isOwner: boolean;
+    isPublic?: boolean;
 }
 
 export function TripActionsMenu({
@@ -36,14 +39,39 @@ export function TripActionsMenu({
     isCommitted,
     isOwner,
     isPublic
-}: TripActionsMenuProps & { isPublic?: boolean }) { // Added isPublic to props type
+}: TripActionsMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
+
+    const toggleMenu = () => {
+        if (!isOpen) {
+            if (buttonRef.current) {
+                const rect = buttonRef.current.getBoundingClientRect();
+                // Position: Right aligned to button, Top aligned to button bottom
+                // w-56 = 14rem = 224px
+                setMenuPos({
+                    top: rect.bottom + 8,
+                    left: rect.right - 224
+                });
+            }
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+    };
 
     // Close on click outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+            // Check both menu (portal) and button
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target as Node) &&
+                buttonRef.current &&
+                !buttonRef.current.contains(event.target as Node)
+            ) {
                 setIsOpen(false);
             }
         };
@@ -69,9 +97,10 @@ export function TripActionsMenu({
     }
 
     return (
-        <div className="relative" ref={menuRef}>
+        <div className="relative">
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                ref={buttonRef}
+                onClick={toggleMenu}
                 className={cn(
                     "p-2 rounded-full transition-colors border",
                     isOpen
@@ -83,8 +112,17 @@ export function TripActionsMenu({
                 <MoreHorizontal className="w-5 h-5" />
             </button>
 
-            {isOpen && (
-                <div className="absolute right-0 top-12 w-56 bg-white rounded-xl shadow-xl border border-stone-gray/10 z-[100] overflow-hidden animate-in slide-in-from-top-2 duration-200">
+            {isOpen && typeof document !== 'undefined' && createPortal(
+                <div
+                    ref={menuRef}
+                    style={{
+                        position: 'fixed',
+                        top: menuPos.top,
+                        left: menuPos.left,
+                        zIndex: 9999
+                    }}
+                    className="w-56 bg-white rounded-xl shadow-xl border border-stone-gray/10 overflow-hidden animate-in slide-in-from-top-2 duration-200"
+                >
                     <div className="p-1 flex flex-col gap-1">
 
                         <div onClick={() => setIsOpen(false)}>
@@ -113,11 +151,6 @@ export function TripActionsMenu({
 
                         <div onClick={() => setIsOpen(false)}>
                             <div>
-                                {/* Assuming TripVisibilityToggle is imported. I need to import it. 
-                                It was not imported in the original file I see in `view_file` output 
-                                (wait, I didn't see it imported in module view earlier).
-                                I'll add the import.
-                             */}
                                 <TripVisibilityToggle tripId={tripId} initialIsPublic={!!isPublic} variant="menu-item" />
                             </div>
 
@@ -136,7 +169,8 @@ export function TripActionsMenu({
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

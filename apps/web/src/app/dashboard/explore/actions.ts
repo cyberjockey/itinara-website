@@ -1,8 +1,11 @@
 "use server";
 
+// Forcing rebuild to ensure fix is live
+
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { createTripFromTemplate } from "@/app/actions/trip";
 
 interface ActivityData {
     id?: string;
@@ -127,6 +130,8 @@ export async function getPublishedTemplate(id: string) {
     };
 }
 
+
+
 export async function useTemplate(templateId: string, startDateStr: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -135,108 +140,21 @@ export async function useTemplate(templateId: string, startDateStr: string) {
         redirect('/auth/login?next=/dashboard/explore');
     }
 
-    // 1. Fetch the template
-    const { data: template, error: templateError } = await supabase
-        .from('trip_templates')
-        .select(`*, destinations(name)`)
-        .eq('id', templateId)
-        .single();
-
-    if (templateError || !template) {
-        throw new Error("Template not found");
-    }
-
-    // 2. Calculate dates
-    const startDate = new Date(startDateStr);
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + (template.duration_days - 1));
-
-    // 3. Create the Trip
-    const { data: trip, error: tripError } = await supabase
-        .from('trips')
-        .insert({
-            user_id: user.id,
-            title: template.title,
-            destination: template.destinations?.name || "Unknown Destination",
-            start_date: startDate.toISOString(),
-            end_date: endDate.toISOString(),
+    try {
+        const trip = await createTripFromTemplate({
+            templateId,
+            startDateStr,
+            userId: user.id,
             status: 'planning',
-            source_template_id: templateId,
-            guide_material_url: template.guide_material_url || null,
-            guide_materials: template.guide_materials || []
-        })
-        .select()
-        .single();
-
-    if (tripError) {
-        console.error("Error creating trip:", tripError);
-        throw new Error("Failed to create trip");
-    }
-
-    // 4. Create Activities from Itinerary
-    const activitiesToInsert: ActivityToInsert[] = [];
-    const itinerary = template.itinerary as unknown as Itinerary; // Assuming JSON structure
-
-    if (itinerary && itinerary.days) {
-        // Collect all activity titles to search for places
-        const allTitles = new Set<string>();
-        itinerary.days.forEach((day: ItineraryDay) => {
-            day.activities?.forEach((activity: ActivityData) => {
-                if (activity.title) allTitles.add(activity.title);
-            });
+            tripType: 'curated'
         });
 
-        // Fetch matching places
-        const { data: matchedPlaces } = await supabase
-            .from('places')
-            .select('id, name')
-            .in('name', Array.from(allTitles));
-
-        const placesMap = new Map(matchedPlaces?.map(p => [p.name || "", p.id]) || []);
-
-        itinerary.days.forEach((day: ItineraryDay, index: number) => {
-            const dayNumber = index + 1; // 1-based day number
-
-            if (day.activities) {
-                day.activities.forEach((activity: ActivityData) => {
-                    const placeId = activity.place_id || activity.place_data?.id || (activity.title ? placesMap.get(activity.title) : null);
-
-                    activitiesToInsert.push({
-                        trip_id: trip.id,
-                        day_number: dayNumber,
-                        title: activity.title || "Untitled Activity",
-                        start_time: activity.time || null,
-                        location: activity.place_data?.location || activity.place_data?.name || null,
-                        category: activity.place_data?.type || 'Sightseeing', // Default category
-                        notes: activity.description || "",
-                        place_id: placeId || null,
-                    });
-                });
-            }
-        });
+        revalidatePath('/dashboard/trips');
+        redirect(`/dashboard/trips/${trip.id}`);
+    } catch (error) {
+        console.error("Failed to use template:", error);
+        throw error; // Re-throw to show error boundary if needed, or handle gracefully
     }
-
-    if (activitiesToInsert.length > 0) {
-        const { error: activitiesError } = await supabase
-            .from('activities')
-            .insert(activitiesToInsert);
-
-        if (activitiesError) {
-            console.error("Error inserting activities:", activitiesError);
-            // Non-fatal? Or should we rollback? For MVP allow it, user can fix.
-        }
-    }
-
-    // 5. Increment use_count
-    const { error: rpcError } = await supabase.rpc('increment_template_use_count', { template_id: templateId });
-    if (rpcError) {
-        console.error('Failed to increment template use count:', rpcError);
-    }
-    // If RPC doesn't exist, just update manually (ignoring race condition for MVP)
-    // await supabase.from('trip_templates').update({ use_count: template.use_count + 1 }).eq('id', templateId);
-
-    revalidatePath('/dashboard/trips');
-    redirect(`/dashboard/trips/${trip.id}`);
 }
 
 export async function toggleSaveDestination(destinationId: string) {

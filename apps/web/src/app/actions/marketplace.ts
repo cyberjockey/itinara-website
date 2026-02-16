@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceRoleClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { createTripFromTemplate } from "@/app/actions/trip";
 
 interface ActivityData {
     id?: string;
@@ -61,95 +62,24 @@ export async function purchaseTemplate(templateId: string, startDateStr: string,
         throw new Error("Insufficient VIP Credits. Please purchase more.");
     }
 
-    // 2. Fetch the template
-    const { data: template, error: templateError } = await supabase
-        .from('trip_templates')
-        .select(`*, destinations(name)`)
-        .eq('id', templateId)
-        .single();
 
-    if (templateError || !template) {
-        throw new Error("Template not found");
-    }
 
-    // 3. Deduct Quota
-    const { error: updateError } = await supabase
-        .from('user_quotas')
-        .update({ vip_trips_remaining: quota.vip_trips_remaining - 1 })
-        .eq('user_id', user.id);
-
-    if (updateError) {
-        throw new Error("Failed to process payment (Quota deduction).");
-    }
-
-    // 4. Create the Trip
-    const startDate = new Date(startDateStr);
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + (template.duration_days - 1));
-
-    const { data: trip, error: tripError } = await supabase
-        .from('trips')
-        .insert({
-            user_id: user.id,
-            title: template.title,
-            destination: template.destinations?.name || "Unknown Destination",
-            start_date: startDate.toISOString(),
-            end_date: endDate.toISOString(),
+    // 4. Create the Trip (via shared action)
+    let trip;
+    try {
+        trip = await createTripFromTemplate({
+            templateId,
+            startDateStr,
+            userId: user.id,
             status: 'active', // Auto-commit: Trip is ready for travel immediately
-            trip_type: 'vip', // Explicitly VIP since purchased with VIP quota
-            is_public: false,
-            source_template_id: templateId // Fix: Link to template so guide chat works
-        })
-        .select()
-        .single();
-
-    if (tripError) {
-        console.error("Error creating trip:", tripError);
-        // CRITICAL: We deducted quota but failed to create trip. 
-        // Ideally we should rollback quota here.
+            tripType: 'vip',  // Explicitly VIP since purchased with VIP quota
+            isPublic: false
+        });
+    } catch (error) {
+        console.error("Error creating trip:", error);
+        // Rollback Quota
         await supabase.from('user_quotas').update({ vip_trips_remaining: quota.vip_trips_remaining }).eq('user_id', user.id);
         throw new Error("Failed to create trip. Quota has been refunded.");
-    }
-
-    // 5. Create Activities
-    const activitiesToInsert: ActivityToInsert[] = [];
-    const itinerary = template.itinerary as unknown as Itinerary;
-
-    if (itinerary && itinerary.days) {
-        itinerary.days.forEach((day: ItineraryDay, index: number) => {
-            const dayNumber = index + 1;
-            if (day.activities) {
-                day.activities.forEach((activity: ActivityData) => {
-                    // Look up Place ID if available? 
-                    // Template activities usually store `place_id` in `place_data` or `place_id` prop?
-                    // The `useTemplate` logic used `place_data?.location` text.
-                    // If we have `place_id`, we should use it to enable the Map Fix we just did.
-
-                    const placeId = activity.place_id || activity.place_data?.id || null;
-
-                    activitiesToInsert.push({
-                        trip_id: trip.id,
-                        day_number: dayNumber,
-                        title: activity.title || "Untitled Activity",
-                        start_time: activity.time || null,
-                        location: activity.place_data?.location || activity.place_data?.name || null,
-                        category: activity.place_data?.type || 'Sightseeing',
-                        notes: activity.description || "",
-                        place_id: placeId // IMPORTANT for Map
-                    });
-                });
-            }
-        });
-    }
-
-    if (activitiesToInsert.length > 0) {
-        await supabase.from('activities').insert(activitiesToInsert);
-    }
-
-    // 6. Increment use_count
-    const { error: rpcError } = await supabase.rpc('increment_template_use_count', { template_id: templateId });
-    if (rpcError) {
-        console.error('Failed to increment template use count:', rpcError);
     }
 
     // 7. Track referral purchase (if applicable)

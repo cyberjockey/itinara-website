@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { LoginForm } from "@/components/auth/LoginForm";
-import { login } from "@/app/login/actions";
+// import { login } from "@/app/login/actions";
 
 export default function LoginPage() {
     return (
@@ -24,7 +24,7 @@ export default function LoginPage() {
 
             <div className="flex-1 flex items-center justify-center px-4 relative z-10">
                 <Suspense fallback={<div className="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-white/20 w-full max-w-md h-[600px] animate-pulse" />}>
-                    <LoginForm action={login} />
+                    <LoginForm />
                 </Suspense>
             </div>
         </div>

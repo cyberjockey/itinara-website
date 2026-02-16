@@ -66,7 +66,7 @@ export default async function TripDetailPage(props: {
 
     return (
         <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden bg-white/50">
-            <div className="mb-0 px-4 md:px-6 pt-6 bg-white border-b border-stone-gray/10 pb-4 shadow-sm z-10 w-full">
+            <div className="mb-0 px-4 md:px-6 pt-6 bg-white border-b border-stone-gray/10 pb-4 shadow-sm z-40 w-full relative">
                 <div className="max-w-7xl mx-auto w-full">
                     {/* Top Row: Back Button & Visibility Badge (Desktop) */}
                     <div className="flex items-center justify-between mb-2">

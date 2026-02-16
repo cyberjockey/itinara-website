@@ -71,7 +71,7 @@ export function DayColumn({ dayNumber, date, activities, onAddActivity, readOnly
             </div>
 
             {/* Droppable Area */}
-            <div ref={readOnly ? undefined : setNodeRef} className="flex-1 p-3 overflow-visible md:overflow-y-auto min-h-[100px]">
+            <div ref={readOnly ? undefined : setNodeRef} className="flex-1 p-3 min-h-[100px]">
                 {readOnly ? (
                     <div className="space-y-3">
                         {activities.map((activity) => (
@@ -84,9 +84,30 @@ export function DayColumn({ dayNumber, date, activities, onAddActivity, readOnly
                         strategy={verticalListSortingStrategy}
                     >
                         <div className="space-y-3">
-                            {activities.map((activity) => (
-                                <SortableActivityCard key={activity.id} activity={activity} />
-                            ))}
+                            {activities.map((activity, index) => {
+                                // Find previous activity with valid coordinates in the same day
+                                // or potentially from previous days (but simplifying to same day for now)
+                                let prevCoords = null;
+                                if (index > 0) {
+                                    for (let i = index - 1; i >= 0; i--) {
+                                        const prev = activities[i];
+                                        const lat = prev.place?.coordinates?.lat || prev.place?.latitude;
+                                        const lng = prev.place?.coordinates?.lng || prev.place?.longitude;
+                                        if (lat && lng) {
+                                            prevCoords = { lat, lng };
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                return (
+                                    <SortableActivityCard
+                                        key={activity.id}
+                                        activity={activity}
+                                        previousCoordinates={prevCoords}
+                                    />
+                                );
+                            })}
                         </div>
                     </SortableContext>
                 )}

@@ -1,34 +1,57 @@
 "use client";
 
-
-import { useActionState, useEffect } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+// import { login } from "@/app/login/actions";
 
-const initialState = {
-    message: "",
-};
+interface LoginFormProps { }
 
-interface LoginFormProps {
-    action: (prevState: any, formData: FormData) => Promise<{ message: string }>;
-}
-
-export function LoginForm({ action }: LoginFormProps) {
+export function LoginForm({ }: LoginFormProps) {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const next = searchParams.get("next");
+    const supabase = createClient();
 
-    const [state, formAction, isPending] = useActionState(action, initialState);
+    const [isPending, startTransition] = useTransition();
+    const [message, setMessage] = useState("");
 
     // Clear legacy cookie that might cause 431 errors
     useEffect(() => {
-        document.cookie = "itinara-web-auth=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        document.cookie = "itinara-web-auth-v2=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     }, []);
 
-    const handleGoogleLogin = async () => {
-        const supabase = createClient();
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setMessage("");
 
+        const formData = new FormData(event.currentTarget);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+
+        startTransition(async () => {
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) {
+                setMessage(error.message);
+            } else {
+                // Success - redirect
+                router.refresh(); // Refresh to update server components with new session
+                if (next) {
+                    router.push(next);
+                } else {
+                    router.push("/dashboard?event=login");
+                }
+            }
+        });
+    };
+
+    const handleGoogleLogin = async () => {
         const redirectTo = next
             ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
             : `${window.location.origin}/auth/callback`;
@@ -54,7 +77,7 @@ export function LoginForm({ action }: LoginFormProps) {
             </div>
 
             {/* EMAIL / PASSWORD */}
-            <form action={formAction} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
                 {next && <input type="hidden" name="next" value={next} />}
 
                 <div>
@@ -81,16 +104,16 @@ export function LoginForm({ action }: LoginFormProps) {
                     />
                 </div>
 
-                {state?.message && (
+                {message && (
                     <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg">
-                        {state.message}
+                        {message}
                     </div>
                 )}
 
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full py-3.5 rounded-full bg-terracotta text-white font-bold"
+                    className="w-full py-3.5 rounded-full bg-terracotta text-white font-bold disabled:opacity-50"
                 >
                     {isPending ? "Signing in..." : "Sign In"}
                 </button>
