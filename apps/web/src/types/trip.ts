@@ -23,6 +23,7 @@ export interface Activity {
     id: string;
     day_number: number;
     start_time: string | null;
+    end_time?: string | null;
     title: string;
     location: string | null;
     category: string | null;

@@ -70,9 +70,7 @@ export function DestinationHero({ name, description, imageUrl }: DestinationHero
                     <Link href="/dashboard" className="px-8 py-4 bg-[#E35435] text-white rounded-full font-bold text-lg hover:bg-[#C13F23] transition-colors shadow-xl">
                         Download Itinerary
                     </Link>
-                    <Link href="#pricing" className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full font-bold text-lg hover:bg-white/20 transition-colors">
-                        View Pricing
-                    </Link>
+
                 </motion.div>
             </div>
         </header>

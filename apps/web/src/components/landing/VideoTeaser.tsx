@@ -120,7 +120,7 @@ export function VideoTeaser() {
                             <iframe
                                 width="100%"
                                 height="100%"
-                                src="https://www.youtube.com/embed/LyJ_10nwI34?autoplay=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3"
+                                src="https://www.youtube.com/embed/kkQFvgJf3SI?autoplay=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3"
                                 title="Unlock Real Indonesia - Official Teaser"
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

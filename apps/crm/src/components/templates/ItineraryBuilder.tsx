@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Plus, Trash2, Clock, MapPin, Save, Loader2, X } from "lucide-react";
+import { Plus, Trash2, Clock, MapPin, Save, Loader2, X, Pencil } from "lucide-react";
 import { updateTemplate } from "@/app/dashboard/templates/actions";
 import { PlacePicker } from "@/components/places/PlacePicker";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -82,6 +82,7 @@ export function ItineraryBuilder({ template }: { template: any }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
     const [isTransitionMode, setIsTransitionMode] = useState(false); // NEW: for transition activities
+    const [editingActivityId, setEditingActivityId] = useState<string | null>(null); // NEW: track editing activity
     const [newActivity, setNewActivity] = useState<Partial<Activity>>({
         start_time: "09:00",
         duration_hours: 1,
@@ -90,22 +91,31 @@ export function ItineraryBuilder({ template }: { template: any }) {
         location: ""
     });
 
-    const handleOpenAddModal = (dayIndex: number, isTransition = false) => {
+    const handleOpenAddModal = (dayIndex: number, isTransition = false, activityToEdit?: Activity) => {
         setActiveDayIndex(dayIndex);
         setIsTransitionMode(isTransition);
-        setNewActivity({
-            start_time: "09:00",
-            duration_hours: isTransition ? 0.5 : 1, // Transitions default to 30 min
-            title: isTransition ? "" : "",
-            description: "",
-            location: "",
-            is_transition: isTransition,
-            transition_type: isTransition ? 'driving' : undefined
-        });
+
+        if (activityToEdit) {
+            setEditingActivityId(activityToEdit.id);
+            setNewActivity({
+                ...activityToEdit
+            });
+        } else {
+            setEditingActivityId(null);
+            setNewActivity({
+                start_time: "09:00",
+                duration_hours: isTransition ? 0.5 : 1, // Transitions default to 30 min
+                title: isTransition ? "" : "",
+                description: "",
+                location: "",
+                is_transition: isTransition,
+                transition_type: isTransition ? 'driving' : undefined
+            });
+        }
         setIsModalOpen(true);
     };
 
-    const handleAddActivity = () => {
+    const handleSaveActivity = () => {
         if (activeDayIndex === null || !newActivity.title) return;
 
         const durationHours = newActivity.duration_hours || 1;
@@ -113,7 +123,7 @@ export function ItineraryBuilder({ template }: { template: any }) {
         const endTime = calculateEndTime(startTime, durationHours);
 
         const activity: Activity = {
-            id: crypto.randomUUID(),
+            id: editingActivityId || crypto.randomUUID(),
             title: newActivity.title || "New Activity",
             description: newActivity.description || "",
             start_time: startTime,
@@ -121,25 +131,43 @@ export function ItineraryBuilder({ template }: { template: any }) {
             end_time: endTime,
             location: newActivity.location || "",
             place_id: newActivity.place_id,
+            place_data: newActivity.place_data,
             is_transition: newActivity.is_transition,
             transition_type: newActivity.transition_type,
         };
 
+        const currentDayActivities = days[activeDayIndex].activities;
+
         // Validate no time overlap
-        const dayActivities = days[activeDayIndex].activities;
-        if (hasTimeOverlap(dayActivities, activity)) {
+        // Filter out the current activity if we are editing, so it doesn't overlap with itself
+        const otherActivities = editingActivityId
+            ? currentDayActivities.filter(a => a.id !== editingActivityId)
+            : currentDayActivities;
+
+        if (hasTimeOverlap(otherActivities, activity)) {
             alert("⚠️ Time Overlap Detected!\n\nThis activity conflicts with an existing activity. Please choose a different time.");
             return;
         }
 
         const newDays = [...days];
-        newDays[activeDayIndex].activities.push(activity);
+
+        if (editingActivityId) {
+            // Update existing
+            const activityIndex = newDays[activeDayIndex].activities.findIndex(a => a.id === editingActivityId);
+            if (activityIndex !== -1) {
+                newDays[activeDayIndex].activities[activityIndex] = activity;
+            }
+        } else {
+            // Add new
+            newDays[activeDayIndex].activities.push(activity);
+        }
 
         // Sort by time
         newDays[activeDayIndex].activities.sort((a, b) => a.start_time.localeCompare(b.start_time));
 
         setDays(newDays);
         setIsModalOpen(false);
+        setEditingActivityId(null); // Reset editing state
     };
 
     const handleDeleteActivity = (dayIndex: number, activityId: string) => {
@@ -257,7 +285,7 @@ export function ItineraryBuilder({ template }: { template: any }) {
                                                         {/* Content */}
                                                         <div className="flex-1 bg-gray-50/50 hover:bg-white p-4 rounded-lg border border-transparent hover:border-gray-200 transition-all ml-4 mb-2 shadow-sm">
                                                             <div className="flex justify-between items-start">
-                                                                <div>
+                                                                <div className="flex-1 cursor-pointer" onClick={() => handleOpenAddModal(dayIndex, !!activity.is_transition, activity)}>
                                                                     <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                                                                         {activity.is_transition && (
                                                                             <span className="text-lg">
@@ -291,12 +319,25 @@ export function ItineraryBuilder({ template }: { template: any }) {
                                                                         <p className="text-sm text-gray-600 mt-2">{activity.description}</p>
                                                                     )}
                                                                 </div>
-                                                                <button
-                                                                    onClick={() => handleDeleteActivity(dayIndex, activity.id)}
-                                                                    className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </button>
+                                                                <div className="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <button
+                                                                        onClick={() => handleOpenAddModal(dayIndex, !!activity.is_transition, activity)}
+                                                                        className="text-gray-400 hover:text-blue-600 p-1.5 rounded-md hover:bg-blue-50 transition-colors"
+                                                                        title="Edit"
+                                                                    >
+                                                                        <Pencil className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDeleteActivity(dayIndex, activity.id);
+                                                                        }}
+                                                                        className="text-gray-400 hover:text-red-500 p-1.5 rounded-md hover:bg-red-50 transition-colors"
+                                                                        title="Delete"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -331,7 +372,9 @@ export function ItineraryBuilder({ template }: { template: any }) {
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
                         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-xl z-10 shrink-0">
                             <h3 className="font-bold text-gray-900">
-                                {isTransitionMode ? 'Add Transition Activity' : 'Add New Activity'}
+                                {editingActivityId
+                                    ? (isTransitionMode ? 'Edit Transition' : 'Edit Activity')
+                                    : (isTransitionMode ? 'Add Transition Activity' : 'Add New Activity')}
                             </h3>
                             <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
                                 <X className="w-5 h-5" />
@@ -417,8 +460,9 @@ export function ItineraryBuilder({ template }: { template: any }) {
                                                         place_id: place.id,
                                                         place_data: place,
                                                         location: place.location || '',
-                                                        title: newActivity.title || place.name, // Auto-fill title if empty
-                                                        description: newActivity.description || place.description || '' // Auto-fill desc if empty
+                                                        location: place.location || '',
+                                                        title: place.name, // Always set title to place name
+                                                        description: newActivity.description || '' // Never auto-fill description from place data
                                                     });
                                                 }}
                                                 onCancel={() => { }}
@@ -456,10 +500,10 @@ export function ItineraryBuilder({ template }: { template: any }) {
                                 Cancel
                             </button>
                             <button
-                                onClick={handleAddActivity}
+                                onClick={handleSaveActivity}
                                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm"
                             >
-                                Add Activity
+                                {editingActivityId ? "Save Changes" : "Add Activity"}
                             </button>
                         </div>
                     </div>

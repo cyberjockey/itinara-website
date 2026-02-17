@@ -137,7 +137,7 @@ export async function createTripFromTemplate(options: CreateTripOptions) {
                     // 3. Match via title from database
                     const placeId = activity.place_id || activity.place_data?.id || (activity.title ? placesMap.get(activity.title) : null);
 
-                    // Time Resolution Logic (The Fix):
+                    // Time Resolution Logic:
                     // Checks start_time (db standard) then time (legacy/frontend)
                     const startTime = activity.start_time || activity.time || null;
 
