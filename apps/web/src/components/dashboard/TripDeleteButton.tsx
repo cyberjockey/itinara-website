@@ -1,9 +1,6 @@
-"use client";
-
 import { useState, useTransition, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Trash2, AlertTriangle, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { deleteTrip } from "@/app/dashboard/trips/actions";
 
 interface TripDeleteButtonProps {
@@ -16,7 +13,6 @@ export function TripDeleteButton({ tripId, variant = 'default' }: TripDeleteButt
     const [confirmText, setConfirmText] = useState("");
     const [isPending, startTransition] = useTransition();
     const [mounted, setMounted] = useState(false);
-    const router = useRouter();
 
     useEffect(() => {
         setMounted(true);
@@ -27,7 +23,8 @@ export function TripDeleteButton({ tripId, variant = 'default' }: TripDeleteButt
             const res = await deleteTrip(tripId);
             if (res.success) {
                 // Redirect to dashboard
-                router.push("/dashboard");
+                // Force a hard navigation to ensure fresh state
+                window.location.href = "/dashboard";
             } else {
                 alert(res.message);
             }

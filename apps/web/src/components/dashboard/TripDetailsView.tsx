@@ -5,7 +5,6 @@ import { format, parseISO } from "date-fns";
 import { ChevronDown, ChevronUp, FileText, Download, MapPin, Phone, Globe, Clock, Info, Instagram, Facebook, Twitter, Youtube, CheckCircle2, Video, Trash2, AlertCircle, Eye } from "lucide-react";
 import Link from 'next/link';
 // import { useTrip } from "@/components/dashboard/TripContext";
-import { deleteTrip } from "@/app/dashboard/trips/actions";
 import { PdfViewerModal } from "@/components/ui/PdfViewerModal";
 
 import { Activity, Place, Trip } from "@/types/trip";

@@ -19,8 +19,15 @@ export function TripCardActions({ tripId, tripName }: TripCardActionsProps) {
         if (confirmText !== "DELETE") return;
         setIsDeleting(true);
         try {
-            await deleteTrip(tripId);
-            // Redirect happens in server action
+            const res = await deleteTrip(tripId);
+            if (res.success) {
+                // Hard redirect to ensure fresh state
+                window.location.href = "/dashboard";
+            } else {
+                console.error("Delete failed:", res.message);
+                setIsDeleting(false);
+                // Optional: Show error to user
+            }
         } catch (error) {
             console.error("Delete error:", error);
             setIsDeleting(false);
