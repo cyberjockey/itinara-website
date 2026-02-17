@@ -81,7 +81,7 @@ export async function createTrip(prevState: { message: string; error?: string } 
         destination,
         start_date: startDate,
         end_date: endDate,
-        status: "upcoming",
+        status: "planning",
         trip_type: tripType,
         max_activities: maxActivities,
         activity_count: 0,
@@ -148,7 +148,7 @@ export async function createTripFromAI(formData: FormData) {
             destination: "Derived from AI",
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
-            status: 'upcoming'
+            status: 'planning'
         })
         .select()
         .single();

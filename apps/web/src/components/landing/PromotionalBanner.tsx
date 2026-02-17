@@ -29,7 +29,7 @@ export function PromotionalBanner() {
 
                         <p className="text-white/80 text-lg mb-8 max-w-xl">
                             Unlock special discounts on premium trips and discover hidden gems across the archipelago.
-                            Join us in welcoming the Year of the Snake!
+                            Join us in welcoming the Year of the Fire Horse!
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
@@ -59,7 +59,7 @@ export function PromotionalBanner() {
                                 2026
                             </div>
                             <div className="text-xl md:text-2xl font-heading text-white tracking-[0.2em] uppercase">
-                                Year of the Snake
+                                Year of the Fire Horse
                             </div>
                             <div className="mt-6 inline-block px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-lg rotate-[-2deg] group-hover:rotate-0 transition-transform">
                                 UP TO 50% OFF

@@ -42,18 +42,19 @@ export function PromotionalCarousel() {
     if (promotions.length === 0) return null;
 
     return (
-        <div className="relative group">
-            <div className="overflow-hidden" ref={emblaRef}>
-                <div className="flex">
+        <div className="relative group w-full h-[700px] md:h-[450px]">
+            {/* Enforcing height in the code frame as requested */}
+            <div className="overflow-hidden h-full" ref={emblaRef}>
+                <div className="flex h-full">
                     {promotions.map((promo) => (
-                        <div key={promo.id} className="flex-[0_0_100%] min-w-0 relative">
+                        <div key={promo.id} className="flex-[0_0_100%] min-w-0 relative h-full">
                             {/* Inject CSS specific to this slide */}
                             {promo.css_content && (
                                 <style dangerouslySetInnerHTML={{ __html: promo.css_content }} />
                             )}
 
                             {/* Render HTML content */}
-                            <div dangerouslySetInnerHTML={{ __html: promo.html_content }} />
+                            <div className="h-full" dangerouslySetInnerHTML={{ __html: promo.html_content }} />
 
                             {/* Optional formatting wrapper if CTA is just a link overlay */}
                             {promo.cta_link && (
